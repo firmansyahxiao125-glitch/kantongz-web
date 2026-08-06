@@ -1,0 +1,183 @@
+@import 'tailwindcss';
+
+/**
+ * Sistem desain KANTONGZ Web.
+ *
+ * Palet dan skala hidup di sini sebagai token CSS, bukan tersebar di kelas
+ * utilitas. Satu tempat berubah, seluruh aplikasi ikut — dan tema terang
+ * hanyalah kumpulan nilai lain untuk token yang sama.
+ */
+
+@theme {
+  --color-bg: #09090b;
+  --color-surface: #111113;
+  --color-surface-2: #17171a;
+  --color-surface-3: #1f1f23;
+
+  --color-line: #232327;
+  --color-line-strong: #2e2e33;
+
+  --color-ink: #fafafa;
+  --color-ink-muted: #a1a1aa;
+  --color-ink-faint: #71717a;
+
+  --color-primary: #3b82f6;
+  --color-accent: #00f5d4;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1rem;
+  --radius-panel: 1.25rem;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
+  --shadow-float: 0 4px 8px rgb(0 0 0 / 0.4), 0 32px 64px -24px rgb(0 0 0 / 0.8);
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #09090b;
+  --surface: #111113;
+  --surface-2: #17171a;
+  --surface-3: #1f1f23;
+  --line: #232327;
+  --line-strong: #2e2e33;
+  --ink: #fafafa;
+  --ink-muted: #a1a1aa;
+  --ink-faint: #71717a;
+}
+
+/**
+ * Tema terang. Bukan inversi mekanis — permukaan naik ke putih sementara
+ * garis justru menggelap, karena kontras yang membaca sebagai "terangkat"
+ * bekerja terbalik di dua tema.
+ */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --surface-3: #e9e9ec;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+  --ink: #09090b;
+  --ink-muted: #52525b;
+  --ink-faint: #71717a;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Fokus terlihat di kedua tema, dan tidak pernah dihapus. WCAG 2.4.7. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  }
+
+  /* Pengguna yang meminta gerak dikurangi mendapat antarmuka yang sama,
+     tanpa gerak. Bukan antarmuka yang berbeda. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .bg-app {
+    background: var(--bg);
+  }
+  .bg-surface {
+    background: var(--surface);
+  }
+  .bg-surface-2 {
+    background: var(--surface-2);
+  }
+  .bg-surface-3 {
+    background: var(--surface-3);
+  }
+  .text-ink {
+    color: var(--ink);
+  }
+  .text-muted {
+    color: var(--ink-muted);
+  }
+  .text-faint {
+    color: var(--ink-faint);
+  }
+  .border-line {
+    border-color: var(--line);
+  }
+  .border-line-strong {
+    border-color: var(--line-strong);
+  }
+
+  /* Kaca: buram + tepi terang, meniru cahaya yang datang dari atas layar.
+     Tanpa tepi itu, panel terbaca sebagai persegi keruh. */
+  .glass {
+    background: color-mix(in oklab, var(--surface) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid color-mix(in oklab, var(--line-strong) 80%, transparent);
+  }
+
+  .glass-strong {
+    background: color-mix(in oklab, var(--surface) 90%, transparent);
+    backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid var(--line-strong);
+  }
+
+  /* Pendar gradien di belakang panel utama. Satu per layar, tidak lebih. */
+  .aurora::before {
+    content: '';
+    position: absolute;
+    inset: -40% -20% auto -20%;
+    height: 70%;
+    background:
+      radial-gradient(50% 60% at 20% 40%, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 70%),
+      radial-gradient(45% 55% at 80% 30%, color-mix(in oklab, var(--color-accent) 16%, transparent), transparent 70%);
+    filter: blur(60px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--ink) 15%, var(--color-accent) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--line) 70%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--line) 70%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 20%, transparent 75%);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
