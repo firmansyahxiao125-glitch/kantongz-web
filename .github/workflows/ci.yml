@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push: { branches: [main] }
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+
+      - run: npm ci
+
+      # Tidak ada `continue-on-error` di mana pun. Gerbang yang boleh dilewati
+      # bukan gerbang.
+      - name: TypeScript
+        run: npm run typecheck
+      - name: ESLint
+        run: npm run lint
+
+      # Audit kontras berjalan di CI, bukan hanya di mesin perancang.
+      #
+      # Ia MEMBACA `globals.css` dan menghitung rasio setiap pasangan
+      # teks/permukaan terhadap WCAG 2.1 AA. Satu nilai warna yang diubah
+      # tanpa memeriksa akibatnya akan memerahkan pipeline sebelum sampai ke
+      # pengguna — dan pengguna yang tidak dapat membaca nominalnya tidak akan
+      # melaporkannya sebagai bug, ia hanya berhenti memakai aplikasinya.
+      - name: Kontras WCAG AA
+        run: npm run contrast
+
+      - name: Build
+        run: npm run build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+
+      - name: Audit dependensi produksi
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Bangkitkan SBOM
+        run: npx --yes @cyclonedx/cyclonedx-npm@latest --omit dev --output-file sbom.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-web
+          path: sbom.json
+          retention-days: 90
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build citra
+        uses: docker/build-push-action@v6
+        with: { context: ., push: false, tags: 'kantongz-web:ci' }
