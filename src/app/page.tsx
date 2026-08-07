@@ -1,8 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Bot, Fingerprint, LineChart, ShieldCheck, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Code2, Fingerprint, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { DemoPreview } from '@/components/landing/demo-preview';
+import {
+  Arsitektur,
+  Keamanan,
+  Kemampuan,
+  Repositori,
+  TanyaJawab,
+} from '@/components/landing/sections';
 import { Reveal, RevealGroup } from '@/components/ui/reveal';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
@@ -12,31 +20,6 @@ import { HeroScene } from '@/components/three/hero-scene';
 export const metadata: Metadata = {
   title: 'KANTONGZ — Uangmu, dengan mesin yang mengawasinya',
 };
-
-const PILLARS = [
-  {
-    icon: Bot,
-    title: 'Kategorisasi otomatis',
-    body: 'Transaksi masuk langsung tergolong. Tidak ada tugas rapi-rapi yang menumpuk sampai akhir bulan.',
-  },
-  {
-    icon: LineChart,
-    title: 'Peringatan sebelum, bukan sesudah',
-    body: 'Mesin melihat pola pengeluaranmu dan memberi tahu ketika arahnya salah — saat masih bisa diubah.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Keamanan tingkat perbankan',
-    body: 'Argon2id, rotasi token dengan deteksi pemakaian ulang, dan jejak audit yang tidak bisa dihapus.',
-  },
-] as const;
-
-const NUMBERS = [
-  { value: '10 mnt', label: 'Umur access token' },
-  { value: '5×', label: 'Percobaan sebelum terkunci' },
-  { value: '15 mnt', label: 'Batas diam sesi' },
-  { value: '5 thn', label: 'Retensi jejak audit' },
-] as const;
 
 export default function LandingPage() {
   return (
@@ -51,9 +34,10 @@ export default function LandingPage() {
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Utama">
             {[
-              ['Fitur', '#fitur'],
+              ['Kemampuan', '#fitur'],
+              ['Arsitektur', '#arsitektur'],
               ['Keamanan', '#keamanan'],
-              ['Cara kerja', '#cara-kerja'],
+              ['Tanya jawab', '#tanya-jawab'],
             ].map(([label, href]) => (
               <a
                 key={href}
@@ -164,147 +148,42 @@ export default function LandingPage() {
           </RevealGroup>
         </div>
 
-        {/* pratinjau produk */}
-        <Reveal className="mx-auto mt-20 max-w-5xl">
-          <div className="relative rounded-[var(--radius-panel)] border border-[var(--line-strong)] bg-[var(--surface)] p-2 shadow-[var(--shadow-float)]">
-            <div className="rounded-xl border border-[var(--line)] bg-[var(--bg)] p-5 sm:p-8">
-              <div className="mb-6 flex items-center gap-1.5" aria-hidden>
-                <span className="size-2.5 rounded-full bg-[var(--color-danger)]/70" />
-                <span className="size-2.5 rounded-full bg-[var(--color-warning)]/70" />
-                <span className="size-2.5 rounded-full bg-[var(--color-success)]/70" />
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-4">
-                {NUMBERS.map((n) => (
-                  <div
-                    key={n.label}
-                    className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4"
-                  >
-                    <div className="tabular text-2xl font-semibold tracking-tight">{n.value}</div>
-                    <div className="mt-1 text-xs text-[var(--ink-faint)]">{n.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-3 grid gap-3 lg:grid-cols-3">
-                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 lg:col-span-2">
-                  <div className="text-sm text-[var(--ink-muted)]">Arus kas</div>
-                  <div className="mt-4 flex h-28 items-end gap-1.5" aria-hidden>
-                    {[38, 52, 44, 66, 58, 78, 62, 88, 71, 94, 80, 100].map((h, i) => (
-                      <div
-                        key={i}
-                        style={{ height: `${String(h)}%` }}
-                        className="flex-1 rounded-t-sm bg-gradient-to-t from-[var(--color-primary)]/25 to-[var(--color-primary)]"
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4">
-                  <div className="text-sm text-[var(--ink-muted)]">Wawasan</div>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--ink)]">
-                    Pengeluaran transportasi naik 34% dibanding rata-rata tiga bulan terakhir.
-                  </p>
-                  <div className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-warning)]/12 px-2.5 py-1 text-xs text-[var(--color-warning)]">
-                    <Zap className="size-3" aria-hidden />
-                    Perlu perhatian
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
+        <DemoPreview />
       </section>
 
-      {/* ── pilar ────────────────────────────────────────────────── */}
-      <section id="fitur" className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
-        <RevealGroup>
-          <Reveal>
-            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              Bukan aplikasi pencatat.
-              <span className="block text-[var(--ink-muted)]">Sistem operasi keuangan.</span>
-            </h2>
-          </Reveal>
-
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
-            {PILLARS.map(({ icon: Icon, title, body }) => (
-              <Reveal key={title}>
-                <article className="group h-full rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] p-6 transition-colors duration-300 hover:border-[var(--line-strong)]">
-                  <span className="inline-flex size-11 items-center justify-center rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] transition-transform duration-300 group-hover:-translate-y-0.5">
-                    <Icon className="size-5 text-[var(--color-accent)]" aria-hidden />
-                  </span>
-                  <h3 className="mt-5 text-base font-medium">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">{body}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </RevealGroup>
-      </section>
-
-      {/* ── keamanan ─────────────────────────────────────────────── */}
-      <section id="keamanan" className="border-y border-[var(--line)] bg-[var(--surface)]/40">
-        <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
-          <RevealGroup>
-            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-              <div>
-                <Reveal>
-                  <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Keamanan yang dirancang lebih dulu
-                  </h2>
-                </Reveal>
-                <Reveal>
-                  <p className="mt-5 text-pretty leading-relaxed text-[var(--ink-muted)]">
-                    Setiap keputusan keamanan di sini dibuat dengan satu pertanyaan: apa yang
-                    terjadi kalau ini gagal? Token yang bocor kehilangan gunanya begitu dipakai
-                    dua kali. Penguncian diperiksa sebelum kredensial dibandingkan. Jejak audit
-                    dirantai hash, sehingga perusakan terdeteksi.
-                  </p>
-                </Reveal>
-              </div>
-
-              <Reveal>
-                <ul className="space-y-3">
-                  {[
-                    ['Argon2id 64 MiB', 'Sandi tidak pernah disimpan, hanya diverifikasi.'],
-                    ['Rotasi token', 'Pemakaian ulang mencabut seluruh keluarga token.'],
-                    ['Pengikatan perangkat', 'Token yang berpindah perangkat langsung dicabut.'],
-                    ['Jejak audit berantai', 'Menghapus satu baris memutus rantai sesudahnya.'],
-                  ].map(([title, body]) => (
-                    <li
-                      key={title}
-                      className="flex gap-4 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4"
-                    >
-                      <ShieldCheck
-                        className="mt-0.5 size-5 shrink-0 text-[var(--color-success)]"
-                        aria-hidden
-                      />
-                      <div>
-                        <div className="text-sm font-medium">{title}</div>
-                        <div className="mt-1 text-sm text-[var(--ink-muted)]">{body}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-            </div>
-          </RevealGroup>
-        </div>
-      </section>
+      <Kemampuan />
+      <Arsitektur />
+      <Keamanan />
+      <TanyaJawab />
+      <Repositori />
 
       {/* ── ajakan ───────────────────────────────────────────────── */}
-      <section id="cara-kerja" className="relative px-4 py-24 sm:py-32">
-        <Reveal className="mx-auto max-w-3xl text-center">
-          <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            Tiga langkah, lalu mesinnya bekerja
+      <section className="relative overflow-hidden px-4 py-24 sm:py-32">
+        <div className="aurora absolute inset-0" aria-hidden />
+        <Reveal className="relative mx-auto max-w-3xl text-center">
+          <h2 className="text-h2 text-balance font-semibold">
+            Jalankan seluruhnya di mesinmu sendiri
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-pretty leading-relaxed text-[var(--ink-muted)]">
-            Buat akun, verifikasi email, dan hubungkan rekeningmu. Sisanya berjalan sendiri.
+          <p className="mx-auto mt-5 max-w-xl text-pretty leading-relaxed text-muted">
+            Satu perintah{' '}
+            <code className="numeric rounded-md border border-line bg-[var(--surface-2)] px-1.5 py-0.5 text-[0.9em] text-ink">
+              docker compose up
+            </code>{' '}
+            menyalakan API, basis data, antrean, dan server surel. Tanpa akun pihak ketiga, tanpa
+            kunci API, tanpa biaya berulang.
           </p>
-          <Link href="/daftar" className="mt-9 inline-block">
-            <Button size="lg" iconRight={<ArrowRight className="size-4" />}>
-              Mulai sekarang
-            </Button>
-          </Link>
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/daftar">
+              <Button size="lg" iconRight={<ArrowRight className="size-4" />}>
+                Buat akun
+              </Button>
+            </Link>
+            <a href="#repositori">
+              <Button size="lg" variant="secondary" icon={<Code2 className="size-4" />}>
+                Lihat kodenya
+              </Button>
+            </a>
+          </div>
         </Reveal>
       </section>
 
@@ -314,7 +193,10 @@ export default function LandingPage() {
             <CoreMark className="size-5" />
             <span>KANTONGZ</span>
           </div>
-          <p>Dibangun untuk uang sungguhan, dengan kehati-hatian yang setara.</p>
+          <p className="text-center sm:text-right">
+            Proyek portofolio dan tugas akhir — bukan layanan komersial.
+            <span className="block">Seluruh data pada demo adalah data buatan.</span>
+          </p>
         </div>
       </footer>
     </div>
