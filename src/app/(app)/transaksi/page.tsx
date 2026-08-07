@@ -171,7 +171,7 @@ export default function TransaksiPage() {
                     aria-hidden
                   >
                     {trx.kind === 'income' ? (
-                      <ArrowDownLeft size={16} className="text-[var(--color-success)]" />
+                      <ArrowDownLeft size={16} className="text-[var(--color-positive)]" />
                     ) : trx.kind === 'transfer' ? (
                       <Repeat size={16} className="text-muted" />
                     ) : (
@@ -197,7 +197,7 @@ export default function TransaksiPage() {
 
                   <span
                     className={`shrink-0 text-sm tabular ${
-                      trx.kind === 'income' ? 'text-[var(--color-success)]' : 'text-ink'
+                      trx.kind === 'income' ? 'text-[var(--color-positive)]' : 'text-ink'
                     }`}
                   >
                     {trx.kind === 'income' ? '+' : trx.kind === 'expense' ? '−' : ''}

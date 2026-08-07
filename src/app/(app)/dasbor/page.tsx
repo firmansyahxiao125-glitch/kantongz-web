@@ -45,28 +45,55 @@ export default function DasborPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
+      {/*
+        HIERARKI, bukan empat kotak sama besar.
+
+        Empat ubin berukuran identik memaksa mata memilih sendiri harus mulai
+        dari mana, dan pilihan itu sering salah. Kekayaan bersih adalah SATU
+        H1 layar ini (DESIGN §6): kuningan, dua kali lebih lebar, dan angkanya
+        lebih besar. Tiga sisanya turun satu tingkat dan memakai warna
+        semantik — arah uang, bukan peringkat.
+      */}
       <motion.section
         variants={stagger}
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        /*
+          DUA BARIS, bukan satu deret ubin sama besar.
+
+          Percobaan pertama memakai satu grid enam kolom dengan H1 selebar
+          tiga. Angkanya TERPOTONG: "Rp 4.723.000" dalam mono 28px menuntut
+          sekitar 310px, sementara kolom sempitnya hanya memberi 175px. Uang
+          yang terpotong bukan masalah estetika — ia salah baca.
+
+          Susunan ini memberi H1 satu baris penuh untuk dirinya, lalu tiga
+          angka pendukung berbagi baris kedua dengan lebar 1/3 masing-masing —
+          cukup untuk nominal terpanjang yang mungkin muncul.
+        */
+        className="grid gap-4"
         aria-label="Ringkasan bulan ini"
       >
         <Stat
           label="Kekayaan bersih"
           value={d.netWorth}
           format={formatIdr}
+          tone="value"
+          hero
           icon={<Wallet size={16} aria-hidden />}
-          hint="Seluruh dompet"
+          hint={`Dihitung dari ${String(d.accounts.length)} dompet`}
         />
+
+        <div className="grid gap-4 sm:grid-cols-3">
         <Stat
-          label="Pemasukan bulan ini"
+          label="Masuk bulan ini"
           value={d.monthIncome}
           format={formatIdr}
+          tone={d.monthIncome > 0 ? 'positive' : 'neutral'}
           icon={<TrendingUp size={16} aria-hidden />}
         />
         <Stat
-          label="Pengeluaran bulan ini"
+          label="Keluar bulan ini"
           value={d.monthExpense}
           format={formatIdr}
+          tone={d.monthExpense > 0 ? 'negative' : 'neutral'}
           icon={<TrendingDown size={16} aria-hidden />}
           delta={rasioPengeluaran(d.monthExpense, d.expenseDelta)}
           /* Naiknya pengeluaran BUKAN kabar baik — dan panah hijau di atas
@@ -75,7 +102,7 @@ export default function DasborPage() {
           positiveIsGood={false}
           hint={
             d.expenseDelta === null
-              ? 'Belum ada bulan pembanding'
+              ? 'Belum ada pembanding'
               : `${formatIdr(Math.abs(d.expenseDelta))} ${d.expenseDelta > 0 ? 'lebih' : 'lebih hemat'}`
           }
         />
@@ -83,9 +110,11 @@ export default function DasborPage() {
           label="Selisih"
           value={d.monthIncome - d.monthExpense}
           format={formatIdr}
+          tone={d.monthIncome - d.monthExpense >= 0 ? 'positive' : 'negative'}
           icon={<Repeat size={16} aria-hidden />}
           hint={d.monthIncome - d.monthExpense >= 0 ? 'Surplus' : 'Defisit'}
         />
+        </div>
       </motion.section>
 
       <div className="grid gap-4 xl:grid-cols-3">
@@ -153,7 +182,7 @@ export default function DasborPage() {
                   <li key={account.id} className="flex items-center gap-2.5 text-sm">
                     <span
                       className="size-2.5 shrink-0 rounded-full"
-                      style={{ background: account.color ?? 'var(--color-primary)' }}
+                      style={{ background: account.color ?? 'var(--color-holo)' }}
                       aria-hidden
                     />
                     <span className="flex-1 truncate text-muted">{account.name}</span>
@@ -185,7 +214,7 @@ export default function DasborPage() {
                             {d.topCategories.find((c) => c.categoryId === budget.categoryId)
                               ?.categoryName ?? 'Kategori'}
                           </span>
-                          <span className={lewat ? 'text-[var(--color-danger)]' : 'text-muted'}>
+                          <span className={lewat ? 'text-[var(--color-negative)]' : 'text-muted'}>
                             {formatIdr(budget.spent)} / {formatIdr(budget.amount)}
                           </span>
                         </div>
@@ -194,8 +223,8 @@ export default function DasborPage() {
                             className="h-full rounded-full"
                             style={{
                               background: lewat
-                                ? 'var(--color-danger)'
-                                : 'var(--color-primary)',
+                                ? 'var(--color-negative)'
+                                : 'var(--color-holo)',
                             }}
                             initial={{ width: 0 }}
                             animate={{ width: `${String(ratio * 100)}%` }}
@@ -238,7 +267,7 @@ function TransactionRow({ trx }: { trx: Transaction }) {
   const sign = trx.kind === 'income' ? '+' : trx.kind === 'expense' ? '−' : '';
   const colour =
     trx.kind === 'income'
-      ? 'text-[var(--color-success)]'
+      ? 'text-[var(--color-positive)]'
       : trx.kind === 'expense'
         ? 'text-ink'
         : 'text-muted';
@@ -250,7 +279,7 @@ function TransactionRow({ trx }: { trx: Transaction }) {
         aria-hidden
       >
         {trx.kind === 'income' ? (
-          <ArrowDownLeft size={15} className="text-[var(--color-success)]" />
+          <ArrowDownLeft size={15} className="text-[var(--color-positive)]" />
         ) : trx.kind === 'transfer' ? (
           <Repeat size={15} className="text-muted" />
         ) : (

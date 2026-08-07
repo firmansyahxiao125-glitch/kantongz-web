@@ -121,8 +121,8 @@ export default function TujuanPage() {
                         <span
                           className="grid size-9 shrink-0 place-items-center rounded-lg"
                           style={{
-                            background: `color-mix(in oklab, ${goal.color ?? 'var(--color-accent)'} 16%, transparent)`,
-                            color: goal.color ?? 'var(--color-accent)',
+                            background: `color-mix(in oklab, ${goal.color ?? 'var(--color-holo)'} 16%, transparent)`,
+                            color: goal.color ?? 'var(--color-holo)',
                           }}
                           aria-hidden
                         >
@@ -172,8 +172,8 @@ export default function TujuanPage() {
                         className="h-full rounded-full"
                         style={{
                           background: goal.achieved
-                            ? 'var(--color-success)'
-                            : (goal.color ?? 'var(--color-accent)'),
+                            ? 'var(--color-positive)'
+                            : (goal.color ?? 'var(--color-holo)'),
                         }}
                         initial={{ width: 0 }}
                         animate={{ width: `${String(ratio * 100)}%` }}

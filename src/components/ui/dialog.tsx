@@ -96,7 +96,7 @@ function DialogBody({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 24, scale: 0.99 }}
         transition={{ duration: DURATION.base, ease: EASE_OUT }}
-        className="glass-strong relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-[var(--radius-panel)] p-6 shadow-[var(--shadow-float)] sm:rounded-[var(--radius-panel)]"
+        className="glass-strong relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-[var(--radius-xl)] p-6 shadow-[var(--shadow-float)] sm:rounded-[var(--radius-xl)]"
       >
         <header className="mb-5 pr-8">
           <h2 id={titleId} className="text-lg font-semibold tracking-tight text-ink">

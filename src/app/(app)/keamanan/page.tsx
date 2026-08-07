@@ -33,7 +33,7 @@ export default function KeamananPage() {
       <Card>
         <CardBody className="flex items-start gap-4">
           <span
-            className="grid size-10 shrink-0 place-items-center rounded-xl bg-[color-mix(in_oklab,var(--color-success)_14%,transparent)] text-[var(--color-success)]"
+            className="grid size-10 shrink-0 place-items-center rounded-xl bg-[color-mix(in_oklab,var(--color-positive)_14%,transparent)] text-[var(--color-positive)]"
             aria-hidden
           >
             <ShieldCheck size={19} />
@@ -91,7 +91,7 @@ export default function KeamananPage() {
       <Card>
         <CardBody className="flex flex-wrap items-start gap-4">
           <span
-            className="grid size-10 shrink-0 place-items-center rounded-xl bg-[color-mix(in_oklab,var(--color-danger)_12%,transparent)] text-[var(--color-danger)]"
+            className="grid size-10 shrink-0 place-items-center rounded-xl bg-[color-mix(in_oklab,var(--color-negative)_12%,transparent)] text-[var(--color-negative)]"
             aria-hidden
           >
             <LogOut size={19} />

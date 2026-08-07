@@ -133,7 +133,7 @@ export default function AnggaranPage() {
                         <p className="flex items-center gap-2 text-sm font-medium text-ink">
                           <span
                             className="size-2.5 shrink-0 rounded-full"
-                            style={{ background: category?.color ?? 'var(--color-primary)' }}
+                            style={{ background: category?.color ?? 'var(--color-holo)' }}
                             aria-hidden
                           />
                           <span className="truncate">{category?.name ?? 'Kategori'}</span>
@@ -142,7 +142,7 @@ export default function AnggaranPage() {
                           </span>
                         </p>
                         <p
-                          className={`mt-0.5 text-xs ${over ? 'text-[var(--color-danger)]' : 'text-muted'}`}
+                          className={`mt-0.5 text-xs ${over ? 'text-[var(--color-negative)]' : 'text-muted'}`}
                         >
                           {over
                             ? `Lewat ${formatIdr(-sisa)} dari batas`
@@ -182,10 +182,10 @@ export default function AnggaranPage() {
                         className="h-full rounded-full"
                         style={{
                           background: over
-                            ? 'var(--color-danger)'
+                            ? 'var(--color-negative)'
                             : ratio > 0.85
-                              ? 'var(--color-warning)'
-                              : 'var(--color-primary)',
+                              ? 'var(--color-caution)'
+                              : 'var(--color-holo)',
                         }}
                         initial={{ width: 0 }}
                         animate={{ width: `${String(ratio * 100)}%` }}

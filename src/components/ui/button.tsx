@@ -9,14 +9,26 @@ import { cn } from '@/lib/cn';
 /**
  * Tombol.
  *
- * Satu komponen, lima varian. Tombol yang dibuat ulang per layar akan berbeda
+ * Satu komponen, empat varian. Tombol yang dibuat ulang per layar akan berbeda
  * tinggi, radius, dan perilaku fokusnya — dan perbedaan itu yang paling cepat
  * membuat antarmuka terbaca murah.
+ *
+ * ── AKSI UTAMA ADALAH KUNINGAN ─────────────────────────────────────────
+ *
+ * DESIGN §1.4 menyebutnya aturan paling ketat di seluruh dokumen: kuningan
+ * hanya pada angka uang dan aksi utama. Varian `primary` sempat memakai warna
+ * hologram — dan itu menghabiskan isyarat yang seharusnya dimiliki uang. Ketika
+ * satu-satunya benda hangat di layar yang dingin adalah uangmu dan tombol yang
+ * memindahkannya, mata tahu ke mana harus pergi tanpa dipandu.
+ *
+ * `accent` DIHAPUS, bukan diperbaiki. Ia hidup untuk memberi cara kedua
+ * menandai aksi penting, dan cara kedua adalah tepat masalahnya: dua varian
+ * "penting" berarti tidak ada yang penting.
  */
 const button = cva(
   [
     'relative inline-flex items-center justify-center gap-2 whitespace-nowrap',
-    'rounded-xl font-medium select-none',
+    'rounded-[var(--radius-md)] font-medium select-none',
     'transition-[transform,background-color,border-color,box-shadow,opacity]',
     'duration-150 ease-out',
     'active:scale-[0.98]',
@@ -27,14 +39,12 @@ const button = cva(
     variants: {
       variant: {
         primary: [
-          'bg-[var(--color-primary)] text-white',
-          'shadow-[0_1px_0_0_rgb(255_255_255/0.15)_inset,0_8px_24px_-8px_rgb(59_130_246/0.6)]',
-          'hover:brightness-110',
-        ].join(' '),
-        accent: [
-          'bg-[var(--color-accent)] text-[#04201c]',
-          'shadow-[0_1px_0_0_rgb(255_255_255/0.25)_inset,0_8px_24px_-8px_rgb(0_245_212/0.5)]',
-          'hover:brightness-110',
+          'bg-[var(--color-brass)] text-[#1A1204]',
+          /* Sorot dalam di tepi atas + pendar hangat di bawah. Keduanya meniru
+             pelat kuningan yang menangkap cahaya dari atas: yang pertama
+             memberinya tepi, yang kedua memberinya massa. */
+          'shadow-[0_1px_0_0_rgb(255_244_220/0.45)_inset,0_10px_28px_-10px_rgb(200_148_64/0.65)]',
+          'hover:bg-[var(--color-brass-bright)]',
         ].join(' '),
         secondary: [
           'bg-[var(--surface-3)] text-[var(--ink)] border border-[var(--line-strong)]',
@@ -42,8 +52,8 @@ const button = cva(
         ].join(' '),
         ghost: 'text-[var(--ink-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]',
         danger: [
-          'bg-[var(--color-danger)]/12 text-[var(--color-danger)]',
-          'border border-[var(--color-danger)]/35 hover:bg-[var(--color-danger)]/20',
+          'bg-[var(--color-negative)]/12 text-[var(--color-negative)]',
+          'border border-[var(--color-negative)]/35 hover:bg-[var(--color-negative)]/20',
         ].join(' '),
       },
       size: {
@@ -51,7 +61,7 @@ const button = cva(
            gagal pada jari, dan gagal diam-diam. */
         sm: 'h-10 px-3.5 text-sm',
         md: 'h-11 px-5 text-sm',
-        lg: 'h-12 px-6 text-base',
+        lg: 'h-13 px-7 text-[15px]',
         icon: 'h-10 w-10',
       },
       block: { true: 'w-full', false: '' },

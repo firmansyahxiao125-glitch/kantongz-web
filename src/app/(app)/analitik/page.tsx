@@ -62,11 +62,11 @@ export default function AnalitikPage() {
               <h2 className="text-sm font-semibold text-ink">Arus kas</h2>
               <div className="flex gap-4 text-xs">
                 <span className="flex items-center gap-1.5 text-muted">
-                  <span className="size-2 rounded-full bg-[var(--color-accent)]" aria-hidden />
+                  <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
                   Masuk <span className="tabular text-ink">{formatIdr(totalIn)}</span>
                 </span>
                 <span className="flex items-center gap-1.5 text-muted">
-                  <span className="size-2 rounded-full bg-[var(--color-primary)]" aria-hidden />
+                  <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
                   Keluar <span className="tabular text-ink">{formatIdr(totalOut)}</span>
                 </span>
               </div>
@@ -141,7 +141,7 @@ export default function AnalitikPage() {
                         <div className="mb-1 flex justify-between text-xs">
                           <span className="truncate text-muted">{account.name}</span>
                           <span
-                            className={`tabular ${account.balance < 0 ? 'text-[var(--color-danger)]' : 'text-ink'}`}
+                            className={`tabular ${account.balance < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                           >
                             {formatIdr(account.balance)}
                           </span>
@@ -152,8 +152,8 @@ export default function AnalitikPage() {
                             style={{
                               background:
                                 account.balance < 0
-                                  ? 'var(--color-danger)'
-                                  : (account.color ?? 'var(--color-primary)'),
+                                  ? 'var(--color-negative)'
+                                  : (account.color ?? 'var(--color-holo)'),
                             }}
                             initial={{ width: 0 }}
                             animate={{ width: `${String(ratio * 100)}%` }}

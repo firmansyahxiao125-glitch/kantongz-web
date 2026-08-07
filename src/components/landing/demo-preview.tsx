@@ -37,7 +37,7 @@ export function DemoPreview() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
-        className="glass-strong relative rounded-[var(--radius-panel)] p-2 shadow-[var(--shadow-float)]"
+        className="glass-strong relative rounded-[var(--radius-xl)] p-2 shadow-[var(--shadow-float)]"
       >
         {/*
           Penanda data contoh. Di dalam bingkai, bukan di keterangan bawah yang
@@ -49,9 +49,9 @@ export function DemoPreview() {
 
         <div className="rounded-xl border border-line bg-[var(--bg)] p-5 sm:p-7">
           <div className="mb-6 flex items-center gap-1.5" aria-hidden>
-            <span className="size-2.5 rounded-full bg-[var(--color-danger)]/70" />
-            <span className="size-2.5 rounded-full bg-[var(--color-warning)]/70" />
-            <span className="size-2.5 rounded-full bg-[var(--color-success)]/70" />
+            <span className="size-2.5 rounded-full bg-[var(--color-negative)]/70" />
+            <span className="size-2.5 rounded-full bg-[var(--color-caution)]/70" />
+            <span className="size-2.5 rounded-full bg-[var(--color-positive)]/70" />
           </div>
 
           <div className="grid gap-3 lg:grid-cols-5">
@@ -64,14 +64,14 @@ export function DemoPreview() {
                 Kekayaan bersih
               </p>
               <p className="numeric mt-2 text-3xl font-medium">{formatIdr(4_180_000)}</p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-[var(--color-danger)]">
+              <p className="mt-1 flex items-center gap-1.5 text-xs text-[var(--color-negative)]">
                 <TrendingDown className="size-3.5" aria-hidden />
                 Turun 54% dalam dua pekan
               </p>
               <Sparkline
                 className="mt-5 h-12"
                 values={SALDO_CONTOH}
-                stroke="var(--color-danger)"
+                stroke="var(--color-negative)"
               />
             </motion.div>
 
@@ -81,7 +81,7 @@ export function DemoPreview() {
               className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-2"
             >
               <div className="flex items-center gap-2">
-                <AlertTriangle className="size-4 text-[var(--color-warning)]" aria-hidden />
+                <AlertTriangle className="size-4 text-[var(--color-caution)]" aria-hidden />
                 <p className="text-xs font-medium uppercase tracking-wider text-faint">Wawasan</p>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-ink">
@@ -124,7 +124,7 @@ export function DemoPreview() {
               className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-3"
             >
               <div className="flex items-center gap-2">
-                <Sparkles className="size-4 text-[var(--color-accent)]" aria-hidden />
+                <Sparkles className="size-4 text-[var(--color-holo)]" aria-hidden />
                 <p className="text-xs font-medium uppercase tracking-wider text-faint">Asisten</p>
               </div>
               <p className="mt-3 text-sm text-muted">“Saldoku cukup sampai kapan?”</p>

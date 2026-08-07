@@ -129,7 +129,7 @@ export default function LaporanPage() {
             <dl className="flex gap-6 text-sm">
               <div>
                 <dt className="text-xs text-muted">Pemasukan</dt>
-                <dd className="tabular text-[var(--color-success)]">{formatIdr(income)}</dd>
+                <dd className="tabular text-[var(--color-positive)]">{formatIdr(income)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Pengeluaran</dt>
@@ -138,7 +138,7 @@ export default function LaporanPage() {
               <div>
                 <dt className="text-xs text-muted">Selisih</dt>
                 <dd
-                  className={`tabular ${income - expense < 0 ? 'text-[var(--color-danger)]' : 'text-ink'}`}
+                  className={`tabular ${income - expense < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                 >
                   {formatIdr(income - expense)}
                 </dd>
@@ -199,7 +199,7 @@ export default function LaporanPage() {
                         <td className="py-2 pr-3 text-muted">{account?.name ?? '—'}</td>
                         <td
                           className={`py-2 pl-3 text-right tabular whitespace-nowrap ${
-                            trx.kind === 'income' ? 'text-[var(--color-success)]' : 'text-ink'
+                            trx.kind === 'income' ? 'text-[var(--color-positive)]' : 'text-ink'
                           }`}
                         >
                           {trx.kind === 'income' ? '+' : trx.kind === 'expense' ? '−' : ''}

@@ -77,7 +77,7 @@ export default function DaftarPage() {
       footer={
         <>
           Sudah punya akun?{' '}
-          <Link href="/masuk" className="font-medium text-[var(--color-primary)] hover:underline">
+          <Link href="/masuk" className="font-medium text-[var(--color-holo)] hover:underline">
             Masuk
           </Link>
         </>

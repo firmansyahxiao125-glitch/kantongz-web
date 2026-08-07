@@ -25,7 +25,7 @@ export function FormAlert({ message }: { message: string | null }) {
             transition={{ duration: DURATION.fast, ease: EASE_OUT }}
             className="overflow-hidden"
           >
-            <p className="mb-1 flex items-start gap-2.5 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 px-3.5 py-3 text-sm leading-relaxed text-[var(--color-danger)]">
+            <p className="mb-1 flex items-start gap-2.5 rounded-xl border border-[var(--color-negative)]/30 bg-[var(--color-negative)]/10 px-3.5 py-3 text-sm leading-relaxed text-[var(--color-negative)]">
               <AlertTriangle size={16} className="mt-0.5 shrink-0" aria-hidden />
               <span>{message}</span>
             </p>

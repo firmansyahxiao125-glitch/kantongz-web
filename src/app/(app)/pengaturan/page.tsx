@@ -66,7 +66,7 @@ export default function PengaturanPage() {
                   }}
                   className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-3 text-sm transition-colors ${
                     active
-                      ? 'border-[var(--color-primary)] bg-[color-mix(in_oklab,var(--color-primary)_10%,transparent)] text-ink'
+                      ? 'border-[var(--color-holo)] bg-[color-mix(in_oklab,var(--color-holo)_10%,transparent)] text-ink'
                       : 'border-line text-muted hover:text-ink'
                   }`}
                 >

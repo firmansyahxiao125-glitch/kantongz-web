@@ -48,10 +48,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           className={cn(
             'w-full appearance-none rounded-xl border bg-[var(--surface)] px-3.5 py-2.5 pr-10',
             'text-[15px] text-ink outline-none transition-[border-color,box-shadow] duration-150',
-            'focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40',
+            'focus-visible:ring-2 focus-visible:ring-[var(--color-holo)]/40',
             error
-              ? 'border-[var(--color-danger)]'
-              : 'border-[var(--line)] focus-visible:border-[var(--color-primary)]',
+              ? 'border-[var(--color-negative)]'
+              : 'border-[var(--line)] focus-visible:border-[var(--color-holo)]',
             className,
           )}
         >
@@ -75,7 +75,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       </div>
 
       {error ? (
-        <p id={errorId} role="alert" className="text-xs text-[var(--color-danger)]">
+        <p id={errorId} role="alert" className="text-xs text-[var(--color-negative)]">
           {error}
         </p>
       ) : null}

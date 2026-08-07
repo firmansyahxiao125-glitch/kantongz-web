@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Code2, Fingerprint, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { MagneticButton } from '@/components/ui/magnetic';
 import { DemoPreview } from '@/components/landing/demo-preview';
 import {
   Arsitektur,
@@ -15,7 +16,7 @@ import { Reveal, RevealGroup } from '@/components/ui/reveal';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
 import { HeroParallax } from '@/components/three/hero-parallax';
-import { HeroScene } from '@/components/three/hero-scene';
+import { MascotScene } from '@/components/three/mascot-scene';
 
 export const metadata: Metadata = {
   title: 'KANTONGZ — Uangmu, dengan mesin yang mengawasinya',
@@ -66,86 +67,90 @@ export default function LandingPage() {
       </header>
 
       {/* ── hero ─────────────────────────────────────────────────── */}
-      <section id="konten" className="aurora relative isolate px-4 pb-24 pt-36 sm:pt-44">
+      <section id="konten" className="aurora relative isolate overflow-hidden px-4 pb-20 pt-32 sm:pt-40">
         <div className="grid-lines pointer-events-none absolute inset-0 -z-10" aria-hidden />
 
-        {/* Adegan berada DI BELAKANG teks, bukan di sebelahnya. */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[38rem] sm:h-[46rem]">
-          <HeroParallax>
-            <HeroScene className="size-full" />
-          </HeroParallax>
-        </div>
-
         {/*
-          Tabir keterbacaan.
-          Adegan yang bercahaya di belakang teks membuat paragraf kehilangan
-          kontras justru di bagian paling terang — dan halaman yang indah
-          tetapi tidak terbaca telah gagal pada tugas pertamanya. Tabir ini
-          menggelapkan tepat di belakang kolom teks dan membiarkan sisi-sisinya
-          tetap terbuka, sehingga adegan masih terlihat penuh.
+          TATA LETAK ASIMETRIS, bukan terpusat.
+
+          Maskot adalah SUBJEK, bukan latar. Adegan yang diletakkan di belakang
+          teks memaksa salah satu dari keduanya kalah: teks kehilangan kontras,
+          atau adegan tertutup tabir sampai tidak terlihat. Memberinya kolom
+          sendiri menyelesaikan keduanya sekaligus.
+
+          Pembagiannya 7:5 dan bukan 6:6. Kolom yang sama lebar tidak punya
+          arah baca — mata berhenti di tengah dan memilih sendiri, dan pilihan
+          itu sering salah. Ketimpangan kecil memberi tahu mata harus mulai
+          dari mana tanpa satu pun panah.
         */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[38rem] sm:h-[46rem]"
-          style={{
-            background: [
-              /* Bulat di belakang judul — menggelapkan pusat tanpa memotong
-                 tepi, sehingga adegan masih terbaca penuh di sisi kiri-kanan. */
-              'radial-gradient(50% 34% at 50% 26%, color-mix(in oklab, var(--bg) 72%, transparent), transparent 76%)',
-              /* Lurus dari bawah judul ke bawah — paragraf, tombol, dan baris
-                 keterangan seluruhnya duduk di atas dasar padat. Di sinilah
-                 kontras paling mudah hilang, dan kontras yang hilang pada
-                 kalimat penjelas berarti tidak ada yang membacanya. */
-              'linear-gradient(to bottom, transparent 26%, color-mix(in oklab, var(--bg) 88%, transparent) 46%, var(--bg) 72%)',
-            ].join(','),
-          }}
-        />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-7">
+            <RevealGroup>
+              <Reveal>
+                <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-[var(--surface)]/60 px-3.5 py-1.5 text-xs text-muted backdrop-blur">
+                  <Sparkles className="size-3.5 text-[var(--color-holo)]" aria-hidden />
+                  AI Financial Operating System
+                </span>
+              </Reveal>
 
-        <div className="relative mx-auto max-w-4xl text-center">
-          <RevealGroup>
-            <Reveal>
-              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--surface)]/60 px-3.5 py-1.5 text-xs text-[var(--ink-muted)] backdrop-blur">
-                <Sparkles className="size-3.5 text-[var(--color-accent)]" aria-hidden />
-                AI Financial Operating System
-              </span>
-            </Reveal>
+              <Reveal>
+                <h1 className="text-display mt-7 text-balance">
+                  Uangmu, dengan{' '}
+                  <span className="text-gradient">mesin yang mengawasinya</span>
+                </h1>
+              </Reveal>
+
+              <Reveal>
+                <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
+                  Kategorisasi otomatis, anomali yang ketahuan sebelum jadi masalah, dan
+                  jawaban atas pertanyaanmu sendiri — seluruhnya berjalan di mesinmu, tanpa
+                  satu pun kunci API berbayar.
+                </p>
+              </Reveal>
+
+              <Reveal>
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                  <Link href="/daftar" className="w-full sm:w-auto">
+                    <MagneticButton>
+                      <Button size="lg" block iconRight={<ArrowRight className="size-4" />}>
+                        Mulai gratis
+                      </Button>
+                    </MagneticButton>
+                  </Link>
+                  <Link href="/masuk" className="w-full sm:w-auto">
+                    <Button size="lg" variant="secondary" block>
+                      Masuk ke akun
+                    </Button>
+                  </Link>
+                </div>
+              </Reveal>
+
+              <Reveal>
+                <p className="mt-6 flex items-center gap-2 text-xs text-faint">
+                  <Fingerprint className="size-3.5" aria-hidden />
+                  Argon2id, rotasi token, dan penguncian otomatis sejak hari pertama
+                </p>
+              </Reveal>
+            </RevealGroup>
+          </div>
+
+          {/*
+            Maskot. `aria-hidden` di dalam `MascotScene`, dan namanya
+            diperkenalkan lewat teks di bawahnya — pembaca layar bertemu
+            "Bruang" sebagai kata, bukan sebagai kanvas yang tak terbaca.
+          */}
+          <div className="relative lg:col-span-5">
+            <HeroParallax>
+              <MascotScene className="mx-auto aspect-square w-full max-w-[30rem]" />
+            </HeroParallax>
 
             <Reveal>
-              <h1 className="mt-7 text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-                Uangmu, dengan{' '}
-                <span className="text-gradient">mesin yang mengawasinya</span>
-              </h1>
-            </Reveal>
-
-            <Reveal>
-              <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-[var(--ink-muted)] sm:text-lg">
-                Satu rekening, kategorisasi otomatis, dan peringatan sebelum masalah terjadi —
-                bukan setelah saldomu habis.
+              <p className="text-center text-xs text-faint">
+                <span className="text-muted">Bruang</span> — mengawasi bukumu, dan melambai
+                kalau kamu lama menatapnya
               </p>
             </Reveal>
-
-            <Reveal>
-              <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link href="/daftar" className="w-full sm:w-auto">
-                  <Button size="lg" block iconRight={<ArrowRight className="size-4" />}>
-                    Mulai gratis
-                  </Button>
-                </Link>
-                <Link href="/masuk" className="w-full sm:w-auto">
-                  <Button size="lg" variant="secondary" block>
-                    Masuk ke akun
-                  </Button>
-                </Link>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <p className="mt-5 flex items-center justify-center gap-2 text-xs text-[var(--ink-faint)]">
-                <Fingerprint className="size-3.5" aria-hidden />
-                Biometrik, rotasi token, dan penguncian otomatis sejak hari pertama
-              </p>
-            </Reveal>
-          </RevealGroup>
+          </div>
         </div>
 
         <DemoPreview />

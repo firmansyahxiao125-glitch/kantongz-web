@@ -99,12 +99,12 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
       >
         <defs>
           <linearGradient id={gradientIncome} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.32" />
-            <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--color-holo)" stopOpacity="0.32" />
+            <stop offset="100%" stopColor="var(--color-holo)" stopOpacity="0" />
           </linearGradient>
           <linearGradient id={gradientExpense} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--color-holo)" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="var(--color-holo)" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -141,7 +141,7 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         <motion.path
           d={path(income, max, false)}
           fill="none"
-          stroke="var(--color-accent)"
+          stroke="var(--color-holo)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0 }}
@@ -151,7 +151,7 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         <motion.path
           d={path(expense, max, false)}
           fill="none"
-          stroke="var(--color-primary)"
+          stroke="var(--color-holo)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0 }}
@@ -183,8 +183,8 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
 
       {active ? (
         <>
-          <Dot ratioX={xRatio} value={active.income} max={max} color="var(--color-accent)" />
-          <Dot ratioX={xRatio} value={active.expense} max={max} color="var(--color-primary)" />
+          <Dot ratioX={xRatio} value={active.income} max={max} color="var(--color-holo)" />
+          <Dot ratioX={xRatio} value={active.expense} max={max} color="var(--color-holo)" />
         </>
       ) : null}
 
@@ -201,11 +201,11 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         >
           <p className="mb-1 font-medium text-ink">{formatDayShort(active.bucket)}</p>
           <p className="flex items-center gap-1.5 text-muted">
-            <span className="size-1.5 rounded-full bg-[var(--color-accent)]" />
+            <span className="size-1.5 rounded-full bg-[var(--color-holo)]" />
             Masuk {formatIdr(active.income)}
           </p>
           <p className="flex items-center gap-1.5 text-muted">
-            <span className="size-1.5 rounded-full bg-[var(--color-primary)]" />
+            <span className="size-1.5 rounded-full bg-[var(--color-holo)]" />
             Keluar {formatIdr(active.expense)}
           </p>
         </div>
@@ -216,11 +216,11 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
           bersama grafik yang sudah ditandai `aria-label`. */}
       <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
         <li className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-[var(--color-accent)]" aria-hidden />
+          <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
           Masuk
         </li>
         <li className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-[var(--color-primary)]" aria-hidden />
+          <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
           Keluar
         </li>
       </ul>

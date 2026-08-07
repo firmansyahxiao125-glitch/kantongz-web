@@ -140,8 +140,8 @@ export default function DompetPage() {
                       <span
                         className="grid size-9 place-items-center rounded-lg"
                         style={{
-                          background: `color-mix(in oklab, ${account.color ?? 'var(--color-primary)'} 16%, transparent)`,
-                          color: account.color ?? 'var(--color-primary)',
+                          background: `color-mix(in oklab, ${account.color ?? 'var(--color-holo)'} 16%, transparent)`,
+                          color: account.color ?? 'var(--color-holo)',
                         }}
                         aria-hidden
                       >
@@ -167,7 +167,7 @@ export default function DompetPage() {
 
                     <p
                       className={`mt-auto pt-3 text-xl font-semibold tabular tracking-tight ${
-                        account.balance < 0 ? 'text-[var(--color-danger)]' : 'text-ink'
+                        account.balance < 0 ? 'text-[var(--color-negative)]' : 'text-ink'
                       }`}
                     >
                       {formatIdr(account.balance)}

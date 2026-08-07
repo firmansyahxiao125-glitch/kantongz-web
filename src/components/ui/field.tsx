@@ -48,10 +48,10 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           className={cn(
             'w-full rounded-xl border bg-[var(--surface)] px-3.5 py-2.5 text-[15px] text-[var(--ink)]',
             'placeholder:text-[var(--ink-faint)] transition-[border-color,box-shadow] duration-150',
-            'outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40',
+            'outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-holo)]/40',
             error
-              ? 'border-[var(--color-danger)] focus-visible:border-[var(--color-danger)]'
-              : 'border-[var(--line)] focus-visible:border-[var(--color-primary)]',
+              ? 'border-[var(--color-negative)] focus-visible:border-[var(--color-negative)]'
+              : 'border-[var(--line)] focus-visible:border-[var(--color-holo)]',
             isPassword && 'pr-11',
             className,
           )}
@@ -66,7 +66,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
             /* Bukan `aria-pressed`: yang penting bagi pembaca layar adalah apa
                yang akan terjadi, bukan keadaan tombolnya. */
             aria-label={revealed ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-            className="absolute right-1 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[var(--ink-muted)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40"
+            className="absolute right-1 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[var(--ink-muted)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-holo)]/40"
           >
             {revealed ? <EyeOff size={17} aria-hidden /> : <Eye size={17} aria-hidden />}
           </button>
@@ -85,7 +85,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           /* `role="alert"` mengumumkannya saat muncul — pesan galat yang hanya
              terlihat mata tidak sampai ke pengguna pembaca layar. */
           role="alert"
-          className="flex items-start gap-1.5 text-xs text-[var(--color-danger)]"
+          className="flex items-start gap-1.5 text-xs text-[var(--color-negative)]"
         >
           <AlertCircle size={13} className="mt-px shrink-0" aria-hidden />
           <span>{error}</span>

@@ -75,7 +75,7 @@ export default function AsistenPage() {
         <Card>
           <CardBody>
             <header className="mb-3 flex items-center gap-2">
-              <Sparkles size={16} className="text-[var(--color-accent)]" aria-hidden />
+              <Sparkles size={16} className="text-[var(--color-holo)]" aria-hidden />
               <h2 className="text-sm font-semibold text-ink">Ringkasan bulan ini</h2>
             </header>
 
@@ -104,7 +104,7 @@ export default function AsistenPage() {
                 <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-4 text-sm">
                   <div>
                     <dt className="text-xs text-muted">Masuk</dt>
-                    <dd className="tabular text-[var(--color-success)]">
+                    <dd className="tabular text-[var(--color-positive)]">
                       {formatIdr(summary.data.income)}
                     </dd>
                   </div>
@@ -115,7 +115,7 @@ export default function AsistenPage() {
                   <div>
                     <dt className="text-xs text-muted">Selisih</dt>
                     <dd
-                      className={`tabular ${summary.data.net < 0 ? 'text-[var(--color-danger)]' : 'text-ink'}`}
+                      className={`tabular ${summary.data.net < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                     >
                       {formatIdr(summary.data.net)}
                     </dd>
@@ -149,7 +149,7 @@ export default function AsistenPage() {
                     <p className="text-sm font-medium text-ink">{turn.question}</p>
 
                     {turn.error ? (
-                      <p className="text-sm text-[var(--color-danger)]" role="alert">
+                      <p className="text-sm text-[var(--color-negative)]" role="alert">
                         {isApiError(turn.error)
                           ? messageFor(turn.error.code)
                           : messageFor('unknown')}
@@ -231,9 +231,9 @@ export default function AsistenPage() {
 }
 
 const VERDICT: Record<Simulation['verdict'], { label: string; className: string }> = {
-  aman: { label: 'Aman', className: 'text-[var(--color-success)]' },
-  ketat: { label: 'Ketat', className: 'text-[var(--color-warning)]' },
-  tidak_aman: { label: 'Tidak aman', className: 'text-[var(--color-danger)]' },
+  aman: { label: 'Aman', className: 'text-[var(--color-positive)]' },
+  ketat: { label: 'Ketat', className: 'text-[var(--color-caution)]' },
+  tidak_aman: { label: 'Tidak aman', className: 'text-[var(--color-negative)]' },
 };
 
 /**
@@ -320,7 +320,7 @@ function SimulationCard() {
               <div>
                 <dt className="text-xs text-muted">Setelah komitmen</dt>
                 <dd
-                  className={`tabular ${simulate.data.projectedMonthlySurplus < 0 ? 'text-[var(--color-danger)]' : 'text-ink'}`}
+                  className={`tabular ${simulate.data.projectedMonthlySurplus < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                 >
                   {formatIdr(simulate.data.projectedMonthlySurplus)}
                 </dd>

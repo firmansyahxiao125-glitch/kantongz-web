@@ -57,6 +57,10 @@ export function Stage({
           alpha: true,
           powerPreference: 'high-performance',
         }}
+        /* Bayangan HANYA pada mutu penuh. Peta bayangan adalah lulus render
+           kedua atas seluruh adegan; menyalakannya di `lite` adalah menggandakan
+           biaya pada perangkat yang justru dipilih karena tidak sanggup. */
+        shadows={tier === 'full'}
         /* Kanvas dekoratif. Pembaca layar tidak boleh menemukan apa pun di
            sini — isinya sudah disampaikan teks di sekelilingnya. */
         aria-hidden
@@ -115,23 +119,55 @@ function Rig({ parallax, distance }: { parallax: number; distance: number }) {
 }
 
 /**
- * Pencahayaan.
+ * Pencahayaan tiga titik, susunan sinematik.
  *
- * Tiga sumber: kunci dari kanan atas, isi dingin dari kiri, dan ambien lemah
- * supaya sisi gelap tidak menjadi siluet hitam. Adegan bercahaya sendiri masih
- * membutuhkan ini — logam tanpa cahaya terarah tidak punya kilau, dan tanpa
- * kilau kartu dan koin terbaca sebagai plastik.
+ *   KEY    kanan-atas-depan, hangat, paling terang. Membentuk wajah.
+ *   FILL   kiri, dingin, sepertiga kekuatan key. Mengangkat bayangan supaya
+ *          sisi gelap punya BENTUK alih-alih menjadi siluet hitam.
+ *   RIM    belakang-atas, hologram. Menggambar garis cahaya di tepi siluet,
+ *          dan itulah satu-satunya hal yang memisahkan subjek gelap dari
+ *          latar gelap.
+ *
+ * Suhu key dan fill sengaja berlawanan — hangat melawan dingin. Dua sumber
+ * berwarna sama menghasilkan bentuk yang datar berapa pun kuatnya, karena
+ * mata membaca kedalaman dari perbedaan RONA sebanyak dari perbedaan terang.
+ *
+ * `castShadow` hanya pada key. Dua sumber berbayang menggandakan biaya peta
+ * bayangan untuk bayangan kedua yang hampir tidak pernah terlihat.
  */
 function Lighting({ tier }: { tier: Exclude<GraphicsTier, 'off'> }) {
+  const full = tier === 'full';
+
   return (
     <>
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[4, 5, 3]} intensity={1.5} color="#ffffff" />
-      <directionalLight position={[-5, -2, -3]} intensity={0.7} color="#3b82f6" />
-      {/* Sorot lembut dari atas hanya pada mutu penuh — biayanya nyata dan
-          sumbangannya paling kecil di antara ketiganya. */}
-      {tier === 'full' ? (
-        <pointLight position={[0, 3.5, 1.5]} intensity={14} distance={12} color="#00f5d4" />
+      {/* Ambien rendah. Menaikkannya lebih mudah daripada menata cahaya, dan
+          itulah persis mengapa hasilnya selalu terlihat datar. */}
+      <ambientLight intensity={0.22} />
+
+      <directionalLight
+        position={[3.2, 4.5, 3.5]}
+        intensity={2.1}
+        color="#FFF4DC"
+        castShadow={full}
+        shadow-mapSize={full ? [1024, 1024] : [256, 256]}
+        shadow-bias={-0.0012}
+      >
+        {/* Frustum bayangan dirapatkan ke subjek. Frustum bawaan mencakup
+            seluruh adegan, yang menyebarkan resolusi peta ke ruang kosong dan
+            menghasilkan tepi bayangan bergerigi. */}
+        <orthographicCamera attach="shadow-camera" args={[-4, 4, 4, -4, 0.1, 14]} />
+      </directionalLight>
+
+      <directionalLight position={[-4.5, 0.5, 2]} intensity={0.55} color="#7FE3FF" />
+
+      {/* Rim. Di BELAKANG subjek, menghadap kamera. */}
+      <directionalLight position={[-1.5, 2.5, -4]} intensity={1.4} color="#B8F0FF" />
+
+      {/* Praktikal hangat dari bawah-depan, hanya pada mutu penuh. Meniru
+          cahaya yang memantul dari permukaan meja — halus, dan satu-satunya
+          alasan dagu tidak menjadi lubang hitam. */}
+      {full ? (
+        <pointLight position={[0, -1.8, 2.4]} intensity={6} distance={8} color="#C89440" />
       ) : null}
     </>
   );

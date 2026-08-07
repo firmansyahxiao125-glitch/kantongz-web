@@ -84,7 +84,7 @@ export function Kemampuan() {
     <section id="fitur" className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
       <RevealGroup>
         <Reveal>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-accent)]">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
             Kemampuan
           </p>
         </Reveal>
@@ -101,11 +101,11 @@ export function Kemampuan() {
               key={title}
               variants={fadeUp}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="edge-light group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-[var(--surface)] p-6"
+              className="edge-light group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-line bg-[var(--surface)] p-6"
             >
               <div className="flex items-start justify-between gap-3">
                 <span className="inline-flex size-11 items-center justify-center rounded-xl border border-line-strong bg-[var(--surface-2)]">
-                  <Icon className="size-5 text-[var(--color-accent)]" aria-hidden />
+                  <Icon className="size-5 text-[var(--color-holo)]" aria-hidden />
                 </span>
                 <span className="numeric rounded-md bg-[var(--surface-2)] px-1.5 py-0.5 text-[10px] text-faint">
                   {milestone}
@@ -174,7 +174,7 @@ export function Arsitektur() {
       <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
         <RevealGroup>
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-accent)]">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
               Arsitektur
             </p>
           </Reveal>
@@ -184,14 +184,14 @@ export function Arsitektur() {
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-panel)] border border-line bg-[var(--line)] md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-xl)] border border-line bg-[var(--line)] md:grid-cols-2 lg:grid-cols-3">
             {LAPISAN.map(({ icon: Icon, name, stack, note }) => (
               <motion.div key={name} variants={fadeUp} className="bg-[var(--surface)] p-6">
                 <div className="flex items-center gap-2.5">
                   <Icon className="size-4 text-muted" aria-hidden />
                   <h3 className="text-sm font-semibold">{name}</h3>
                 </div>
-                <p className="numeric mt-2 text-xs leading-relaxed text-[var(--color-accent)]">
+                <p className="numeric mt-2 text-xs leading-relaxed text-[var(--color-holo)]">
                   {stack}
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-muted">{note}</p>
@@ -240,7 +240,7 @@ export function TanyaJawab() {
     <section id="tanya-jawab" className="mx-auto max-w-3xl px-4 py-24 sm:py-32">
       <RevealGroup>
         <Reveal>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-accent)]">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
             Tanya jawab
           </p>
         </Reveal>
@@ -316,7 +316,7 @@ export function Repositori() {
           <Reveal>
             <div className="flex items-center gap-2.5">
               <Code2 className="size-5 text-muted" aria-hidden />
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-accent)]">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
                 Kode
               </p>
             </div>
@@ -339,11 +339,11 @@ export function Repositori() {
               <motion.div
                 key={nama}
                 variants={fadeUp}
-                className="rounded-[var(--radius-card)] border border-line bg-[var(--surface)] p-5"
+                className="rounded-[var(--radius-lg)] border border-line bg-[var(--surface)] p-5"
               >
                 <p className="numeric text-sm text-ink">{nama}</p>
                 <p className="mt-2 text-xs leading-relaxed text-muted">{isi}</p>
-                <p className="numeric mt-3 text-xs text-[var(--color-success)]">{uji}</p>
+                <p className="numeric mt-3 text-xs text-[var(--color-positive)]">{uji}</p>
               </motion.div>
             ))}
           </div>
@@ -372,7 +372,7 @@ export function Keamanan() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div className="lg:sticky lg:top-28">
               <Reveal>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-accent)]">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
                   Keamanan
                 </p>
               </Reveal>
@@ -397,7 +397,7 @@ export function Keamanan() {
                   variants={fadeUp}
                   className="flex gap-4 rounded-xl border border-line bg-[var(--surface)] p-5"
                 >
-                  <Lock className="mt-0.5 size-4 shrink-0 text-[var(--color-success)]" aria-hidden />
+                  <Lock className="mt-0.5 size-4 shrink-0 text-[var(--color-positive)]" aria-hidden />
                   <div>
                     <div className="text-sm font-medium">{title}</div>
                     <div className="mt-1.5 text-sm leading-relaxed text-muted">{body}</div>

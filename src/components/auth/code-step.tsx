@@ -142,7 +142,7 @@ export function CodeStep({
               maxLength={pending.codeLength}
               aria-label={`Digit ke-${String(index + 1)}`}
               autoFocus={index === 0}
-              className="h-14 w-full rounded-xl border border-line bg-[var(--surface)] text-center text-xl font-semibold tabular text-ink outline-none transition-[border-color,box-shadow] duration-150 focus-visible:border-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/35"
+              className="h-14 w-full rounded-xl border border-line bg-[var(--surface)] text-center text-xl font-semibold tabular text-ink outline-none transition-[border-color,box-shadow] duration-150 focus-visible:border-[var(--color-holo)] focus-visible:ring-2 focus-visible:ring-[var(--color-holo)]/35"
             />
           ))}
         </div>

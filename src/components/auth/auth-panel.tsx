@@ -28,7 +28,7 @@ export function AuthPanel({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: EASE_OUT }}
-      className="glass-strong rounded-[var(--radius-panel)] p-7 shadow-[var(--shadow-float)] sm:p-8"
+      className="glass-strong rounded-[var(--radius-xl)] p-7 shadow-[var(--shadow-float)] sm:p-8"
     >
       <h1 className="text-[22px] font-semibold tracking-tight text-ink">{title}</h1>
       <p className="mt-1.5 text-sm leading-relaxed text-muted">{description}</p>

@@ -58,7 +58,7 @@ export function Loading({ label = 'Memuat' }: { label?: string }) {
 export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   return (
     <div className="grid place-items-center gap-3 py-14 text-center" role="alert">
-      <AlertTriangle className="size-6 text-[var(--color-danger)]" aria-hidden />
+      <AlertTriangle className="size-6 text-[var(--color-negative)]" aria-hidden />
       <p className="max-w-sm text-sm leading-relaxed text-muted">
         {isApiError(error) ? messageFor(error.code) : messageFor('unknown')}
       </p>

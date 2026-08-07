@@ -29,13 +29,13 @@ import { fadeUp, stagger } from '@/lib/motion';
 
 const TONE: Record<InsightSeverity, { border: string; text: string; icon: typeof Info }> = {
   critical: {
-    border: 'border-[var(--color-danger)]/40',
-    text: 'text-[var(--color-danger)]',
+    border: 'border-[var(--color-negative)]/40',
+    text: 'text-[var(--color-negative)]',
     icon: AlertTriangle,
   },
   warning: {
-    border: 'border-[var(--color-warning)]/40',
-    text: 'text-[var(--color-warning)]',
+    border: 'border-[var(--color-caution)]/40',
+    text: 'text-[var(--color-caution)]',
     icon: AlertTriangle,
   },
   info: { border: 'border-line', text: 'text-muted', icon: Info },
@@ -130,7 +130,7 @@ export default function WawasanPage() {
                 <p className="text-sm text-muted">
                   Arus bersih{' '}
                   <span
-                    className={`tabular ${projection.dailyNet < 0 ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]'}`}
+                    className={`tabular ${projection.dailyNet < 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'}`}
                   >
                     {formatIdr(projection.dailyNet)}
                   </span>{' '}
@@ -145,7 +145,7 @@ export default function WawasanPage() {
                   className="mt-4 h-10"
                   values={[projection.startingBalance, ...projection.points.map((p) => p.expected)]}
                   stroke={
-                    projection.dailyNet < 0 ? 'var(--color-danger)' : 'var(--color-success)'
+                    projection.dailyNet < 0 ? 'var(--color-negative)' : 'var(--color-positive)'
                   }
                 />
 
@@ -167,7 +167,7 @@ export default function WawasanPage() {
                 </ul>
 
                 {projection.daysUntilEmpty === null ? null : (
-                  <p className="mt-4 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 px-3.5 py-3 text-sm text-[var(--color-danger)]">
+                  <p className="mt-4 rounded-xl border border-[var(--color-negative)]/30 bg-[var(--color-negative)]/10 px-3.5 py-3 text-sm text-[var(--color-negative)]">
                     Dengan pola sekarang, saldomu habis dalam {projection.daysUntilEmpty} hari.
                   </p>
                 )}

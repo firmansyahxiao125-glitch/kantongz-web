@@ -53,7 +53,7 @@ export default function MasukPage() {
       footer={
         <>
           Belum punya akun?{' '}
-          <Link href="/daftar" className="font-medium text-[var(--color-primary)] hover:underline">
+          <Link href="/daftar" className="font-medium text-[var(--color-holo)] hover:underline">
             Buat sekarang
           </Link>
         </>

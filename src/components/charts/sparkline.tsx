@@ -30,7 +30,7 @@ const H = 28;
 export function Sparkline({
   values,
   className,
-  stroke = 'var(--color-primary)',
+  stroke = 'var(--color-holo)',
   filled = true,
 }: SparklineProps) {
   const gradientId = useId();

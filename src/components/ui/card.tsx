@@ -29,7 +29,7 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(f
     <div
       ref={ref}
       className={cn(
-        'rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)]',
+        'rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)]',
         'shadow-[var(--shadow-soft)]',
         className,
       )}
@@ -78,7 +78,7 @@ export function TiltCard({ children, className, glow = false, ...rest }: TiltCar
      bergerak puluhan kali per detik dan setiap render adalah pemborosan. */
   const glowX = useTransform(px, (v) => `${String(v * 100)}%`);
   const glowY = useTransform(py, (v) => `${String(v * 100)}%`);
-  const glowStyle = useMotionTemplate`radial-gradient(340px circle at ${glowX} ${glowY}, color-mix(in oklab, var(--color-primary) 14%, transparent), transparent 70%)`;
+  const glowStyle = useMotionTemplate`radial-gradient(340px circle at ${glowX} ${glowY}, color-mix(in oklab, var(--color-holo) 14%, transparent), transparent 70%)`;
 
   function handleMove(event: PointerEvent<HTMLDivElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -102,7 +102,7 @@ export function TiltCard({ children, className, glow = false, ...rest }: TiltCar
       onPointerLeave={handleLeave}
       style={{ rotateX, rotateY, transformPerspective: 1200, transformStyle: 'preserve-3d' }}
       className={cn(
-        'group relative overflow-hidden rounded-[var(--radius-panel)]',
+        'group relative overflow-hidden rounded-[var(--radius-xl)]',
         'border border-[var(--line-strong)] bg-[var(--surface)]',
         'shadow-[var(--shadow-lift)] will-change-transform',
         className,

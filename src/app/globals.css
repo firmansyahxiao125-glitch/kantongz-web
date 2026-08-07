@@ -3,97 +3,191 @@
 /**
  * Sistem desain KANTONGZ Web.
  *
- * Palet dan skala hidup di sini sebagai token CSS, bukan tersebar di kelas
- * utilitas. Satu tempat berubah, seluruh aplikasi ikut — dan tema terang
- * hanyalah kumpulan nilai lain untuk token yang sama.
+ * SUMBER KEBENARANNYA ADALAH `kantongz/DESIGN.md`, dokumen beku yang sudah
+ * mengatur aplikasi mobile. Berkas ini bukan palet kedua; ia adalah dokumen
+ * yang sama, diterjemahkan ke CSS.
+ *
+ * Sebelum ini web memakai `#3b82f6` (biru bawaan Tailwind) dan `#00f5d4` (cyan
+ * jenuh). Keduanya bukan sekadar berbeda dari mobile — yang kedua persis warna
+ * yang DESIGN.md §1.3 sebut sebagai "warna yang membuat sesuatu terlihat
+ * murah". Dua aplikasi dengan dua palet bukan satu produk, dan palet bawaan
+ * kerangka kerja adalah hal pertama yang terbaca sebagai templat.
+ *
+ * ── TIGA MATERIAL, SATU PEMBAGIAN SEMANTIK (DESIGN §1) ──────────────────
+ *
+ *   TITANIUM → mesin.      Sasis, panel, bingkai. Memantulkan, tidak memancar.
+ *   HOLOGRAM → informasi.  Satu-satunya yang memancarkan cahaya. Maks 1/layar.
+ *   KUNINGAN → uang.       Hanya nilai dan aksi utama. TIDAK PERNAH dekorasi.
+ *
+ * Aturan kuningan adalah yang paling ketat di seluruh dokumen, dan alasannya
+ * bukan selera: ketika satu-satunya benda hangat di layar yang dingin adalah
+ * angka uangmu, mata tahu ke mana harus pergi tanpa dipandu. Setiap pemakaian
+ * kuningan pada ikon, pembatas, atau hiasan melemahkan isyarat itu.
  */
 
 @theme {
-  --color-bg: #09090b;
-  --color-surface: #111113;
-  --color-surface-2: #17171a;
-  --color-surface-3: #1f1f23;
+  /* ── permukaan: enam tingkat, tidak boleh dilompati (DESIGN §1.6) ──────
+     Melompati tingkat menghasilkan dua panel yang beda ketinggiannya tidak
+     terbaca — dan kedalaman yang tidak terbaca sama saja dengan tidak ada. */
+  --color-s0: #06070a;
+  --color-s1: #0d1016;
+  --color-s2: #161a22;
+  --color-s3: #1e242f;
+  --color-s3-active: #262d3a;
 
-  --color-line: #232327;
-  --color-line-strong: #2e2e33;
+  /* ── kuningan: uang (DESIGN §1.4) ────────────────────────────────────── */
+  --color-brass-deep: #7a5820;
+  --color-brass: #c89440;
+  --color-brass-bright: #f0d79a;
+  --color-brass-spec: #fff4dc;
 
-  --color-ink: #fafafa;
-  --color-ink-muted: #a1a1aa;
-  --color-ink-faint: #71717a;
+  /* ── hologram: informasi (DESIGN §1.3) ───────────────────────────────────
+     SENGAJA es kebiruan, bukan cyan jenuh. Menariknya ke arah putih membuatnya
+     terbaca sebagai cahaya sungguhan alih-alih sebagai tinta terang. */
+  --color-holo: #7fe3ff;
+  --color-holo-bright: #b8f0ff;
+  /* `holo-deep` dipakai sebagai hologram tema TERANG, dan #2e9fc4 hanya
+     mencapai 2.53 di atas `surface-3`. Digelapkan sampai lulus 3:1 untuk
+     elemen non-teks (WCAG 1.4.11). */
+  --color-holo-deep: #2a91b3;
 
-  --color-primary: #3b82f6;
-  --color-accent: #00f5d4;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
+  /* ── sinyal: semantik, TERPISAH dari aksen (DESIGN §7) ──────────────────
+     Tidak pernah berdiri sendiri tanpa bentuk atau label — sepuluh persen
+     laki-laki tidak dapat membedakan positif dari negatif lewat warna saja. */
+  --color-positive: #35e0a1;
+  --color-negative: #ff4a5c;
+  --color-caution: #ffb43d;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-stack), ui-monospace, SFMono-Regular, monospace;
 
-  --radius-card: 1rem;
-  --radius-panel: 1.25rem;
+  /* ── radius: satu keluarga, tidak sembarang ─────────────────────────────
+     Rasio tetap 1.5× antar tingkat. Radius yang dipilih per komponen
+     menghasilkan sudut yang hampir sama tetapi tidak persis, dan mata membaca
+     "hampir" sebagai kecerobohan jauh sebelum akal menemukan sebabnya. */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.6875rem;
 
-  /*
-   * Skala tipografi CAIR.
-   *
-   * `clamp()` dan bukan titik henti: judul yang melompat pada 640px terbaca
-   * sebagai dua desain yang dijahit, dan di antara dua titik henti ukurannya
-   * selalu salah untuk salah satu sisi. Batas atas ditetapkan supaya judul
-   * tidak tumbuh tanpa henti di monitor lebar.
-   */
-  --text-display: clamp(2.5rem, 1.2rem + 5.6vw, 5rem);
+  /* ── tipografi cair ────────────────────────────────────────────────────
+     `clamp()` dan bukan titik henti: judul yang melompat pada 640px terbaca
+     sebagai dua desain yang dijahit, dan di antara dua titik henti ukurannya
+     selalu salah untuk salah satu sisi. */
+  --text-display: clamp(2.75rem, 1.1rem + 6.4vw, 5.75rem);
   --text-h1: clamp(2rem, 1.2rem + 3.2vw, 3.5rem);
   --text-h2: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
   --text-h3: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
 
-  /*
-   * Kosakata gerak, dibagi CSS dan Framer Motion.
-   *
-   * Dua sumber durasi adalah dua sumber penyimpangan: transisi CSS yang 200ms
-   * di samping animasi Framer yang 320ms terbaca sebagai antarmuka yang tidak
-   * sinkron dengan dirinya sendiri, tanpa ada yang bisa menunjuk sebabnya.
-   */
+  /* ── gerak: satu kosakata, dibaca CSS dan Framer ────────────────────────
+     Dua sumber durasi adalah dua sumber penyimpangan, dan antarmuka yang
+     setiap bagiannya bergerak sedikit berbeda terbaca murah tanpa ada yang
+     bisa menunjuk sebabnya. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --dur-instant: 120ms;
   --dur-fast: 200ms;
   --dur-base: 320ms;
   --dur-slow: 500ms;
-
-  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
-  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
-  --shadow-float: 0 4px 8px rgb(0 0 0 / 0.4), 0 32px 64px -24px rgb(0 0 0 / 0.8);
-}
-
-:root {
-  color-scheme: dark;
-  --bg: #09090b;
-  --surface: #111113;
-  --surface-2: #17171a;
-  --surface-3: #1f1f23;
-  --line: #232327;
-  --line-strong: #2e2e33;
-  --ink: #fafafa;
-  --ink-muted: #a1a1aa;
-  --ink-faint: #71717a;
 }
 
 /**
- * Tema terang. Bukan inversi mekanis — permukaan naik ke putih sementara
- * garis justru menggelap, karena kontras yang membaca sebagai "terangkat"
- * bekerja terbalik di dua tema.
+ * Tema gelap — bawaan.
+ *
+ * Bayangan memakai HITAM PEKAT, bukan warna permukaan yang digelapkan. Benda
+ * termesin menjatuhkan bayangan tegas, dan radius blur naik lebih cepat
+ * daripada opasitasnya (DESIGN §1.5) — itulah yang membedakan benda yang
+ * MELAYANG dari benda yang sekadar lebih terang.
+ */
+:root {
+  color-scheme: dark;
+
+  --bg: #06070a;
+  --surface: #0d1016;
+  --surface-2: #161a22;
+  --surface-3: #1e242f;
+  --surface-4: #262d3a;
+
+  --ink: #e4e9f2;
+  --ink-muted: #a9b2c6;
+  --ink-dim: #7e8aa9;
+  --ink-faint: #616c8f;
+
+  /* Garis sambungan, bukan batas. Sasis yang dirakit punya seam. */
+  --line: rgb(138 147 166 / 0.14);
+  --line-strong: rgb(138 147 166 / 0.26);
+  --edge: rgb(232 237 246 / 0.08);
+
+  --shadow-contact: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-soft: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px -10px rgb(0 0 0 / 0.65);
+  --shadow-lift: 0 3px 6px rgb(0 0 0 / 0.45), 0 18px 44px -16px rgb(0 0 0 / 0.75);
+  --shadow-float: 0 6px 12px rgb(0 0 0 / 0.45), 0 40px 80px -28px rgb(0 0 0 / 0.85);
+
+  --glow-brass: 0 0 0 1px rgb(200 148 64 / 0.35), 0 8px 28px -8px rgb(200 148 64 / 0.35);
+}
+
+/**
+ * Tema terang — BUKAN inversi mekanis.
+ *
+ * Tiga hal berubah arah, dan ketiganya karena cahaya bekerja terbalik:
+ *
+ * 1. Permukaan NAIK ke putih sementara garis justru MENGGELAP. Kontras yang
+ *    membaca sebagai "terangkat" di tema gelap adalah tepi terang; di tema
+ *    terang ia adalah bayangan.
+ * 2. Kuningan DIGELAPKAN ke `brass.deep`. Kuningan terang di atas putih punya
+ *    rasio kontras 1.9:1 — tidak terbaca, dan justru pada angka uang.
+ * 3. Hologram digelapkan ke `holo.deep` dengan alasan yang sama.
+ *
+ * Semantiknya TETAP: kuningan masih berarti uang, hologram masih berarti
+ * informasi mesin. Yang berubah hanya nilainya, bukan artinya.
  */
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #fafafa;
+
+  --bg: #f7f8fa;
   --surface: #ffffff;
-  --surface-2: #f4f4f5;
-  --surface-3: #e9e9ec;
-  --line: #e4e4e7;
-  --line-strong: #d4d4d8;
-  --ink: #09090b;
-  --ink-muted: #52525b;
-  --ink-faint: #71717a;
+  --surface-2: #f2f4f7;
+  --surface-3: #e7eaef;
+  --surface-4: #dbdfe7;
+
+  --ink: #0b0e14;
+  --ink-muted: #4a5468;
+  /* `dim` dan `faint` DIGELAPKAN dari nilai pilihan pertama (#67718a, #8a93a8).
+     Keduanya gagal WCAG AA di atas `surface-3` — 4.04 dan 2.55 — dan gagalnya
+     tepat di tempat yang paling sulit dilihat mata: teks abu di atas panel
+     terang. Rona biru-abunya dipertahankan; kanalnya diskalakan proporsional
+     alih-alih diganti warna lain, persis seperti perbaikan yang sama pernah
+     dilakukan pada tema gelap di DESIGN §8. */
+  --ink-dim: #606980;
+  --ink-faint: #7e8699;
+
+  /*
+   * Sinyal DIGELAPKAN untuk tema terang, dan ini bukan penyesuaian kosmetik.
+   *
+   * `#35e0a1` di atas putih adalah 1,70:1 — praktis tidak terlihat. Warna ini
+   * dirender sebagai TEKS pada nominal ("+Rp 45.000"), jadi barnya 4,5:1 dan
+   * bukan 3:1 yang berlaku untuk elemen non-teks.
+   *
+   * Ini persis kelas cacat yang paling mudah lolos: di tema gelap seluruhnya
+   * lulus dengan lapang (11,8 / 6,1 / 11,4), jadi tidak ada yang curiga bahwa
+   * nilai yang sama gagal total begitu permukaannya naik ke putih.
+   */
+  --color-positive: #1c7756;
+  --color-negative: #bf3745;
+  --color-caution: #8b6221;
+
+  --line: rgb(11 14 20 / 0.09);
+  --line-strong: rgb(11 14 20 / 0.16);
+  --edge: rgb(11 14 20 / 0.05);
+
+  --shadow-contact: 0 1px 2px rgb(11 14 20 / 0.06);
+  --shadow-soft: 0 1px 2px rgb(11 14 20 / 0.05), 0 8px 24px -12px rgb(11 14 20 / 0.14);
+  --shadow-lift: 0 2px 4px rgb(11 14 20 / 0.06), 0 18px 44px -18px rgb(11 14 20 / 0.2);
+  --shadow-float: 0 4px 8px rgb(11 14 20 / 0.07), 0 40px 80px -30px rgb(11 14 20 / 0.26);
+
+  --glow-brass: 0 0 0 1px rgb(122 88 32 / 0.3), 0 8px 28px -10px rgb(122 88 32 / 0.28);
 }
 
 @layer base {
@@ -106,21 +200,27 @@
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Kerning dan ligatur kontekstual. Inter mengirimkan keduanya, dan
+       mematikannya secara bawaan pada beberapa mesin render. */
+    font-feature-settings: 'kern' 1, 'calt' 1;
   }
 
-  /* Fokus terlihat di kedua tema, dan tidak pernah dihapus. WCAG 2.4.7. */
+  /* Fokus terlihat di kedua tema, dan tidak pernah dihapus. WCAG 2.4.7.
+     Dua cincin: satu gelap rapat ke elemen, satu terang di luarnya — sehingga
+     indikator tetap terlihat di atas permukaan terang MAUPUN gelap. */
   :focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-holo);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-primary) 35%, transparent);
+    background: color-mix(in oklab, var(--color-holo) 30%, transparent);
+    color: var(--ink);
   }
 
-  /* Batang gulir mengikuti tema. Batang putih bawaan di antarmuka gelap
-     adalah satu-satunya bagian layar yang mengaku bahwa ini halaman web. */
+  /* Batang gulir mengikuti tema. Batang putih bawaan di antarmuka gelap adalah
+     satu-satunya bagian layar yang mengaku bahwa ini halaman web. */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--line-strong) transparent;
@@ -143,8 +243,14 @@
     background: transparent;
   }
 
-  /* Pengguna yang meminta gerak dikurangi mendapat antarmuka yang sama,
-     tanpa gerak. Bukan antarmuka yang berbeda. */
+  /*
+   * Gerak dikurangi.
+   *
+   * Animasi CSS dimatikan di sini; animasi Framer Motion TIDAK tersentuh
+   * aturan ini karena ia berjalan lewat gaya sebaris dan `requestAnimationFrame`.
+   * Celah itu ditutup `MotionConfig reducedMotion="user"` di `providers.tsx`,
+   * dan keduanya dibutuhkan — masing-masing buta terhadap separuh yang lain.
+   */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -155,8 +261,8 @@
       scroll-behavior: auto !important;
     }
 
-    /* Sapuan kilau dimatikan sepenuhnya, bukan dipercepat: sapuan 0.01ms
-       berkedip, dan kedipan justru lebih mengganggu daripada gerak asalnya. */
+    /* Sapuan kilau DIMATIKAN, bukan dipercepat: sapuan 0.01ms berkedip, dan
+       kedipan lebih mengganggu daripada gerak aslinya. */
     .shimmer::after {
       display: none;
     }
@@ -164,6 +270,7 @@
 }
 
 @layer utilities {
+  /* ── permukaan ─────────────────────────────────────────────────────── */
   .bg-app {
     background: var(--bg);
   }
@@ -176,15 +283,23 @@
   .bg-surface-3 {
     background: var(--surface-3);
   }
+  .bg-surface-4 {
+    background: var(--surface-4);
+  }
+
   .text-ink {
     color: var(--ink);
   }
   .text-muted {
     color: var(--ink-muted);
   }
+  .text-dim {
+    color: var(--ink-dim);
+  }
   .text-faint {
     color: var(--ink-faint);
   }
+
   .border-line {
     border-color: var(--line);
   }
@@ -192,89 +307,154 @@
     border-color: var(--line-strong);
   }
 
-  /* Kaca: buram + tepi terang, meniru cahaya yang datang dari atas layar.
-     Tanpa tepi itu, panel terbaca sebagai persegi keruh. */
-  .glass {
-    background: color-mix(in oklab, var(--surface) 72%, transparent);
-    backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid color-mix(in oklab, var(--line-strong) 80%, transparent);
+  /*
+   * Panel sasis.
+   *
+   * Satu garis terang di tepi ATAS, meniru cahaya yang datang dari atas layar.
+   * Tanpa itu, panel gelap terbaca sebagai LUBANG di latar, bukan sebagai
+   * pelat yang terletak di atasnya — dan perbedaan itu adalah seluruh
+   * perbedaan antara antarmuka yang punya kedalaman dan yang tidak.
+   */
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, transparent, var(--edge) 22%, var(--edge) 78%, transparent);
+    pointer-events: none;
   }
 
-  .glass-strong {
-    background: color-mix(in oklab, var(--surface) 90%, transparent);
-    backdrop-filter: blur(28px) saturate(160%);
-    border: 1px solid var(--line-strong);
+  /* Tepi terang saja, untuk elemen yang sudah punya latar dan bingkainya
+     sendiri. `.panel` memakai efek yang sama; ini versi yang dapat ditempelkan
+     ke apa pun. */
+  .edge-light {
+    position: relative;
+  }
+  .edge-light::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, transparent, var(--edge) 22%, var(--edge) 78%, transparent);
+    pointer-events: none;
   }
 
-  /* Pendar gradien di belakang panel utama. Satu per layar, tidak lebih. */
+  /*
+   * Pendar latar. SATU per layar, tidak lebih.
+   *
+   * Warnanya hologram, bukan kuningan — kuningan hanya boleh muncul pada uang
+   * dan aksi utama (DESIGN §1.4), dan pendar latar bukan keduanya. Ini persis
+   * jenis pelanggaran yang terasa "hangat dan mahal" saat dibuat lalu memakan
+   * seluruh isyarat kuningan sebulan kemudian.
+   */
   .aurora::before {
     content: '';
     position: absolute;
     inset: -40% -20% auto -20%;
-    height: 70%;
+    height: 72%;
     background:
-      radial-gradient(50% 60% at 20% 40%, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 70%),
-      radial-gradient(45% 55% at 80% 30%, color-mix(in oklab, var(--color-accent) 16%, transparent), transparent 70%);
-    filter: blur(60px);
+      radial-gradient(
+        48% 58% at 22% 40%,
+        color-mix(in oklab, var(--color-holo) 16%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        42% 52% at 78% 28%,
+        color-mix(in oklab, var(--color-holo-deep) 14%, transparent),
+        transparent 70%
+      );
+    filter: blur(64px);
     pointer-events: none;
     z-index: 0;
   }
 
-  .text-gradient {
-    background: linear-gradient(135deg, var(--ink) 15%, var(--color-accent) 130%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  /* Kaca. Dipakai HEMAT — pada bilah tetap dan lapisan mengambang saja.
+     Kaca di mana-mana menghilangkan hierarki: kalau segalanya melayang,
+     tidak ada yang melayang. */
+  .glass {
+    background: color-mix(in oklab, var(--surface) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid var(--line-strong);
+  }
+  .glass-strong {
+    background: color-mix(in oklab, var(--surface) 90%, transparent);
+    backdrop-filter: blur(28px) saturate(165%);
+    border: 1px solid var(--line-strong);
   }
 
-  .grid-lines {
-    background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--line) 70%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--line) 70%, transparent) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 20%, transparent 75%);
-  }
-
-  .tabular {
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* Angka uang. Lebar digit rata supaya kolom nominal tidak bergoyang saat
-     nilainya berubah — pada daftar transaksi itu terbaca sebagai kegelisahan. */
+  /* ── uang ──────────────────────────────────────────────────────────────
+     Lebar digit rata. Pada daftar transaksi, digit berlebar berbeda membuat
+     kolom nominal bergoyang setiap kali nilainya berubah — dan goyangan pada
+     aplikasi uang terbaca sebagai angka yang tidak dapat dipercaya. */
   .numeric {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
   }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 
+  /* Kuningan pada angka uang. DESIGN §1.4 — hanya di sini dan pada aksi utama. */
+  .text-value {
+    color: var(--color-brass-bright);
+  }
+  :root[data-theme='light'] .text-value {
+    color: var(--color-brass-deep);
+  }
+
+  /* ── tipografi ─────────────────────────────────────────────────────────
+     Tracking MENGETAT seiring ukuran naik. Spasi huruf yang optis benar pada
+     14px terlihat renggang pada 72px, karena jarak antar huruf yang dibaca
+     mata adalah proporsi dari tinggi huruf, bukan nilai tetap. */
   .text-display {
     font-size: var(--text-display);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    font-weight: 600;
   }
   .text-h1 {
     font-size: var(--text-h1);
-    line-height: 1.08;
-    letter-spacing: -0.03em;
+    line-height: 1.06;
+    letter-spacing: -0.032em;
+    font-weight: 600;
   }
   .text-h2 {
     font-size: var(--text-h2);
-    line-height: 1.15;
-    letter-spacing: -0.022em;
+    line-height: 1.14;
+    letter-spacing: -0.024em;
+    font-weight: 600;
   }
   .text-h3 {
     font-size: var(--text-h3);
     line-height: 1.3;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.016em;
+    font-weight: 550;
   }
 
-  /*
-   * Sapuan kilau untuk keadaan memuat.
-   *
-   * `animate-pulse` meredupkan seluruh blok serentak, yang terbaca sebagai
-   * elemen yang rusak. Sapuan bergerak terbaca sebagai sesuatu yang SEDANG
-   * datang — dan itu memang yang terjadi.
-   */
+  /* Label bagian. Huruf besar berspasi lebar — dibaca sebagai penanda
+     struktur, bukan sebagai kalimat yang kebetulan pendek. */
+  .text-eyebrow {
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ── keadaan memuat ────────────────────────────────────────────────────
+     Sapuan, bukan denyut. Denyut meredupkan seluruh blok serentak dan terbaca
+     sebagai elemen RUSAK; sapuan yang bergerak terbaca sebagai sesuatu yang
+     SEDANG DATANG — dan itu memang yang sedang terjadi. */
   .shimmer {
     position: relative;
     overflow: hidden;
@@ -288,7 +468,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      color-mix(in oklab, var(--ink) 7%, transparent),
+      color-mix(in oklab, var(--ink) 8%, transparent),
       transparent
     );
     animation: shimmer-sweep 1.6s var(--ease-in-out) infinite;
@@ -300,33 +480,41 @@
     }
   }
 
-  /* Bintik halus di atas permukaan besar. Gradien murni pada layar OLED
-     menunjukkan pita warna; bintik memecahnya tanpa terlihat sebagai tekstur. */
+  /* Bintik halus. Gradien murni pada layar OLED menunjukkan pita warna;
+     bintik memecahnya tanpa pernah terbaca sebagai tekstur. */
   .grain::after {
     content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.035;
+    opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Garis terang di tepi atas panel — meniru cahaya yang datang dari atas
-     layar. Tanpa ini panel gelap terbaca sebagai lubang, bukan sebagai pelat. */
-  .edge-light {
-    position: relative;
+  /* Kisi teknis. Ditutup masker radial supaya ia MEMUDAR alih-alih berhenti
+     di garis lurus — kisi yang terpotong tegas terbaca sebagai gambar latar
+     yang kurang besar. */
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 15%, transparent 72%);
   }
-  .edge-light::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 1px;
+
+  .text-gradient {
     background: linear-gradient(
-      90deg,
-      transparent,
-      color-mix(in oklab, var(--ink) 14%, transparent) 30%,
-      color-mix(in oklab, var(--ink) 14%, transparent) 70%,
-      transparent
+      135deg,
+      var(--ink) 10%,
+      color-mix(in oklab, var(--color-holo) 85%, var(--ink)) 120%
     );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Satu-satunya pendar di aplikasi, dan hanya untuk aksi utama. */
+  .glow-brass {
+    box-shadow: var(--glow-brass);
   }
 }

@@ -80,7 +80,7 @@ function StaticCore() {
           className="absolute inset-[18%] rounded-full"
           style={{
             background:
-              'radial-gradient(circle at 38% 32%, color-mix(in oklab, var(--color-accent) 55%, transparent), color-mix(in oklab, var(--color-primary) 30%, transparent) 55%, transparent 72%)',
+              'radial-gradient(circle at 38% 32%, color-mix(in oklab, var(--color-holo) 55%, transparent), color-mix(in oklab, var(--color-holo) 30%, transparent) 55%, transparent 72%)',
             filter: 'blur(2px)',
           }}
         />
@@ -90,7 +90,7 @@ function StaticCore() {
             className="absolute rounded-full border"
             style={{
               inset: `${String(6 + i * 6)}%`,
-              borderColor: `color-mix(in oklab, var(--color-accent) ${String(24 - i * 6)}%, transparent)`,
+              borderColor: `color-mix(in oklab, var(--color-holo) ${String(24 - i * 6)}%, transparent)`,
               transform: `rotateX(72deg) rotateZ(${String(i * 28)}deg)`,
             }}
           />

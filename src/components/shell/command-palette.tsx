@@ -106,7 +106,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         exit={{ opacity: 0, y: -8, scale: 0.98 }}
         transition={{ duration: DURATION.fast, ease: EASE_OUT }}
         onKeyDown={handleKey}
-        className="glass-strong relative w-full max-w-lg overflow-hidden rounded-[var(--radius-panel)] shadow-[var(--shadow-float)]"
+        className="glass-strong relative w-full max-w-lg overflow-hidden rounded-[var(--radius-xl)] shadow-[var(--shadow-float)]"
       >
         <div className="flex items-center gap-3 border-b border-line px-4">
           <Search size={17} className="shrink-0 text-faint" aria-hidden />
