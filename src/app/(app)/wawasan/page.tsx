@@ -159,7 +159,7 @@ export default function WawasanPage() {
                       {/* Pita ketidakpastian ditampilkan, bukan disembunyikan.
                           Angka tunggal pada proyeksi keuangan terlihat tepat dan
                           tidak pernah tepat. */}
-                      <p className="text-xs tabular text-faint">
+                      <p className="text-xs tabular text-dim">
                         {formatIdr(point.low)} – {formatIdr(point.high)}
                       </p>
                     </li>
@@ -191,14 +191,14 @@ export default function WawasanPage() {
                   <li key={charge.merchant} className="flex items-center gap-3 py-2.5">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-ink">{charge.merchant}</p>
-                      <p className="text-xs text-faint">
+                      <p className="text-xs text-dim">
                         Tiap {charge.intervalDays} hari · {charge.occurrences} kali · terakhir{' '}
                         {formatDate(charge.lastChargedAt)}
                       </p>
                     </div>
                     <span className="shrink-0 text-sm tabular text-ink">
                       {formatIdr(charge.monthlyCost)}
-                      <span className="text-faint">/bln</span>
+                      <span className="text-dim">/bln</span>
                     </span>
                   </li>
                 ))}
@@ -226,7 +226,7 @@ export default function WawasanPage() {
                   <li key={s.transactionId} className="flex items-center gap-3 py-2.5">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-ink">{s.categoryName}</p>
-                      <p className="text-xs text-faint">{s.reason}</p>
+                      <p className="text-xs text-dim">{s.reason}</p>
                     </div>
                     <Button
                       variant="secondary"
@@ -266,7 +266,7 @@ function InsightCard({ insight }: { insight: Insight }) {
             <p className="mt-1 text-sm leading-relaxed text-muted">{insight.body}</p>
             {/* MENGAPA wawasan ini muncul. Wawasan tanpa ini adalah tebakan yang
                 menyamar sebagai analisis. */}
-            <p className="mt-2 text-xs leading-relaxed text-faint">{insight.reason}</p>
+            <p className="mt-2 text-xs leading-relaxed text-dim">{insight.reason}</p>
           </div>
         </div>
       </CardBody>

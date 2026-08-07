@@ -163,7 +163,7 @@ export default function DompetPage() {
                     </div>
 
                     <p className="truncate text-sm font-medium text-ink">{account.name}</p>
-                    <p className="text-xs text-faint">{LABEL[account.kind]}</p>
+                    <p className="text-xs text-dim">{LABEL[account.kind]}</p>
 
                     <p
                       className={`mt-auto pt-3 text-xl font-semibold tabular tracking-tight ${

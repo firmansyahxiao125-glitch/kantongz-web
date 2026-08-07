@@ -12,6 +12,7 @@ import {
   Repositori,
   TanyaJawab,
 } from '@/components/landing/sections';
+import { CaraKerja, Harga, MesinAi, Suara } from '@/components/landing/story';
 import { Reveal, RevealGroup } from '@/components/ui/reveal';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
@@ -33,17 +34,21 @@ export default function LandingPage() {
             <span className="text-sm font-semibold tracking-tight">KANTONGZ</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Utama">
+          {/* `gap-0.5` + tinggi 40px. Lighthouse menandai jarak antar-sasaran
+              sebagai kurang; menambah tinggi lebih murah daripada menambah
+              jarak, karena jarak mendorong navigasi melebihi lebar bilahnya. */}
+          <nav className="hidden items-center gap-0.5 md:flex" aria-label="Utama">
             {[
               ['Kemampuan', '#fitur'],
+              ['Mesin AI', '#mesin-ai'],
               ['Arsitektur', '#arsitektur'],
               ['Keamanan', '#keamanan'],
-              ['Tanya jawab', '#tanya-jawab'],
+              ['Biaya', '#harga'],
             ].map(([label, href]) => (
               <a
                 key={href}
                 href={href}
-                className="rounded-lg px-3 py-2 text-sm text-[var(--ink-muted)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
+                className="flex h-10 items-center rounded-[var(--radius-sm)] px-3 text-sm text-muted transition-colors duration-[var(--dur-fast)] hover:bg-[var(--surface-2)] hover:text-ink"
               >
                 {label}
               </a>
@@ -126,7 +131,7 @@ export default function LandingPage() {
               </Reveal>
 
               <Reveal>
-                <p className="mt-6 flex items-center gap-2 text-xs text-faint">
+                <p className="mt-6 flex items-center gap-2 text-xs text-dim">
                   <Fingerprint className="size-3.5" aria-hidden />
                   Argon2id, rotasi token, dan penguncian otomatis sejak hari pertama
                 </p>
@@ -145,7 +150,7 @@ export default function LandingPage() {
             </HeroParallax>
 
             <Reveal>
-              <p className="text-center text-xs text-faint">
+              <p className="text-center text-xs text-dim">
                 <span className="text-muted">Bruang</span> — mengawasi bukumu, dan melambai
                 kalau kamu lama menatapnya
               </p>
@@ -157,8 +162,12 @@ export default function LandingPage() {
       </section>
 
       <Kemampuan />
+      <MesinAi />
+      <CaraKerja />
       <Arsitektur />
       <Keamanan />
+      <Suara />
+      <Harga />
       <TanyaJawab />
       <Repositori />
 
@@ -193,7 +202,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="border-t border-[var(--line)]">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-[var(--ink-faint)] sm:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-[var(--ink-dim)] sm:flex-row">
           <div className="flex items-center gap-2.5">
             <CoreMark className="size-5" />
             <span>KANTONGZ</span>

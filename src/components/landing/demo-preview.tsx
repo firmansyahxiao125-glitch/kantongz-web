@@ -43,7 +43,7 @@ export function DemoPreview() {
           Penanda data contoh. Di dalam bingkai, bukan di keterangan bawah yang
           bisa terlewat — orang membaca panel, bukan catatan kakinya.
         */}
-        <span className="absolute -top-3 left-6 z-10 rounded-full border border-line-strong bg-[var(--surface-2)] px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-faint">
+        <span className="absolute -top-3 left-6 z-10 rounded-full border border-line-strong bg-[var(--surface-2)] px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-dim">
           Data contoh
         </span>
 
@@ -60,7 +60,7 @@ export function DemoPreview() {
               variants={fadeUp}
               className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-3"
             >
-              <p className="text-xs font-medium uppercase tracking-wider text-faint">
+              <p className="text-xs font-medium uppercase tracking-wider text-dim">
                 Kekayaan bersih
               </p>
               <p className="numeric mt-2 text-3xl font-medium">{formatIdr(4_180_000)}</p>
@@ -82,7 +82,7 @@ export function DemoPreview() {
             >
               <div className="flex items-center gap-2">
                 <AlertTriangle className="size-4 text-[var(--color-caution)]" aria-hidden />
-                <p className="text-xs font-medium uppercase tracking-wider text-faint">Wawasan</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-dim">Wawasan</p>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-ink">
                 Pengeluaran jauh di atas kebiasaan.
@@ -102,7 +102,7 @@ export function DemoPreview() {
             >
               <div className="flex items-center gap-2">
                 <Repeat className="size-4 text-muted" aria-hidden />
-                <p className="text-xs font-medium uppercase tracking-wider text-faint">
+                <p className="text-xs font-medium uppercase tracking-wider text-dim">
                   Langganan
                 </p>
               </div>
@@ -110,10 +110,10 @@ export function DemoPreview() {
                 <span className="flex-1 truncate text-sm text-ink">Netflix</span>
                 <span className="numeric text-sm text-ink">
                   {formatIdr(186_000)}
-                  <span className="text-faint">/bln</span>
+                  <span className="text-dim">/bln</span>
                 </span>
               </div>
-              <p className="mt-1.5 text-xs text-faint">
+              <p className="mt-1.5 text-xs text-dim">
                 Tiap 30 hari · 5 kali · nominal tidak pernah berubah
               </p>
             </motion.div>
@@ -125,14 +125,14 @@ export function DemoPreview() {
             >
               <div className="flex items-center gap-2">
                 <Sparkles className="size-4 text-[var(--color-holo)]" aria-hidden />
-                <p className="text-xs font-medium uppercase tracking-wider text-faint">Asisten</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-dim">Asisten</p>
               </div>
               <p className="mt-3 text-sm text-muted">“Saldoku cukup sampai kapan?”</p>
               <p className="mt-2 text-sm leading-relaxed text-ink">
                 Dengan pola sekarang, saldomu habis dalam 78 hari.
               </p>
               {/* Asal-usul angka, sama seperti di aplikasi sungguhan. */}
-              <p className="mt-2 text-xs text-faint">
+              <p className="mt-2 text-xs text-dim">
                 Dihitung dari arus bersih 41 hari terakhir dibagi saldo seluruh dompet.
               </p>
             </motion.div>

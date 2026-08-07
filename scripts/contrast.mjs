@@ -85,7 +85,18 @@ const PAIRS = [
   { fg: 'ink', need: 4.5, note: 'teks utama' },
   { fg: 'ink-muted', need: 4.5, note: 'teks sekunder' },
   { fg: 'ink-dim', need: 4.5, note: 'keterangan' },
-  { fg: 'ink-faint', need: 3.0, note: 'label besar & non-teks' },
+  /*
+   * NON-TEKS SAJA, ambang 3:1 (WCAG 1.4.11).
+   *
+   * Lighthouse menemukan token ini membawa teks tubuh 14px di footer pada
+   * 3,43:1. Percobaan menaikkannya sampai lulus 4,5:1 mendaratkannya di 4,51 —
+   * sementara `ink-dim` ada di 4,52. Keduanya menjadi tingkat yang SAMA.
+   *
+   * Kesimpulannya: tangga tinta hanya menyanggah tiga tingkat teks yang tetap
+   * terbaca, bukan empat. `ink-faint` karena itu berhenti dipakai untuk teks
+   * dan tinggal sebagai token elemen dekoratif.
+   */
+  { fg: 'ink-faint', need: 3.0, note: 'NON-TEKS saja (ikon, garis, angka aria-hidden)' },
   /* Sinyal dirender sebagai TEKS pada nominal, jadi 4,5:1 — bukan 3:1 yang
      berlaku bagi elemen non-teks. Warnanya juga TIDAK PERNAH berdiri sendiri:
      selalu ditemani tanda atau ikon, karena sepuluh persen laki-laki tidak

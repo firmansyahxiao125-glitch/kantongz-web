@@ -131,7 +131,7 @@ export default function TujuanPage() {
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-ink">{goal.name}</p>
                           {goal.targetDate ? (
-                            <p className="text-xs text-faint">
+                            <p className="text-xs text-dim">
                               Target {formatDate(goal.targetDate)}
                             </p>
                           ) : null}
@@ -154,7 +154,7 @@ export default function TujuanPage() {
 
                     <p className="text-xl font-semibold tabular tracking-tight text-ink">
                       {formatIdr(goal.savedAmount)}
-                      <span className="text-sm font-normal text-faint">
+                      <span className="text-sm font-normal text-dim">
                         {' '}
                         / {formatIdr(goal.targetAmount)}
                       </span>

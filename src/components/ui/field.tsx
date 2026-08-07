@@ -47,7 +47,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           aria-describedby={describedBy.length > 0 ? describedBy : undefined}
           className={cn(
             'w-full rounded-xl border bg-[var(--surface)] px-3.5 py-2.5 text-[15px] text-[var(--ink)]',
-            'placeholder:text-[var(--ink-faint)] transition-[border-color,box-shadow] duration-150',
+            'placeholder:text-[var(--ink-dim)] transition-[border-color,box-shadow] duration-150',
             'outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-holo)]/40',
             error
               ? 'border-[var(--color-negative)] focus-visible:border-[var(--color-negative)]'

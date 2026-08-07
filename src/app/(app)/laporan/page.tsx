@@ -212,7 +212,7 @@ export default function LaporanPage() {
               </table>
 
               {list.data?.nextCursor ? (
-                <p className="mt-4 text-xs text-faint">
+                <p className="mt-4 text-xs text-dim">
                   Menampilkan {MAX_ROWS} transaksi teratas pada rentang ini. Persempit rentangnya
                   untuk laporan yang lengkap.
                 </p>

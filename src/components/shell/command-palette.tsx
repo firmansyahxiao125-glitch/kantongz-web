@@ -109,7 +109,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         className="glass-strong relative w-full max-w-lg overflow-hidden rounded-[var(--radius-xl)] shadow-[var(--shadow-float)]"
       >
         <div className="flex items-center gap-3 border-b border-line px-4">
-          <Search size={17} className="shrink-0 text-faint" aria-hidden />
+          <Search size={17} className="shrink-0 text-dim" aria-hidden />
           <input
             ref={inputRef}
             value={query}
@@ -120,7 +120,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
             placeholder="Cari halaman…"
             aria-label="Cari halaman"
             aria-controls="palet-hasil"
-            className="w-full bg-transparent py-4 text-[15px] text-ink outline-none placeholder:text-faint"
+            className="w-full bg-transparent py-4 text-[15px] text-ink outline-none placeholder:text-dim"
           />
         </div>
 
@@ -151,7 +151,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
                   >
                     <Icon size={16} className="shrink-0" aria-hidden />
                     <span className="flex-1">{item.label}</span>
-                    {focused ? <CornerDownLeft size={14} className="text-faint" aria-hidden /> : null}
+                    {focused ? <CornerDownLeft size={14} className="text-dim" aria-hidden /> : null}
                   </button>
                 </li>
               );

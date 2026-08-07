@@ -127,7 +127,7 @@ export default function DaftarPage() {
           Lanjutkan
         </Button>
 
-        <p className="text-center text-xs leading-relaxed text-faint">
+        <p className="text-center text-xs leading-relaxed text-dim">
           Dengan melanjutkan kamu menyetujui Ketentuan Layanan dan Kebijakan Privasi KANTONGZ.
         </p>
       </form>

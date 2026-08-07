@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "screenshots": "node scripts/screenshots.mjs --base http://localhost:3100 --out ../kantongz/docs/screenshots"
+    "screenshots": "node scripts/screenshots.mjs --base http://localhost:3100 --out ../kantongz/docs/screenshots",
+    "contrast": "node scripts/contrast.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",

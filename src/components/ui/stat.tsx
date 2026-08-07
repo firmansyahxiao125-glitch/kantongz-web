@@ -105,8 +105,8 @@ export function Stat({
       ) : null}
 
       <div className="relative flex items-start justify-between gap-3">
-        <p className="text-eyebrow text-faint">{label}</p>
-        {icon ? <span className="shrink-0 text-faint">{icon}</span> : null}
+        <p className="text-eyebrow text-dim">{label}</p>
+        {icon ? <span className="shrink-0 text-dim">{icon}</span> : null}
       </div>
 
       <CountUp
@@ -122,14 +122,14 @@ export function Stat({
       <div className="relative mt-2 flex min-h-5 flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         {delta === null ? (
           hint ? (
-            <span className="text-faint">{hint}</span>
+            <span className="text-dim">{hint}</span>
           ) : null
         ) : (
           <>
             <span
               className={cn(
                 'inline-flex items-center gap-0.5 rounded-[var(--radius-xs)] px-1.5 py-0.5 font-medium',
-                baik === null && 'bg-[var(--surface-2)] text-faint',
+                baik === null && 'bg-[var(--surface-2)] text-dim',
                 baik === true &&
                   'bg-[color-mix(in_oklab,var(--color-positive)_14%,transparent)] text-[var(--color-positive)]',
                 baik === false &&
@@ -142,7 +142,7 @@ export function Stat({
               <Arrow className="size-3" aria-hidden />
               {PERSEN.format(Math.abs(delta))}
             </span>
-            {hint ? <span className="text-faint">{hint}</span> : null}
+            {hint ? <span className="text-dim">{hint}</span> : null}
           </>
         )}
       </div>

@@ -114,7 +114,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
             >
               <Search size={15} aria-hidden />
               <span>Cari</span>
-              <kbd className="ml-3 rounded border border-line-strong bg-[var(--surface-3)] px-1.5 py-0.5 font-sans text-[11px] text-faint">
+              <kbd className="ml-3 rounded border border-line-strong bg-[var(--surface-3)] px-1.5 py-0.5 font-sans text-[11px] text-dim">
                 ⌘K
               </kbd>
             </button>

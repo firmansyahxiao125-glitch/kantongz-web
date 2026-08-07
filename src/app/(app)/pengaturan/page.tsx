@@ -117,7 +117,7 @@ export default function PengaturanPage() {
             <div className="mt-5 grid gap-5 sm:grid-cols-2">
               {(['expense', 'income'] as const).map((kind) => (
                 <section key={kind}>
-                  <h3 className="mb-2 text-[11px] uppercase tracking-wider text-faint">
+                  <h3 className="mb-2 text-[11px] uppercase tracking-wider text-dim">
                     {kind === 'expense' ? 'Pengeluaran' : 'Pemasukan'}
                   </h3>
                   <ul className="space-y-1.5">
@@ -132,7 +132,7 @@ export default function PengaturanPage() {
                           />
                           <span className="flex-1 truncate text-muted">{category.name}</span>
                           {category.system ? (
-                            <span className="text-[11px] text-faint">bawaan</span>
+                            <span className="text-[11px] text-dim">bawaan</span>
                           ) : null}
                         </li>
                       ))}

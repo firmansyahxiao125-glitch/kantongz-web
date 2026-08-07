@@ -161,7 +161,7 @@ export default function DasborPage() {
               </header>
 
               {d.recent.length === 0 ? (
-                <p className="py-8 text-center text-sm text-faint">Belum ada transaksi.</p>
+                <p className="py-8 text-center text-sm text-dim">Belum ada transaksi.</p>
               ) : (
                 <ul className="divide-y divide-[var(--line)]">
                   {d.recent.map((trx) => (
@@ -291,7 +291,7 @@ function TransactionRow({ trx }: { trx: Transaction }) {
         <p className="truncate text-sm text-ink">
           {trx.merchant ?? trx.note ?? (trx.kind === 'transfer' ? 'Transfer' : 'Transaksi')}
         </p>
-        <p className="text-xs text-faint">{formatDate(trx.occurredAt)}</p>
+        <p className="text-xs text-dim">{formatDate(trx.occurredAt)}</p>
       </div>
 
       <span className={`numeric shrink-0 text-sm ${colour}`}>

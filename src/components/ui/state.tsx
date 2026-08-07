@@ -82,7 +82,7 @@ export function EmptyState({
 }) {
   return (
     <div className="grid place-items-center gap-2 py-14 text-center">
-      <Inbox className="size-6 text-faint" aria-hidden />
+      <Inbox className="size-6 text-dim" aria-hidden />
       <p className="font-medium text-ink">{title}</p>
       <p className="max-w-sm text-sm leading-relaxed text-muted">{description}</p>
       {action ? <div className="mt-2">{action}</div> : null}

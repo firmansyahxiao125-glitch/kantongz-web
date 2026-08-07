@@ -95,7 +95,7 @@ export default function AsistenPage() {
                 {/* Dinyatakan terbuka. Ringkasan bertemplat yang menyamar sebagai
                     analisis merusak kepercayaan pada seluruh angka di sekitarnya. */}
                 {summary.data.narrativeSource === 'template' ? (
-                  <p className="mt-3 text-xs leading-relaxed text-faint">
+                  <p className="mt-3 text-xs leading-relaxed text-dim">
                     Disusun dari templat — model bahasa lokal tidak berjalan. Angkanya tetap dihitung
                     dari datamu.
                   </p>
@@ -160,7 +160,7 @@ export default function AsistenPage() {
                         {/* Dari mana angkanya. Jawaban tanpa asal tidak dapat
                             diperiksa siapa pun. */}
                         {turn.answer.grounding ? (
-                          <p className="mt-2 text-xs leading-relaxed text-faint">
+                          <p className="mt-2 text-xs leading-relaxed text-dim">
                             {turn.answer.grounding}
                           </p>
                         ) : null}
@@ -329,7 +329,7 @@ function SimulationCard() {
 
             {/* Seberapa jauh jawabannya layak dipercaya, dinyatakan terbuka. */}
             {simulate.data.reliable ? null : (
-              <p className="mt-3 text-xs leading-relaxed text-faint">
+              <p className="mt-3 text-xs leading-relaxed text-dim">
                 Baru {simulate.data.basisDays} hari data tercatat — angka ini belum menggambarkan
                 pola bulananmu.
               </p>

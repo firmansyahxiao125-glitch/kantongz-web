@@ -67,7 +67,7 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
 
   if (points.length === 0) {
     return (
-      <div className="grid h-50 place-items-center text-sm text-faint">
+      <div className="grid h-50 place-items-center text-sm text-dim">
         Belum ada data untuk ditampilkan.
       </div>
     );
@@ -177,7 +177,7 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         berbeda; apa pun yang digambar di dalam SVG selain garis akan ikut
         terpipihkan — lingkaran menjadi lonjong dan huruf menjadi lebar.
       */}
-      <span className="numeric pointer-events-none absolute left-1 top-0 text-[10px] text-faint">
+      <span className="numeric pointer-events-none absolute left-1 top-0 text-[10px] text-dim">
         {formatCompact(max)}
       </span>
 

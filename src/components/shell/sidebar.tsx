@@ -34,7 +34,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto">
         {NAV.map((group) => (
           <div key={group.label}>
-            <p className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-faint">
+            <p className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-dim">
               {group.label}
             </p>
 

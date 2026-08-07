@@ -187,7 +187,7 @@ export default function TransaksiPage() {
                           ? `${accountName.get(trx.accountId) ?? 'Dompet'} → ${accountName.get(trx.counterAccountId ?? '') ?? 'Dompet'}`
                           : (categoryName.get(trx.categoryId ?? '') ?? 'Tanpa kategori'))}
                     </p>
-                    <p className="truncate text-xs text-faint">
+                    <p className="truncate text-xs text-dim">
                       {formatDate(trx.occurredAt)} · {accountName.get(trx.accountId) ?? '—'}
                       {trx.kind === 'transfer' || !trx.categoryId
                         ? ''

@@ -25,7 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (session.status !== 'masuk') {
     return (
       <div className="grid min-h-dvh place-items-center bg-app" aria-busy="true">
-        <CoreMark className="size-10 animate-pulse text-[var(--ink-faint)]" />
+        <CoreMark className="size-10 animate-pulse text-[var(--ink-dim)]" />
         <span className="sr-only">Memulihkan sesi</span>
       </div>
     );

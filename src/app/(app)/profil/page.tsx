@@ -51,7 +51,7 @@ export default function ProfilPage() {
 
           <dl className="mt-6 space-y-4 border-t border-line pt-5 text-sm">
             <div className="flex items-start gap-3">
-              <UserIcon size={16} className="mt-0.5 shrink-0 text-faint" aria-hidden />
+              <UserIcon size={16} className="mt-0.5 shrink-0 text-dim" aria-hidden />
               <div>
                 <dt className="text-muted">Nama lengkap</dt>
                 <dd className="text-ink">{session.user.fullName}</dd>
@@ -59,7 +59,7 @@ export default function ProfilPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <Mail size={16} className="mt-0.5 shrink-0 text-faint" aria-hidden />
+              <Mail size={16} className="mt-0.5 shrink-0 text-dim" aria-hidden />
               <div>
                 <dt className="text-muted">Email</dt>
                 <dd className="text-ink">{session.user.email}</dd>
@@ -67,7 +67,7 @@ export default function ProfilPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <ShieldCheck size={16} className="mt-0.5 shrink-0 text-faint" aria-hidden />
+              <ShieldCheck size={16} className="mt-0.5 shrink-0 text-dim" aria-hidden />
               <div>
                 <dt className="text-muted">Status akun</dt>
                 <dd className="text-ink">Terverifikasi</dd>

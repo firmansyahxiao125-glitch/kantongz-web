@@ -126,7 +126,7 @@ export default function AnalitikPage() {
               {summary.isPending ? (
                 <Skeleton className="h-40" />
               ) : summary.isError ? null : summary.data.accounts.length === 0 ? (
-                <p className="py-8 text-center text-sm text-faint">Belum ada dompet.</p>
+                <p className="py-8 text-center text-sm text-dim">Belum ada dompet.</p>
               ) : (
                 <ul className="space-y-3">
                   {summary.data.accounts.map((account) => {

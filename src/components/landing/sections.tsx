@@ -107,7 +107,7 @@ export function Kemampuan() {
                 <span className="inline-flex size-11 items-center justify-center rounded-xl border border-line-strong bg-[var(--surface-2)]">
                   <Icon className="size-5 text-[var(--color-holo)]" aria-hidden />
                 </span>
-                <span className="numeric rounded-md bg-[var(--surface-2)] px-1.5 py-0.5 text-[10px] text-faint">
+                <span className="numeric rounded-md bg-[var(--surface-2)] px-1.5 py-0.5 text-[10px] text-dim">
                   {milestone}
                 </span>
               </div>
@@ -116,7 +116,7 @@ export function Kemampuan() {
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{body}</p>
 
               {/* Klaim tanpa dasar adalah brosur. Baris ini yang membedakan. */}
-              <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-faint">
+              <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-dim">
                 {proof}
               </p>
             </motion.article>

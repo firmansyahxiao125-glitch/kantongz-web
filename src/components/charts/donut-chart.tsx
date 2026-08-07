@@ -50,7 +50,7 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
   const arcs = useMemo(() => toArcs(slices, total), [slices, total]);
 
   if (total === 0) {
-    return <p className="py-10 text-center text-sm text-faint">Belum ada pengeluaran bulan ini.</p>;
+    return <p className="py-10 text-center text-sm text-dim">Belum ada pengeluaran bulan ini.</p>;
   }
 
   return (
@@ -88,7 +88,7 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
 
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-center">
-            <p className="text-[11px] uppercase tracking-wider text-faint">Total</p>
+            <p className="text-[11px] uppercase tracking-wider text-dim">Total</p>
             <p className="numeric text-sm font-medium text-ink">{formatIdr(total)}</p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
                     transition={{ duration: 0.7, ease: EASE_OUT }}
                   />
                 </div>
-                <span className="numeric shrink-0 text-xs text-faint">{persen}%</span>
+                <span className="numeric shrink-0 text-xs text-dim">{persen}%</span>
               </div>
             </li>
           );

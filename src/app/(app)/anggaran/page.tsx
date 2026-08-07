@@ -137,7 +137,7 @@ export default function AnggaranPage() {
                             aria-hidden
                           />
                           <span className="truncate">{category?.name ?? 'Kategori'}</span>
-                          <span className="text-xs font-normal text-faint">
+                          <span className="text-xs font-normal text-dim">
                             {PERIOD_LABEL[budget.period]}
                           </span>
                         </p>
@@ -153,7 +153,7 @@ export default function AnggaranPage() {
                       <div className="flex shrink-0 items-center gap-2">
                         <span className="text-sm tabular text-ink">
                           {formatIdr(budget.spent)}{' '}
-                          <span className="text-faint">/ {formatIdr(budget.amount)}</span>
+                          <span className="text-dim">/ {formatIdr(budget.amount)}</span>
                         </span>
                         <Button
                           variant="ghost"
