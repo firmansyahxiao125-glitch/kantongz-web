@@ -52,18 +52,21 @@ export default function DasborPage() {
       >
         <Stat
           label="Kekayaan bersih"
-          value={formatIdr(d.netWorth)}
+          value={d.netWorth}
+          format={formatIdr}
           icon={<Wallet size={16} aria-hidden />}
           hint="Seluruh dompet"
         />
         <Stat
           label="Pemasukan bulan ini"
-          value={formatIdr(d.monthIncome)}
+          value={d.monthIncome}
+          format={formatIdr}
           icon={<TrendingUp size={16} aria-hidden />}
         />
         <Stat
           label="Pengeluaran bulan ini"
-          value={formatIdr(d.monthExpense)}
+          value={d.monthExpense}
+          format={formatIdr}
           icon={<TrendingDown size={16} aria-hidden />}
           delta={rasioPengeluaran(d.monthExpense, d.expenseDelta)}
           /* Naiknya pengeluaran BUKAN kabar baik — dan panah hijau di atas
@@ -78,7 +81,8 @@ export default function DasborPage() {
         />
         <Stat
           label="Selisih"
-          value={formatIdr(d.monthIncome - d.monthExpense)}
+          value={d.monthIncome - d.monthExpense}
+          format={formatIdr}
           icon={<Repeat size={16} aria-hidden />}
           hint={d.monthIncome - d.monthExpense >= 0 ? 'Surplus' : 'Defisit'}
         />

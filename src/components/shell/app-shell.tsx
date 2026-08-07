@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { CommandPalette } from '@/components/shell/command-palette';
+import { PageTransition } from '@/components/shell/page-transition';
 import { Sidebar } from '@/components/shell/sidebar';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
@@ -151,7 +152,9 @@ export function AppShell({ user, children }: { user: User; children: React.React
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        <main id="konten" className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
 
       <CommandPalette

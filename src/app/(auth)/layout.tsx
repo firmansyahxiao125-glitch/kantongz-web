@@ -40,7 +40,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <ThemeToggle />
       </header>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-md flex-col justify-center px-6 pb-20 pt-6 sm:pt-12">
+      <main
+        id="konten"
+        className="relative z-10 mx-auto flex w-full max-w-md flex-col justify-center px-6 pb-20 pt-6 sm:pt-12"
+      >
         {children}
       </main>
     </div>

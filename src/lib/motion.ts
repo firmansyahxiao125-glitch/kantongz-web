@@ -56,3 +56,17 @@ export const pageTransition: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: DURATION.base, ease: EASE_OUT } },
   exit: { opacity: 0, y: -8, transition: { duration: DURATION.fast, ease: EASE_OUT } },
 };
+
+/**
+ * Kartu yang naik saat kursor mendekat.
+ *
+ * Empat piksel, bukan dua belas. Kartu yang melompat tinggi saat disentuh
+ * kursor terbaca sebagai mainan; yang naik sedikit terbaca sebagai permukaan
+ * yang merespons. Bayangannya ikut tumbuh, karena benda yang naik tanpa
+ * bayangan yang melebar terlihat membesar, bukan mendekat.
+ */
+export const hoverLift = {
+  y: -4,
+  boxShadow: 'var(--shadow-lift)',
+  transition: { duration: DURATION.fast, ease: EASE_OUT },
+} as const;

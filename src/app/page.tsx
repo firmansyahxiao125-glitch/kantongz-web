@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Reveal, RevealGroup } from '@/components/ui/reveal';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
+import { HeroParallax } from '@/components/three/hero-parallax';
 import { HeroScene } from '@/components/three/hero-scene';
 
 export const metadata: Metadata = {
@@ -81,11 +82,15 @@ export default function LandingPage() {
       </header>
 
       {/* ── hero ─────────────────────────────────────────────────── */}
-      <section className="aurora relative isolate px-4 pb-24 pt-36 sm:pt-44">
+      <section id="konten" className="aurora relative isolate px-4 pb-24 pt-36 sm:pt-44">
         <div className="grid-lines pointer-events-none absolute inset-0 -z-10" aria-hidden />
 
         {/* Adegan berada DI BELAKANG teks, bukan di sebelahnya. */}
-        <HeroScene className="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[38rem] sm:h-[46rem]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[38rem] sm:h-[46rem]">
+          <HeroParallax>
+            <HeroScene className="size-full" />
+          </HeroParallax>
+        </div>
 
         {/*
           Tabir keterbacaan.

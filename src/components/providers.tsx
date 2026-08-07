@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MotionConfig } from 'framer-motion';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
 
@@ -37,17 +38,31 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={client}>
-      <ThemeProvider>
-        <SessionProvider>{children}</SessionProvider>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            className:
-              'glass-strong !rounded-xl !text-[var(--ink)] !shadow-[var(--shadow-float)] !text-sm',
-          }}
-          closeButton
-        />
-      </ThemeProvider>
+      {/*
+        Framer Motion menganimasikan lewat gaya sebaris dan `requestAnimationFrame`,
+        BUKAN lewat animasi CSS. Aturan `prefers-reduced-motion` di `globals.css`
+        karena itu tidak menyentuhnya sama sekali: pengguna yang meminta gerak
+        dikurangi tetap menerima seluruh transisi halaman, laci yang meluncur,
+        dan setiap kartu yang naik saat masuk layar.
+
+        `reducedMotion="user"` menutup celah itu di satu tempat. Framer menahan
+        animasi transform dan tata letak, tetapi MEMBIARKAN opasitas — memudar
+        tidak memicu vertigo, dan tanpa memudar keadaan berganti dengan kedipan
+        yang justru lebih mengganggu daripada gerak aslinya.
+      */}
+      <MotionConfig reducedMotion="user">
+        <ThemeProvider>
+          <SessionProvider>{children}</SessionProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              className:
+                'glass-strong !rounded-xl !text-[var(--ink)] !shadow-[var(--shadow-float)] !text-sm',
+            }}
+            closeButton
+          />
+        </ThemeProvider>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

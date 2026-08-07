@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
 import type { ReactNode } from 'react';
 
+import { CountUp } from '@/components/ui/count-up';
 import { cn } from '@/lib/cn';
-import { fadeUp } from '@/lib/motion';
+import { fadeUp, hoverLift } from '@/lib/motion';
 
 /**
  * Ubin angka.
@@ -22,7 +23,10 @@ import { fadeUp } from '@/lib/motion';
 
 export interface StatProps {
   label: string;
-  value: string;
+  /** Angka mentah, supaya ubin dapat menghitungnya naik. */
+  value: number;
+  /** Pemformat nilai. Ubin tidak pernah memutuskan sendiri format uang. */
+  format: (value: number) => string;
   /** Perubahan relatif, misalnya -0.34 untuk turun 34%. `null` = tak ada pembanding. */
   delta?: number | null;
   /** Apakah delta positif itu kabar baik. Pengeluaran naik BUKAN kabar baik. */
@@ -40,6 +44,7 @@ const PERSEN = new Intl.NumberFormat('id-ID', {
 export function Stat({
   label,
   value,
+  format,
   delta = null,
   positiveIsGood = true,
   hint,
@@ -55,6 +60,7 @@ export function Stat({
   return (
     <motion.div
       variants={fadeUp}
+      whileHover={hoverLift}
       className={cn(
         'edge-light relative overflow-hidden rounded-[var(--radius-card)]',
         'border border-[var(--line)] bg-[var(--surface)] p-5',
@@ -67,7 +73,11 @@ export function Stat({
         {icon ? <span className="text-faint">{icon}</span> : null}
       </div>
 
-      <p className="numeric mt-3 text-2xl font-medium text-ink sm:text-[1.75rem]">{value}</p>
+      <CountUp
+        value={value}
+        format={format}
+        className="numeric mt-3 block text-2xl font-medium text-ink sm:text-[1.75rem]"
+      />
 
       <div className="mt-2 flex min-h-5 items-center gap-1.5 text-xs">
         {delta === null ? (
