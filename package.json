@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "screenshots": "node scripts/screenshots.mjs --base http://localhost:3100 --out ../kantongz/docs/screenshots"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",
