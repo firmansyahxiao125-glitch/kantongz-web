@@ -60,6 +60,10 @@ const button = cva(
   },
 );
 
+/** Diekspor supaya tautan yang berperan sebagai tombol memakai gaya yang SAMA,
+ *  bukan gaya yang mirip. Yang mirip akan menyimpang. */
+export const buttonStyle = button;
+
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof button> {

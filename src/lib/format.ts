@@ -26,20 +26,38 @@ export function formatPercent(value: number): string {
   return `${sign}${value.toFixed(1)}%`;
 }
 
-export function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(iso));
+/**
+ * Waktu boleh datang sebagai epoch milidetik, ISO, atau `Date`.
+ *
+ * API mengirim epoch milidetik; kolom tanggal murni (`starts_on`) mengirim
+ * `YYYY-MM-DD`. Satu penerima untuk keduanya mencegah `new Date()` tersebar ke
+ * setiap komponen, yang di sanalah zona waktu mulai berbeda-beda.
+ */
+export type TimeInput = number | string | Date;
+
+function asDate(value: TimeInput): Date {
+  return value instanceof Date ? value : new Date(value);
 }
 
-export function formatDateTime(iso: string): string {
+export function formatDate(value: TimeInput): string {
+  return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(asDate(value));
+}
+
+export function formatDateTime(value: TimeInput): string {
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(iso),
+    asDate(value),
   );
 }
 
+/** Label pendek untuk sumbu grafik: "7 Agu". */
+export function formatDayShort(value: TimeInput): string {
+  return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short' }).format(asDate(value));
+}
+
 /** "3 menit lalu". Dipakai lini masa aktivitas dan pusat notifikasi. */
-export function formatRelative(iso: string, now: number = Date.now()): string {
+export function formatRelative(value: TimeInput, now: number = Date.now()): string {
   const rtf = new Intl.RelativeTimeFormat('id-ID', { numeric: 'auto' });
-  const diff = new Date(iso).getTime() - now;
+  const diff = asDate(value).getTime() - now;
   const abs = Math.abs(diff);
 
   const units: [Intl.RelativeTimeFormatUnit, number][] = [

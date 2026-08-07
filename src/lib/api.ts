@@ -1,4 +1,4 @@
-import type { AuthErrorCode } from '@/lib/contracts';
+import type { ErrorCode } from '@/lib/contracts';
 
 /**
  * Klien HTTP.
@@ -14,14 +14,14 @@ export interface ApiMeta {
 }
 
 export interface ApiErrorBody {
-  code: AuthErrorCode;
+  code: ErrorCode;
   message: string;
   details: unknown;
   retryAfter: number | null;
 }
 
 export class ApiError extends Error {
-  readonly code: AuthErrorCode;
+  readonly code: ErrorCode;
   readonly status: number;
   readonly requestId: string | undefined;
   readonly retryAfter: number | null;
@@ -62,15 +62,41 @@ export function getAccessToken(): string | null {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   /** Rute publik tidak menyertakan `Authorization`. M3_SPEC §2. */
   auth?: boolean;
+  /**
+   * Rute BFF milik Next.js sendiri, bukan backend.
+   *
+   * Rute inilah satu-satunya yang boleh membawa kuki — di situ refresh token
+   * tinggal, dan `credentials: 'omit'` pada panggilan backend memastikan kuki
+   * itu tidak pernah ikut ke lintas-asal.
+   */
+  absolute?: boolean;
   signal?: AbortSignal;
 }
 
+/**
+ * Penangan 401.
+ *
+ * Didaftarkan `lib/session` saat modulnya dimuat. Dibalik seperti ini supaya
+ * `api` tidak mengimpor `session` yang mengimpor `api` — lingkaran impor yang
+ * urutan evaluasinya bergantung pada modul mana yang kebetulan dimuat lebih
+ * dulu, dan yang gagal secara berbeda antara server dan peramban.
+ */
+let onUnauthorized: (() => Promise<boolean>) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => Promise<boolean>) | null): void {
+  onUnauthorized = handler;
+}
+
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, auth = true, signal } = options;
+  return send<T>(path, options, true);
+}
+
+async function send<T>(path: string, options: RequestOptions, mayRetry: boolean): Promise<T> {
+  const { method = 'GET', body, auth = true, absolute = false, signal } = options;
 
   const headers: Record<string, string> = { accept: 'application/json' };
   if (body !== undefined) headers['content-type'] = 'application/json';
@@ -78,12 +104,12 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   let response: Response;
   try {
-    response = await fetch(`${BASE_URL}${path}`, {
+    response = await fetch(absolute ? path : `${BASE_URL}${path}`, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: signal ?? null,
-      credentials: 'omit',
+      credentials: absolute ? 'same-origin' : 'omit',
     });
   } catch {
     /* Kegagalan jaringan tidak punya amplop. Kodenya tetap dari kontrak yang
@@ -114,6 +140,26 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
       details: null,
       retryAfter: null,
     };
+
+    /*
+     * Satu percobaan ulang, dan hanya satu. Access token berumur sepuluh menit
+     * sementara halaman bisa terbuka berjam-jam; tanpa ini setiap permintaan
+     * pertama setelah jeda panjang akan gagal di depan pengguna. Percobaan
+     * kedua tidak ditawarkan: bila penyegaran sudah berhasil dan hasilnya masih
+     * 401, yang salah bukan tokennya.
+     */
+    if (
+      mayRetry &&
+      auth &&
+      !absolute &&
+      response.status === 401 &&
+      error.code === 'session_expired' &&
+      onUnauthorized &&
+      (await onUnauthorized())
+    ) {
+      return send<T>(path, options, false);
+    }
+
     throw new ApiError(error, response.status, requestId);
   }
 

@@ -19,6 +19,16 @@ export type AuthErrorCode =
   | 'session_expired'
   | 'unknown';
 
+/**
+ * Kode di luar autentikasi.
+ *
+ * Terpisah karena `AuthErrorCode` beku di sisi backend maupun di aplikasi
+ * mobile. Union ini boleh tumbuh; yang di atas tidak.
+ */
+export type DomainErrorCode = 'not_found' | 'invalid_input' | 'conflict';
+
+export type ErrorCode = AuthErrorCode | DomainErrorCode;
+
 export interface User {
   id: string;
   email: string;
@@ -57,7 +67,7 @@ export interface DeviceInfo {
  * Aplikasi menerjemahkan kodenya sendiri, dan itu yang menjaga bahasa produk
  * tetap satu suara di seluruh permukaan.
  */
-export const ERROR_MESSAGES: Record<AuthErrorCode, string> = {
+export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   invalid_credentials: 'Email atau kata sandi tidak cocok. Periksa kembali, lalu coba lagi.',
   email_taken: 'Email ini sudah terdaftar. Masuk dengan akun itu, atau pulihkan sandinya.',
   weak_password: 'Kata sandi terlalu mudah ditebak. Perpanjang atau campur jenis karakternya.',
@@ -67,8 +77,14 @@ export const ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   rate_limited: 'Terlalu banyak percobaan masuk. Tunggu sebentar sebelum mencoba lagi.',
   session_expired: 'Sesimu sudah berakhir. Masuk lagi untuk melanjutkan.',
   unknown: 'Terjadi kesalahan yang tidak terduga. Coba lagi sebentar lagi.',
+
+  /* "Tidak ditemukan" mencakup juga milik orang lain — backend sengaja tidak
+     membedakannya, dan pesan ini tidak boleh membocorkan bedanya. */
+  not_found: 'Data ini tidak ditemukan. Mungkin sudah dihapus.',
+  invalid_input: 'Ada isian yang belum benar. Periksa kembali, lalu coba lagi.',
+  conflict: 'Sudah ada data dengan nama yang sama. Pakai nama lain.',
 };
 
-export function messageFor(code: AuthErrorCode): string {
+export function messageFor(code: ErrorCode): string {
   return ERROR_MESSAGES[code];
 }

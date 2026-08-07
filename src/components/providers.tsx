@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
 
+import { SessionProvider } from '@/components/session-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 
 /**
@@ -37,7 +38,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <ThemeProvider>
-        {children}
+        <SessionProvider>{children}</SessionProvider>
         <Toaster
           position="top-right"
           toastOptions={{
