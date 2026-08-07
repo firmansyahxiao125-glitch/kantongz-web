@@ -1,0 +1,262 @@
+'use client';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { AlertTriangle, Info, Repeat, TrendingDown, Wand2 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardBody } from '@/components/ui/card';
+import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
+import { formatDate, formatIdr } from '@/lib/format';
+import {
+  intelligence,
+  intelligenceKeys,
+  keys,
+  type Insight,
+  type InsightSeverity,
+} from '@/lib/ledger';
+import { fadeUp, stagger } from '@/lib/motion';
+
+/**
+ * Wawasan. ROADMAP M9, M10, M12.
+ *
+ * Setiap kartu menampilkan `reason` — angka yang mendasarinya — di bawah
+ * kalimatnya. Itu bukan hiasan: saran keuangan yang tidak dapat dijelaskan
+ * tidak akan dipercaya, dan yang tidak dipercaya akan dimatikan bersama seluruh
+ * notifikasi lainnya.
+ */
+
+const TONE: Record<InsightSeverity, { border: string; text: string; icon: typeof Info }> = {
+  critical: {
+    border: 'border-[var(--color-danger)]/40',
+    text: 'text-[var(--color-danger)]',
+    icon: AlertTriangle,
+  },
+  warning: {
+    border: 'border-[var(--color-warning)]/40',
+    text: 'text-[var(--color-warning)]',
+    icon: AlertTriangle,
+  },
+  info: { border: 'border-line', text: 'text-muted', icon: Info },
+};
+
+export default function WawasanPage() {
+  const client = useQueryClient();
+
+  const digest = useQuery({ queryKey: intelligenceKeys.insights, queryFn: intelligence.insights });
+  const suggestions = useQuery({
+    queryKey: intelligenceKeys.suggestions,
+    queryFn: intelligence.suggestions,
+  });
+
+  const apply = useMutation({
+    mutationFn: ({ transactionId, categoryId }: { transactionId: string; categoryId: string }) =>
+      intelligence.applySuggestion(transactionId, categoryId),
+    onSuccess: async () => {
+      await Promise.all([
+        client.invalidateQueries({ queryKey: intelligenceKeys.suggestions }),
+        client.invalidateQueries({ queryKey: intelligenceKeys.insights }),
+        client.invalidateQueries({ queryKey: ['transactions'] }),
+        client.invalidateQueries({ queryKey: keys.dashboard }),
+      ]);
+    },
+  });
+
+  if (digest.isPending) {
+    return (
+      <div className="space-y-4" aria-busy="true">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-28" />
+        ))}
+      </div>
+    );
+  }
+
+  if (digest.isError) {
+    return (
+      <ErrorState
+        error={digest.error}
+        onRetry={() => {
+          void digest.refetch();
+        }}
+      />
+    );
+  }
+
+  const { insights, projection, recurring } = digest.data;
+  const usulan = suggestions.data ?? [];
+
+  return (
+    <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-5">
+      {insights.length === 0 ? (
+        <motion.div variants={fadeUp}>
+          <Card>
+            <CardBody>
+              <EmptyState
+                title="Belum ada yang perlu diperhatikan"
+                description="Wawasan muncul saat ada pengeluaran janggal, langganan yang tampak tidak terpakai, anggaran yang hampir jebol, atau saldo yang menuju nol."
+              />
+            </CardBody>
+          </Card>
+        </motion.div>
+      ) : (
+        <motion.ul variants={stagger} className="space-y-3">
+          {insights.map((insight) => (
+            <motion.li key={insight.id} variants={fadeUp}>
+              <InsightCard insight={insight} />
+            </motion.li>
+          ))}
+        </motion.ul>
+      )}
+
+      <motion.div variants={fadeUp}>
+        <Card>
+          <CardBody>
+            <header className="mb-4 flex items-center gap-2">
+              <TrendingDown size={16} className="text-muted" aria-hidden />
+              <h2 className="text-sm font-semibold text-ink">Proyeksi arus kas</h2>
+            </header>
+
+            {!projection.reliable ? (
+              /* `reliable: false` dinyatakan terbuka, bukan disamarkan sebagai
+                 proyeksi berpita lebar yang tetap ditampilkan seolah bermakna. */
+              <p className="text-sm leading-relaxed text-muted">
+                Datamu belum cukup untuk proyeksi yang bermakna — baru{' '}
+                {projection.basisDays} hari tercatat. Catat transaksi selama dua pekan lagi.
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-muted">
+                  Arus bersih{' '}
+                  <span
+                    className={`tabular ${projection.dailyNet < 0 ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]'}`}
+                  >
+                    {formatIdr(projection.dailyNet)}
+                  </span>{' '}
+                  per hari, dari {projection.basisDays} hari terakhir.
+                </p>
+
+                <ul className="mt-4 space-y-3">
+                  {projection.points.map((point) => (
+                    <li key={point.horizonDays}>
+                      <div className="flex items-baseline justify-between text-sm">
+                        <span className="text-muted">{point.horizonDays} hari</span>
+                        <span className="tabular text-ink">{formatIdr(point.expected)}</span>
+                      </div>
+                      {/* Pita ketidakpastian ditampilkan, bukan disembunyikan.
+                          Angka tunggal pada proyeksi keuangan terlihat tepat dan
+                          tidak pernah tepat. */}
+                      <p className="text-xs tabular text-faint">
+                        {formatIdr(point.low)} – {formatIdr(point.high)}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+
+                {projection.daysUntilEmpty === null ? null : (
+                  <p className="mt-4 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 px-3.5 py-3 text-sm text-[var(--color-danger)]">
+                    Dengan pola sekarang, saldomu habis dalam {projection.daysUntilEmpty} hari.
+                  </p>
+                )}
+              </>
+            )}
+          </CardBody>
+        </Card>
+      </motion.div>
+
+      {recurring.length > 0 ? (
+        <motion.div variants={fadeUp}>
+          <Card>
+            <CardBody>
+              <header className="mb-3 flex items-center gap-2">
+                <Repeat size={16} className="text-muted" aria-hidden />
+                <h2 className="text-sm font-semibold text-ink">Tagihan berulang</h2>
+              </header>
+
+              <ul className="divide-y divide-[var(--line)]">
+                {recurring.map((charge) => (
+                  <li key={charge.merchant} className="flex items-center gap-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-ink">{charge.merchant}</p>
+                      <p className="text-xs text-faint">
+                        Tiap {charge.intervalDays} hari · {charge.occurrences} kali · terakhir{' '}
+                        {formatDate(charge.lastChargedAt)}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm tabular text-ink">
+                      {formatIdr(charge.monthlyCost)}
+                      <span className="text-faint">/bln</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </CardBody>
+          </Card>
+        </motion.div>
+      ) : null}
+
+      {usulan.length > 0 ? (
+        <motion.div variants={fadeUp}>
+          <Card>
+            <CardBody>
+              <header className="mb-1 flex items-center gap-2">
+                <Wand2 size={16} className="text-muted" aria-hidden />
+                <h2 className="text-sm font-semibold text-ink">Usulan kategori</h2>
+              </header>
+              <p className="mb-3 text-sm text-muted">
+                Diterapkan satu per satu, bukan otomatis — kategorisasi yang berubah sendiri membuat
+                laporan bulan lalu berbeda setiap kali dibuka.
+              </p>
+
+              <ul className="divide-y divide-[var(--line)]">
+                {usulan.map((s) => (
+                  <li key={s.transactionId} className="flex items-center gap-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-ink">{s.categoryName}</p>
+                      <p className="text-xs text-faint">{s.reason}</p>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      loading={apply.isPending && apply.variables?.transactionId === s.transactionId}
+                      onClick={() => {
+                        apply.mutate({
+                          transactionId: s.transactionId,
+                          categoryId: s.categoryId,
+                        });
+                      }}
+                    >
+                      Terapkan
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </CardBody>
+          </Card>
+        </motion.div>
+      ) : null}
+    </motion.div>
+  );
+}
+
+function InsightCard({ insight }: { insight: Insight }) {
+  const tone = TONE[insight.severity];
+  const Icon = tone.icon;
+
+  return (
+    <Card className={tone.border}>
+      <CardBody>
+        <div className="flex items-start gap-3">
+          <Icon size={17} className={`mt-0.5 shrink-0 ${tone.text}`} aria-hidden />
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-ink">{insight.title}</h3>
+            <p className="mt-1 text-sm leading-relaxed text-muted">{insight.body}</p>
+            {/* MENGAPA wawasan ini muncul. Wawasan tanpa ini adalah tebakan yang
+                menyamar sebagai analisis. */}
+            <p className="mt-2 text-xs leading-relaxed text-faint">{insight.reason}</p>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}

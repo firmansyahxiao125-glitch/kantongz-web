@@ -3,9 +3,11 @@ import {
   BarChart3,
   FileText,
   LayoutDashboard,
+  Lightbulb,
   PiggyBank,
   Settings,
   Shield,
+  Sparkles,
   Target,
   User,
   Wallet,
@@ -53,6 +55,8 @@ export const NAV: NavGroup[] = [
     label: 'Wawasan',
     items: [
       { href: '/analitik', label: 'Analitik', icon: BarChart3, keywords: 'grafik tren' },
+      { href: '/wawasan', label: 'Wawasan', icon: Lightbulb, keywords: 'anomali langganan proyeksi' },
+      { href: '/asisten', label: 'Asisten', icon: Sparkles, keywords: 'tanya chat simulasi what-if' },
       { href: '/laporan', label: 'Laporan', icon: FileText, keywords: 'ekspor csv cetak pdf' },
     ],
   },
@@ -67,12 +71,14 @@ export const NAV: NavGroup[] = [
 ];
 
 /*
- * Asisten AI dan Notifikasi TIDAK terdaftar di sini.
+ * Notifikasi TIDAK terdaftar di sini.
  *
- * Keduanya belum punya endpoint: asisten membutuhkan kredensial penyedia model
- * yang belum ada, notifikasi membutuhkan pekerja outbox M3.7. Menautkannya
- * sekarang berarti menu yang mengantar ke halaman 404 — dan menu yang berbohong
- * merusak kepercayaan pada seluruh menu, termasuk butir yang bekerja.
+ * Ia belum punya permukaan sendiri: peringatan yang layak diberitahukan sudah
+ * muncul di Wawasan, dan pusat notifikasi terpisah tanpa kanal push yang
+ * sungguhan hanya akan menjadi salinan kedua dari halaman yang sama.
+ *
+ * Wawasan dan Asisten kini ADA di sini — keduanya punya endpoint yang bekerja
+ * tanpa kredensial apa pun.
  */
 
 export const NAV_ITEMS: NavItem[] = NAV.flatMap((group) => group.items);

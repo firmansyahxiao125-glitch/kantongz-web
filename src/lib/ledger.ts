@@ -190,3 +190,124 @@ export const keys = {
   goals: ['goals'] as const,
   cashflow: (params: { days?: number; months?: number }) => ['cashflow', params] as const,
 };
+
+/* ── wawasan & asisten (M9–M13) ──────────────────────────────────────── */
+
+export type InsightKind =
+  | 'anomaly'
+  | 'ghost_subscription'
+  | 'budget_risk'
+  | 'cashflow_risk'
+  | 'weekly_summary';
+
+export type InsightSeverity = 'info' | 'warning' | 'critical';
+
+export interface Insight {
+  id: string;
+  kind: InsightKind;
+  severity: InsightSeverity;
+  title: string;
+  body: string;
+  /** MENGAPA wawasan ini muncul, dalam angka. */
+  reason: string;
+  amount: number | null;
+  transactionId: string | null;
+  categoryId: string | null;
+}
+
+export interface CashflowProjection {
+  startingBalance: number;
+  dailyNet: number;
+  points: { horizonDays: number; expected: number; low: number; high: number }[];
+  basisDays: number;
+  /** `false` berarti datanya belum cukup — bukan proyeksi berpita selebar
+   *  samudra yang tetap ditampilkan seolah bermakna. */
+  reliable: boolean;
+  daysUntilEmpty: number | null;
+}
+
+export interface RecurringCharge {
+  merchant: string;
+  amount: number;
+  intervalDays: number;
+  occurrences: number;
+  lastChargedAt: number;
+  monthlyCost: number;
+  dormant: boolean;
+}
+
+export interface InsightDigest {
+  generatedAt: number;
+  insights: Insight[];
+  projection: CashflowProjection;
+  recurring: RecurringCharge[];
+}
+
+export interface CategorySuggestion {
+  transactionId: string;
+  categoryId: string;
+  categoryName: string;
+  reason: string;
+}
+
+export interface Answer {
+  question: string;
+  intent: string | null;
+  answer: string;
+  /** Dari mana angkanya. Yang membedakan jawaban yang dapat diperiksa dari
+   *  kalimat yang terdengar meyakinkan. */
+  grounding: string | null;
+  amount: number | null;
+}
+
+export interface Simulation {
+  monthlyCommitment: number;
+  months: number;
+  currentMonthlySurplus: number;
+  projectedMonthlySurplus: number;
+  balanceAtEnd: number;
+  monthsUntilEmpty: number | null;
+  verdict: 'aman' | 'ketat' | 'tidak_aman';
+  reason: string;
+  basisDays: number;
+  reliable: boolean;
+}
+
+export interface PeriodSummary {
+  from: number;
+  to: number;
+  income: number;
+  expense: number;
+  net: number;
+  topCategories: { name: string; total: number }[];
+  narrative: string;
+  /** Dinyatakan terbuka. Ringkasan bertemplat yang menyamar sebagai analisis
+   *  merusak kepercayaan pada seluruh angka di sekitarnya. */
+  narrativeSource: 'model' | 'template';
+  insights: Insight[];
+}
+
+export const intelligence = {
+  insights: () => request<InsightDigest>('/v1/insights'),
+  suggestions: () => request<CategorySuggestion[]>('/v1/insights/suggestions'),
+  applySuggestion: (transactionId: string, categoryId: string) =>
+    request<Record<string, never>>('/v1/insights/suggestions/apply', {
+      method: 'POST',
+      body: { transactionId, categoryId },
+    }),
+
+  summary: () => request<PeriodSummary>('/v1/assistant/summary'),
+  ask: (question: string) =>
+    request<Answer>('/v1/assistant/ask', { method: 'POST', body: { question } }),
+  simulate: (monthlyCommitment: number, months: number) =>
+    request<Simulation>('/v1/assistant/simulate', {
+      method: 'POST',
+      body: { monthlyCommitment, months },
+    }),
+};
+
+export const intelligenceKeys = {
+  insights: ['insights'] as const,
+  suggestions: ['insights', 'suggestions'] as const,
+  summary: ['assistant', 'summary'] as const,
+};
