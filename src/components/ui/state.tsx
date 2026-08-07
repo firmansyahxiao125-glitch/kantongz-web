@@ -16,12 +16,33 @@ import { cn } from '@/lib/cn';
  * yang lalu tampil sebagai halaman putih tanpa penjelasan.
  */
 
+/**
+ * Kerangka muat.
+ *
+ * Sapuan kilau, bukan denyut. Denyut meredupkan seluruh blok serentak dan
+ * terbaca sebagai elemen rusak; sapuan yang bergerak terbaca sebagai sesuatu
+ * yang sedang datang — dan itu memang yang sedang terjadi.
+ */
 export function Skeleton({ className }: { className?: string }) {
+  return <div className={cn('shimmer rounded-lg', className)} aria-hidden />;
+}
+
+/**
+ * Kerangka yang menyerupai bentuk isinya.
+ *
+ * Kotak abu-abu seragam memaksa tata letak melompat begitu data tiba. Kerangka
+ * yang tingginya sudah benar membuat kedatangan data tidak menggeser apa pun —
+ * dan pergeseran tata letak adalah cacat yang paling terasa justru pada koneksi
+ * paling lambat.
+ */
+export function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div
-      className={cn('animate-pulse rounded-lg bg-[var(--surface-3)]', className)}
-      aria-hidden
-    />
+    <div className={cn('space-y-2.5', className)} aria-hidden>
+      {Array.from({ length: lines }, (_, i) => (
+        /* Baris terakhir lebih pendek — paragraf sungguhan berakhir begitu. */
+        <Skeleton key={i} className={cn('h-3.5', i === lines - 1 && 'w-2/3')} />
+      ))}
+    </div>
   );
 }
 

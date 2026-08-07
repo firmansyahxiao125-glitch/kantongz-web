@@ -28,9 +28,37 @@
   --color-warning: #f59e0b;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-stack), ui-monospace, SFMono-Regular, monospace;
 
   --radius-card: 1rem;
   --radius-panel: 1.25rem;
+
+  /*
+   * Skala tipografi CAIR.
+   *
+   * `clamp()` dan bukan titik henti: judul yang melompat pada 640px terbaca
+   * sebagai dua desain yang dijahit, dan di antara dua titik henti ukurannya
+   * selalu salah untuk salah satu sisi. Batas atas ditetapkan supaya judul
+   * tidak tumbuh tanpa henti di monitor lebar.
+   */
+  --text-display: clamp(2.5rem, 1.2rem + 5.6vw, 5rem);
+  --text-h1: clamp(2rem, 1.2rem + 3.2vw, 3.5rem);
+  --text-h2: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  --text-h3: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+
+  /*
+   * Kosakata gerak, dibagi CSS dan Framer Motion.
+   *
+   * Dua sumber durasi adalah dua sumber penyimpangan: transisi CSS yang 200ms
+   * di samping animasi Framer yang 320ms terbaca sebagai antarmuka yang tidak
+   * sinkron dengan dirinya sendiri, tanpa ada yang bisa menunjuk sebabnya.
+   */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 320ms;
+  --dur-slow: 500ms;
 
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
@@ -91,6 +119,30 @@
     background: color-mix(in oklab, var(--color-primary) 35%, transparent);
   }
 
+  /* Batang gulir mengikuti tema. Batang putih bawaan di antarmuka gelap
+     adalah satu-satunya bagian layar yang mengaku bahwa ini halaman web. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-faint);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
   /* Pengguna yang meminta gerak dikurangi mendapat antarmuka yang sama,
      tanpa gerak. Bukan antarmuka yang berbeda. */
   @media (prefers-reduced-motion: reduce) {
@@ -101,6 +153,12 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+
+    /* Sapuan kilau dimatikan sepenuhnya, bukan dipercepat: sapuan 0.01ms
+       berkedip, dan kedipan justru lebih mengganggu daripada gerak asalnya. */
+    .shimmer::after {
+      display: none;
     }
   }
 }
@@ -179,5 +237,96 @@
 
   .tabular {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Angka uang. Lebar digit rata supaya kolom nominal tidak bergoyang saat
+     nilainya berubah — pada daftar transaksi itu terbaca sebagai kegelisahan. */
+  .numeric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .text-display {
+    font-size: var(--text-display);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .text-h1 {
+    font-size: var(--text-h1);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+  .text-h2 {
+    font-size: var(--text-h2);
+    line-height: 1.15;
+    letter-spacing: -0.022em;
+  }
+  .text-h3 {
+    font-size: var(--text-h3);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+
+  /*
+   * Sapuan kilau untuk keadaan memuat.
+   *
+   * `animate-pulse` meredupkan seluruh blok serentak, yang terbaca sebagai
+   * elemen yang rusak. Sapuan bergerak terbaca sebagai sesuatu yang SEDANG
+   * datang — dan itu memang yang terjadi.
+   */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--ink) 7%, transparent),
+      transparent
+    );
+    animation: shimmer-sweep 1.6s var(--ease-in-out) infinite;
+  }
+
+  @keyframes shimmer-sweep {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Bintik halus di atas permukaan besar. Gradien murni pada layar OLED
+     menunjukkan pita warna; bintik memecahnya tanpa terlihat sebagai tekstur. */
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Garis terang di tepi atas panel — meniru cahaya yang datang dari atas
+     layar. Tanpa ini panel gelap terbaca sebagai lubang, bukan sebagai pelat. */
+  .edge-light {
+    position: relative;
+  }
+  .edge-light::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--ink) 14%, transparent) 30%,
+      color-mix(in oklab, var(--ink) 14%, transparent) 70%,
+      transparent
+    );
   }
 }

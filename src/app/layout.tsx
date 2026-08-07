@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import { Providers } from '@/components/providers';
 
@@ -14,6 +14,20 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+});
+
+/**
+ * Angka uang memakai lebar digit rata.
+ *
+ * Pada daftar transaksi, digit berlebar berbeda membuat kolom nominal
+ * bergoyang setiap kali nilainya berubah. Pada aplikasi uang goyangan itu
+ * terbaca sebagai angka yang tidak dapat dipercaya.
+ */
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono-stack',
+  display: 'swap',
+  weight: ['400', '500'],
 });
 
 export const metadata: Metadata = {
@@ -68,7 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${mono.variable} font-sans antialiased`}>
         {/* Lompat ke konten — pengguna papan ketik tidak boleh dipaksa
             menyusuri seluruh navigasi di setiap halaman. WCAG 2.4.1 */}
         <a

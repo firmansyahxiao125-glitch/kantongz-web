@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useId, useMemo, useState } from 'react';
 
-import { formatDayShort, formatIdr } from '@/lib/format';
+import { formatCompact, formatDayShort, formatIdr } from '@/lib/format';
 import { EASE_OUT } from '@/lib/motion';
 
 /**
@@ -75,15 +75,17 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
 
   const active = index === null ? null : points[index];
   const step = points.length === 1 ? 0 : (W - PAD * 2) / (points.length - 1);
+  const xRatio = index === null ? 0 : (PAD + index * step) / W;
 
   return (
     <figure className="relative">
       <figcaption className="sr-only">{label}</figcaption>
 
+      <div className="relative h-50">
       <svg
         viewBox={`0 0 ${String(W)} ${String(H)}`}
         preserveAspectRatio="none"
-        className="h-50 w-full"
+        className="h-full w-full"
         role="img"
         aria-label={label}
         onPointerLeave={() => {
@@ -105,6 +107,21 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
             <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0" />
           </linearGradient>
         </defs>
+
+        {/* Kisi mendatar. Empat garis: cukup untuk memperkirakan tinggi,
+            tidak cukup untuk bersaing dengan datanya sendiri. */}
+        {[0.25, 0.5, 0.75].map((ratio) => (
+          <line
+            key={ratio}
+            x1={PAD}
+            x2={W - PAD}
+            y1={PAD + ratio * (H - PAD * 2)}
+            y2={PAD + ratio * (H - PAD * 2)}
+            stroke="var(--line)"
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
 
         <motion.path
           d={path(income, max, true)}
@@ -154,6 +171,24 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
           />
         )}
       </svg>
+      {/*
+        Label dan titik digambar sebagai HTML di atas SVG.
+        `preserveAspectRatio="none"` meregang sumbu X dan Y dengan faktor
+        berbeda; apa pun yang digambar di dalam SVG selain garis akan ikut
+        terpipihkan — lingkaran menjadi lonjong dan huruf menjadi lebar.
+      */}
+      <span className="numeric pointer-events-none absolute left-1 top-0 text-[10px] text-faint">
+        {formatCompact(max)}
+      </span>
+
+      {active ? (
+        <>
+          <Dot ratioX={xRatio} value={active.income} max={max} color="var(--color-accent)" />
+          <Dot ratioX={xRatio} value={active.expense} max={max} color="var(--color-primary)" />
+        </>
+      ) : null}
+
+      </div>
 
       {active ? (
         <div
@@ -175,6 +210,48 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
           </p>
         </div>
       ) : null}
+
+      {/* Dua warna tanpa nama hanyalah dua garis. Legenda ada di luar SVG
+          supaya pembaca layar membacanya sebagai teks, bukan melewatinya
+          bersama grafik yang sudah ditandai `aria-label`. */}
+      <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
+        <li className="flex items-center gap-1.5">
+          <span className="size-2 rounded-full bg-[var(--color-accent)]" aria-hidden />
+          Masuk
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span className="size-2 rounded-full bg-[var(--color-primary)]" aria-hidden />
+          Keluar
+        </li>
+      </ul>
     </figure>
+  );
+}
+
+/** Titik sorot pada satu deret. Diposisikan dalam persen — sama seperti SVG
+ *  meregang, jadi keduanya selalu bertemu di titik yang sama. */
+function Dot({
+  ratioX,
+  value,
+  max,
+  color,
+}: {
+  ratioX: number;
+  value: number;
+  max: number;
+  color: string;
+}) {
+  const ratioY = (H - PAD - (value / max) * (H - PAD * 2)) / H;
+
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[var(--surface)]"
+      style={{
+        left: `${String(ratioX * 100)}%`,
+        top: `${String(ratioY * 100)}%`,
+        background: color,
+      }}
+    />
   );
 }

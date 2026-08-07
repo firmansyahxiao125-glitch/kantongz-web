@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Info, Repeat, TrendingDown, Wand2 } from 'lucide-react';
 
+import { Sparkline } from '@/components/charts/sparkline';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
@@ -135,6 +136,18 @@ export default function WawasanPage() {
                   </span>{' '}
                   per hari, dari {projection.basisDays} hari terakhir.
                 </p>
+
+                {/* Bentuk lintasannya lebih dulu, angkanya sesudah. Deret ini
+                    dimulai dari saldo sekarang supaya kemiringannya jujur —
+                    grafik yang dimulai dari titik proyeksi pertama menyembunyikan
+                    seberapa jauh perjalanannya dari hari ini. */}
+                <Sparkline
+                  className="mt-4 h-10"
+                  values={[projection.startingBalance, ...projection.points.map((p) => p.expected)]}
+                  stroke={
+                    projection.dailyNet < 0 ? 'var(--color-danger)' : 'var(--color-success)'
+                  }
+                />
 
                 <ul className="mt-4 space-y-3">
                   {projection.points.map((point) => (

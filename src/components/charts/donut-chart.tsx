@@ -57,6 +57,17 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
     <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
       <div className="relative shrink-0">
         <svg viewBox="0 0 160 160" className="size-40 -rotate-90" role="img" aria-label={caption}>
+          {/* Lintasan di belakang irisan. Tanpa ini, donat dengan satu kategori
+              terbaca sebagai cincin penuh yang berarti "100% dari segalanya",
+              bukan sebagai satu kategori yang kebetulan sendirian. */}
+          <circle
+            cx="80"
+            cy="80"
+            r={RADIUS}
+            fill="none"
+            stroke="var(--surface-3)"
+            strokeWidth="18"
+          />
           {arcs.map(({ slice, length, start }) => (
             <motion.circle
               key={slice.label}
@@ -78,26 +89,51 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-center">
             <p className="text-[11px] uppercase tracking-wider text-faint">Total</p>
-            <p className="text-sm font-semibold tabular text-ink">{formatIdr(total)}</p>
+            <p className="numeric text-sm font-medium text-ink">{formatIdr(total)}</p>
           </div>
         </div>
       </div>
 
-      <ul className="w-full space-y-2">
-        {slices.map((slice) => (
-          <li key={slice.label} className="flex items-center gap-2.5 text-sm">
-            <span
-              className="size-2.5 shrink-0 rounded-full"
-              style={{ background: slice.color }}
-              aria-hidden
-            />
-            <span className="flex-1 truncate text-muted">{slice.label}</span>
-            <span className="tabular text-ink">{formatIdr(slice.value)}</span>
-            <span className="w-11 text-right tabular text-faint">
-              {Math.round((slice.value / total) * 100)}%
-            </span>
-          </li>
-        ))}
+      {/*
+        `min-w-0` BUKAN hiasan.
+        Anak lentur menolak menyusut di bawah lebar isinya, jadi tanpa ini
+        legenda meluber keluar kartu begitu nominalnya panjang — dan rupiah
+        selalu panjang.
+      */}
+      <ul className="w-full min-w-0 space-y-2.5">
+        {slices.map((slice) => {
+          const persen = Math.round((slice.value / total) * 100);
+
+          return (
+            <li key={slice.label} className="min-w-0 text-sm">
+              <div className="flex items-baseline gap-2.5">
+                <span
+                  className="size-2.5 shrink-0 translate-y-px rounded-full"
+                  style={{ background: slice.color }}
+                  aria-hidden
+                />
+                <span className="min-w-0 flex-1 truncate text-muted">{slice.label}</span>
+                <span className="numeric shrink-0 text-ink">{formatIdr(slice.value)}</span>
+              </div>
+
+              {/* Batang proporsi di bawah baris, bukan kolom persen di
+                  sampingnya: kolom keempat memaksa baris meluber pada kartu
+                  sempit, sementara batang selalu muat berapa pun lebarnya. */}
+              <div className="mt-1.5 flex items-center gap-2 pl-5">
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--surface-3)]">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: slice.color }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${String(persen)}%` }}
+                    transition={{ duration: 0.7, ease: EASE_OUT }}
+                  />
+                </div>
+                <span className="numeric shrink-0 text-xs text-faint">{persen}%</span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

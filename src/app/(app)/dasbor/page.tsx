@@ -10,6 +10,7 @@ import { DonutChart } from '@/components/charts/donut-chart';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody } from '@/components/ui/card';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
+import { Stat } from '@/components/ui/stat';
 import { formatDate, formatIdr } from '@/lib/format';
 import { keys, ledger, type Transaction } from '@/lib/ledger';
 import { fadeUp, stagger } from '@/lib/motion';
@@ -45,7 +46,7 @@ export default function DasborPage() {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
       <motion.section
-        variants={fadeUp}
+        variants={stagger}
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="Ringkasan bulan ini"
       >
@@ -53,26 +54,33 @@ export default function DasborPage() {
           label="Kekayaan bersih"
           value={formatIdr(d.netWorth)}
           icon={<Wallet size={16} aria-hidden />}
-          tone="neutral"
+          hint="Seluruh dompet"
         />
         <Stat
           label="Pemasukan bulan ini"
           value={formatIdr(d.monthIncome)}
           icon={<TrendingUp size={16} aria-hidden />}
-          tone="positive"
         />
         <Stat
           label="Pengeluaran bulan ini"
           value={formatIdr(d.monthExpense)}
           icon={<TrendingDown size={16} aria-hidden />}
-          tone="negative"
-          delta={d.expenseDelta}
+          delta={rasioPengeluaran(d.monthExpense, d.expenseDelta)}
+          /* Naiknya pengeluaran BUKAN kabar baik — dan panah hijau di atas
+             angka yang membengkak adalah kesalahan yang paling sering dibuat
+             justru karena hijau terasa seperti pilihan yang aman. */
+          positiveIsGood={false}
+          hint={
+            d.expenseDelta === null
+              ? 'Belum ada bulan pembanding'
+              : `${formatIdr(Math.abs(d.expenseDelta))} ${d.expenseDelta > 0 ? 'lebih' : 'lebih hemat'}`
+          }
         />
         <Stat
           label="Selisih"
           value={formatIdr(d.monthIncome - d.monthExpense)}
           icon={<Repeat size={16} aria-hidden />}
-          tone={d.monthIncome - d.monthExpense >= 0 ? 'positive' : 'negative'}
+          hint={d.monthIncome - d.monthExpense >= 0 ? 'Surplus' : 'Defisit'}
         />
       </motion.section>
 
@@ -205,48 +213,21 @@ export default function DasborPage() {
 
 /* ── bagian ──────────────────────────────────────────────────────────── */
 
-function Stat({
-  label,
-  value,
-  icon,
-  tone,
-  delta,
-}: {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-  tone: 'neutral' | 'positive' | 'negative';
-  delta?: number | null;
-}) {
-  const toneClass = {
-    neutral: 'text-ink',
-    positive: 'text-[var(--color-success)]',
-    negative: 'text-[var(--color-danger)]',
-  }[tone];
+/**
+ * Delta pengeluaran datang sebagai RUPIAH, sementara ubin menampilkan persen.
+ *
+ * Bulan lalu diturunkan dari keduanya. Bila bulan lalu nol — bulan pertama
+ * memakai aplikasi — tidak ada persen yang bermakna: pembagian dengan nol
+ * menghasilkan "tak hingga persen", dan membulatkannya menjadi angka apa pun
+ * adalah mengarang pembanding yang tidak pernah ada.
+ */
+function rasioPengeluaran(bulanIni: number, delta: number | null): number | null {
+  if (delta === null) return null;
 
-  return (
-    <Card>
-      <CardBody>
-        <div className="mb-2 flex items-center gap-2 text-xs text-muted">
-          <span className={toneClass}>{icon}</span>
-          {label}
-        </div>
-        <p className="text-xl font-semibold tabular tracking-tight text-ink">{value}</p>
+  const bulanLalu = bulanIni - delta;
+  if (bulanLalu <= 0) return null;
 
-        {/* `null` berarti belum ada bulan pembanding — bukan "tidak berubah". */}
-        {delta === undefined || delta === null ? null : (
-          <p className="mt-1 flex items-center gap-1 text-xs text-muted">
-            {delta > 0 ? (
-              <ArrowUpRight size={13} className="text-[var(--color-danger)]" aria-hidden />
-            ) : (
-              <ArrowDownLeft size={13} className="text-[var(--color-success)]" aria-hidden />
-            )}
-            {formatIdr(Math.abs(delta))} {delta > 0 ? 'lebih' : 'lebih hemat'} dari bulan lalu
-          </p>
-        )}
-      </CardBody>
-    </Card>
-  );
+  return delta / bulanLalu;
 }
 
 function TransactionRow({ trx }: { trx: Transaction }) {
@@ -280,7 +261,7 @@ function TransactionRow({ trx }: { trx: Transaction }) {
         <p className="text-xs text-faint">{formatDate(trx.occurredAt)}</p>
       </div>
 
-      <span className={`shrink-0 text-sm tabular ${colour}`}>
+      <span className={`numeric shrink-0 text-sm ${colour}`}>
         {sign}
         {formatIdr(trx.amount)}
       </span>
@@ -293,8 +274,12 @@ function DashboardSkeleton() {
     <div className="space-y-6" aria-busy="true">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-24" />
+          <Skeleton key={i} className="h-[7.75rem]" />
         ))}
+      </div>
+      <div className="grid gap-4 xl:grid-cols-3">
+        <Skeleton className="h-72 xl:col-span-2" />
+        <Skeleton className="h-72" />
       </div>
       <div className="grid gap-4 xl:grid-cols-3">
         <Skeleton className="h-64 xl:col-span-2" />
