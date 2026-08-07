@@ -1,0 +1,15 @@
+# Konteks build dikirim UTUH ke daemon sebelum satu instruksi pun berjalan.
+.env
+.env.*
+!.env.example
+
+node_modules
+.next
+.git
+.github
+coverage
+*.log
+tsconfig.tsbuildinfo
+
+.vscode
+.idea
