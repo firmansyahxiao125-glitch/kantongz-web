@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Reveal, RevealGroup } from '@/components/ui/reveal';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
+import { HeroScene } from '@/components/three/hero-scene';
 
 export const metadata: Metadata = {
   title: 'KANTONGZ — Uangmu, dengan mesin yang mengawasinya',
@@ -82,6 +83,34 @@ export default function LandingPage() {
       {/* ── hero ─────────────────────────────────────────────────── */}
       <section className="aurora relative isolate px-4 pb-24 pt-36 sm:pt-44">
         <div className="grid-lines pointer-events-none absolute inset-0 -z-10" aria-hidden />
+
+        {/* Adegan berada DI BELAKANG teks, bukan di sebelahnya. */}
+        <HeroScene className="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[38rem] sm:h-[46rem]" />
+
+        {/*
+          Tabir keterbacaan.
+          Adegan yang bercahaya di belakang teks membuat paragraf kehilangan
+          kontras justru di bagian paling terang — dan halaman yang indah
+          tetapi tidak terbaca telah gagal pada tugas pertamanya. Tabir ini
+          menggelapkan tepat di belakang kolom teks dan membiarkan sisi-sisinya
+          tetap terbuka, sehingga adegan masih terlihat penuh.
+        */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[38rem] sm:h-[46rem]"
+          style={{
+            background: [
+              /* Bulat di belakang judul — menggelapkan pusat tanpa memotong
+                 tepi, sehingga adegan masih terbaca penuh di sisi kiri-kanan. */
+              'radial-gradient(50% 34% at 50% 26%, color-mix(in oklab, var(--bg) 72%, transparent), transparent 76%)',
+              /* Lurus dari bawah judul ke bawah — paragraf, tombol, dan baris
+                 keterangan seluruhnya duduk di atas dasar padat. Di sinilah
+                 kontras paling mudah hilang, dan kontras yang hilang pada
+                 kalimat penjelas berarti tidak ada yang membacanya. */
+              'linear-gradient(to bottom, transparent 26%, color-mix(in oklab, var(--bg) 88%, transparent) 46%, var(--bg) 72%)',
+            ].join(','),
+          }}
+        />
 
         <div className="relative mx-auto max-w-4xl text-center">
           <RevealGroup>
