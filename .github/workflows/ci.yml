@@ -92,12 +92,19 @@ jobs:
       # bukan diduga. Versi Windows lolos hanya karena `HOSTNAME` disetel
       # manual di sana — persis jenis perbedaan yang membuat langkah CI hijau
       # di laptop dan merah di runner.
-      - name: Tipografi (Inter + JetBrains Mono benar-benar dirender)
+      #
+      # KEDUA gerbang peramban berbagi SATU peladen, dan itu disengaja.
+      # Menyalakannya dua kali menggandakan waktu boot dan menambah satu titik
+      # gagal yang tidak menguji apa pun. `set -e` membuat kegagalan gerbang
+      # mana pun langsung memerahkan langkah ini.
+      - name: Gerbang peramban (tipografi + keluaran terender)
         run: |
+          set -e
           cp -r .next/static .next/standalone/.next/static
           if [ -d public ]; then cp -r public .next/standalone/public; fi
           PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
           node scripts/typography.mjs --base http://localhost:3100
+          node scripts/render.mjs --base http://localhost:3100
 
   security:
     runs-on: ubuntu-latest
