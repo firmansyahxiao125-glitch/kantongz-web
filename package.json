@@ -12,6 +12,7 @@
     "contrast": "node scripts/contrast.mjs",
     "typography": "node scripts/typography.mjs",
     "render": "node scripts/render.mjs",
+    "gates": "node scripts/gates.mjs",
     "test": "vitest run"
   },
   "dependencies": {
