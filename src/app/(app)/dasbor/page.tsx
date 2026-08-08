@@ -11,6 +11,7 @@ import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody } from '@/components/ui/card';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
 import { Stat } from '@/components/ui/stat';
+import { rasioPengeluaran } from '@/lib/delta';
 import { formatDate, formatIdr } from '@/lib/format';
 import { keys, ledger, type Transaction } from '@/lib/ledger';
 import { fadeUp, stagger } from '@/lib/motion';
@@ -245,23 +246,6 @@ export default function DasborPage() {
 }
 
 /* ── bagian ──────────────────────────────────────────────────────────── */
-
-/**
- * Delta pengeluaran datang sebagai RUPIAH, sementara ubin menampilkan persen.
- *
- * Bulan lalu diturunkan dari keduanya. Bila bulan lalu nol — bulan pertama
- * memakai aplikasi — tidak ada persen yang bermakna: pembagian dengan nol
- * menghasilkan "tak hingga persen", dan membulatkannya menjadi angka apa pun
- * adalah mengarang pembanding yang tidak pernah ada.
- */
-function rasioPengeluaran(bulanIni: number, delta: number | null): number | null {
-  if (delta === null) return null;
-
-  const bulanLalu = bulanIni - delta;
-  if (bulanLalu <= 0) return null;
-
-  return delta / bulanLalu;
-}
 
 function TransactionRow({ trx }: { trx: Transaction }) {
   const sign = trx.kind === 'income' ? '+' : trx.kind === 'expense' ? '−' : '';

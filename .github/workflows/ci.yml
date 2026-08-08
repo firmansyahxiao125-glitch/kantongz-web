@@ -24,6 +24,12 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+      # Logika MURNI yang salahnya tidak terlihat di layar sampai terlambat:
+      # pembagian nol pada persentase uang, dan keputusan tingkat grafis yang
+      # menentukan apakah bundel 341 KB diunduh sebuah ponsel.
+      - name: Tes
+        run: npm test
+
       # Audit kontras berjalan di CI, bukan hanya di mesin perancang.
       #
       # Ia MEMBACA `globals.css` dan menghitung rasio setiap pasangan
