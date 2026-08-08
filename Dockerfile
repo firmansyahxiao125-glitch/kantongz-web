@@ -25,6 +25,25 @@ ARG NEXT_PUBLIC_API_URL=http://localhost:3000
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# `public/` DIJAMIN ADA sebelum tahap runtime menyalinnya.
+#
+# Direktorinya kosong, dan Git tidak melacak direktori kosong — jadi ia TIDAK
+# ada sesudah `actions/checkout`. Build lokal lolos hanya karena direktori itu
+# kebetulan ada di disk pengembang; build dari checkout bersih gagal:
+#
+#   #17 [runtime 3/3] COPY --from=build /app/public ./public
+#   ERROR: failed to calculate checksum ... "/app/public": not found
+#
+# Direproduksi dengan `git archive HEAD | tar -x` lalu `docker build` — bukan
+# dugaan.
+#
+# Baris `COPY`-nya DIPERTAHANKAN, dan itu keputusan yang disengaja. Menghapusnya
+# juga membuat build hijau, tetapi menukar kegagalan yang BERISIK dengan yang
+# SENYAP: begitu seseorang menaruh `robots.txt` atau `og-image.png` di `public/`,
+# berkas itu tidak akan pernah sampai ke citra, dan tidak ada yang gagal untuk
+# memberitahunya.
+RUN mkdir -p public
+
 RUN npm run build
 
 FROM base AS runtime

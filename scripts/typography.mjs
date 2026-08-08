@@ -60,12 +60,19 @@
  *
  *   npm run build
  *   cp -r .next/static .next/standalone/.next/static
- *   PORT=3100 node .next/standalone/server.js &
+ *   PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
  *   node scripts/typography.mjs --base http://localhost:3100
  *
  * Di PowerShell, dua baris tengahnya menjadi:
  *   Copy-Item -Recurse -Force .next\\static .next\\standalone\\.next\\static
- *   $env:PORT='3100'; node .next\\standalone\\server.js
+ *   $env:PORT='3100'; $env:HOSTNAME='127.0.0.1'; node .next\\standalone\\server.js
+ *
+ * `HOSTNAME` WAJIB disetel. `server.js` memakai
+ * `process.env.HOSTNAME || '0.0.0.0'`, dan Docker maupun runner CI sudah
+ * menyetel variabel itu ke ID kontainer / nama mesin. Tanpa menimpanya,
+ * peladen mengikat ke nama tersebut dan `http://localhost:3100` tidak pernah
+ * menjawab — gerbang ini lalu gagal dengan exit 2 karena alasan yang tidak
+ * ada hubungannya dengan tipografi.
  */
 
 import { spawn } from 'node:child_process';

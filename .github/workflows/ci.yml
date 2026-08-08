@@ -76,11 +76,27 @@ jobs:
       #
       # `public/` disalin bersyarat: direktorinya kosong, dan Git tidak melacak
       # direktori kosong — jadi ia tidak ada sesudah checkout.
+      #
+      # `HOSTNAME` DISETEL EKSPLISIT, dan ini bukan kehati-hatian berlebih.
+      #
+      # `server.js` standalone memakai `process.env.HOSTNAME || '0.0.0.0'`.
+      # Docker dan runner CI keduanya sudah menyetel `HOSTNAME` — ke ID
+      # kontainer atau nama mesin runner. Peladen lalu mengikat ke nama itu,
+      # dan `http://localhost:3100` TIDAK PERNAH menjawab:
+      #
+      #   - Local: http://2aed865e3bb6:3100
+      #   peladen standalone: HTTP 000
+      #   Peladen di http://localhost:3100 tidak pernah menjawab.  (exit 2)
+      #
+      # Diamati langsung saat menjalankan langkah ini di dalam kontainer Linux,
+      # bukan diduga. Versi Windows lolos hanya karena `HOSTNAME` disetel
+      # manual di sana — persis jenis perbedaan yang membuat langkah CI hijau
+      # di laptop dan merah di runner.
       - name: Tipografi (Inter + JetBrains Mono benar-benar dirender)
         run: |
           cp -r .next/static .next/standalone/.next/static
           if [ -d public ]; then cp -r public .next/standalone/public; fi
-          PORT=3100 node .next/standalone/server.js &
+          PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
           node scripts/typography.mjs --base http://localhost:3100
 
   security:
