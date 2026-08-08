@@ -1,12 +1,8 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import { AlertTriangle, Repeat, Sparkles, TrendingDown } from 'lucide-react';
 
 import { Sparkline } from '@/components/charts/sparkline';
 import { Reveal } from '@/components/ui/reveal';
 import { formatIdr } from '@/lib/format';
-import { fadeUp, stagger } from '@/lib/motion';
 
 /**
  * Pratinjau produk di halaman muka.
@@ -32,13 +28,7 @@ const SALDO_CONTOH = [
 export function DemoPreview() {
   return (
     <Reveal className="mx-auto mt-20 max-w-5xl">
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        className="glass-strong relative rounded-[var(--radius-xl)] p-2 shadow-[var(--shadow-float)]"
-      >
+      <div className="glass-strong relative rounded-[var(--radius-xl)] p-2 shadow-[var(--shadow-float)]">
         {/*
           Penanda data contoh. Di dalam bingkai, bukan di keterangan bawah yang
           bisa terlewat — orang membaca panel, bukan catatan kakinya.
@@ -56,10 +46,7 @@ export function DemoPreview() {
 
           <div className="grid gap-3 lg:grid-cols-5">
             {/* saldo + lintasan */}
-            <motion.div
-              variants={fadeUp}
-              className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-3"
-            >
+            <div className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-3">
               <p className="text-xs font-medium uppercase tracking-wider text-dim">
                 Kekayaan bersih
               </p>
@@ -73,13 +60,10 @@ export function DemoPreview() {
                 values={SALDO_CONTOH}
                 stroke="var(--color-negative)"
               />
-            </motion.div>
+            </div>
 
             {/* wawasan */}
-            <motion.div
-              variants={fadeUp}
-              className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-2"
-            >
+            <div className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-2">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="size-4 text-[var(--color-caution)]" aria-hidden />
                 <p className="text-xs font-medium uppercase tracking-wider text-dim">Wawasan</p>
@@ -93,13 +77,10 @@ export function DemoPreview() {
                 terakhir.
               </p>
               <p className="numeric mt-3 text-sm text-ink">{formatIdr(4_200_000)}</p>
-            </motion.div>
+            </div>
 
             {/* langganan */}
-            <motion.div
-              variants={fadeUp}
-              className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-2"
-            >
+            <div className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-2">
               <div className="flex items-center gap-2">
                 <Repeat className="size-4 text-muted" aria-hidden />
                 <p className="text-xs font-medium uppercase tracking-wider text-dim">
@@ -116,13 +97,10 @@ export function DemoPreview() {
               <p className="mt-1.5 text-xs text-dim">
                 Tiap 30 hari · 5 kali · nominal tidak pernah berubah
               </p>
-            </motion.div>
+            </div>
 
             {/* asisten */}
-            <motion.div
-              variants={fadeUp}
-              className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-3"
-            >
+            <div className="edge-light relative overflow-hidden rounded-xl border border-line bg-[var(--surface)] p-5 lg:col-span-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="size-4 text-[var(--color-holo)]" aria-hidden />
                 <p className="text-xs font-medium uppercase tracking-wider text-dim">Asisten</p>
@@ -135,10 +113,10 @@ export function DemoPreview() {
               <p className="mt-2 text-xs text-dim">
                 Dihitung dari arus bersih 41 hari terakhir dibagi saldo seluruh dompet.
               </p>
-            </motion.div>
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </Reveal>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
-import { Providers } from '@/components/providers';
+import { ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
 
@@ -91,7 +91,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Lompat ke konten
         </a>
-        <Providers>{children}</Providers>
+        {/*
+          HANYA tema yang global.
+
+          React Query, penyimpanan sesi, sistem notifikasi, dan Framer Motion
+          dulu juga dipasang di sini — dan karena itu ikut diunduh serta
+          dijalankan oleh setiap pengunjung halaman muka, yang tidak memakai
+          satu pun dari keempatnya. Sekarang keempatnya berhenti di
+          `AppProviders`, dipasang oleh grup rute `(app)` dan `(auth)` saja.
+
+          Tema tetap di sini karena pengalih tema memang ada di halaman muka,
+          dan karena `data-theme` harus sudah benar sebelum piksel pertama —
+          itu urusan skrip pra-paint di atas, dan penyedia ini yang membacanya.
+        */}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,3 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import {
   Boxes,
   Brain,
@@ -15,14 +12,20 @@ import {
   Smartphone,
   TrendingUp,
 } from 'lucide-react';
-import { useState } from 'react';
 
-import { Reveal, RevealGroup } from '@/components/ui/reveal';
-import { cn } from '@/lib/cn';
-import { fadeUp, stagger } from '@/lib/motion';
+import { Reveal } from '@/components/ui/reveal';
 
 /**
- * Bagian-bagian halaman muka.
+ * Bagian-bagian halaman muka — seluruhnya SERVER COMPONENT.
+ *
+ * Berkas ini dulu diawali `'use client'`, dan satu baris itu memindahkan lima
+ * bagian teks statis ke peramban untuk dihidrasi. Alasannya cuma satu: gerak
+ * masuk-viewport dan kartu yang naik saat disentuh kursor. Keduanya sekarang
+ * dikerjakan CSS (`[data-reveal]` dan `.hover-lift` di `globals.css`), jadi
+ * tidak ada lagi yang perlu dikirim ke peramban dari sini.
+ *
+ * Satu-satunya bagian yang benar-benar interaktif — akordeon tanya jawab —
+ * pindah ke `faq.tsx` supaya `'use client'`-nya tidak menular ke tetangganya.
  *
  * SELURUH angka dan kalimat di berkas ini menggambarkan apa yang benar-benar
  * ada di repositori ini. Tidak ada logo perusahaan yang tidak memakainya,
@@ -82,27 +85,22 @@ const KEMAMPUAN = [
 export function Kemampuan() {
   return (
     <section id="fitur" className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
-      <RevealGroup>
-        <Reveal>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
-            Kemampuan
-          </p>
-        </Reveal>
-        <Reveal>
-          <h2 className="text-h2 mt-4 text-balance font-semibold">
-            Bukan aplikasi pencatat.
-            <span className="block text-muted">Sistem operasi keuangan.</span>
-          </h2>
-        </Reveal>
+      <Reveal>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
+          Kemampuan
+        </p>
+      </Reveal>
+      <Reveal index={1}>
+        <h2 className="text-h2 mt-4 text-balance font-semibold">
+          Bukan aplikasi pencatat.
+          <span className="block text-muted">Sistem operasi keuangan.</span>
+        </h2>
+      </Reveal>
 
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {KEMAMPUAN.map(({ icon: Icon, title, body, proof, milestone }) => (
-            <motion.article
-              key={title}
-              variants={fadeUp}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="edge-light group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-line bg-[var(--surface)] p-6"
-            >
+      <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {KEMAMPUAN.map(({ icon: Icon, title, body, proof, milestone }, index) => (
+          <Reveal key={title} index={index} className="h-full">
+            <article className="edge-light hover-lift group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-line bg-[var(--surface)] p-6">
               <div className="flex items-start justify-between gap-3">
                 <span className="inline-flex size-11 items-center justify-center rounded-xl border border-line-strong bg-[var(--surface-2)]">
                   <Icon className="size-5 text-[var(--color-holo)]" aria-hidden />
@@ -119,10 +117,10 @@ export function Kemampuan() {
               <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-dim">
                 {proof}
               </p>
-            </motion.article>
-          ))}
-        </div>
-      </RevealGroup>
+            </article>
+          </Reveal>
+        ))}
+      </div>
     </section>
   );
 }
@@ -172,21 +170,27 @@ export function Arsitektur() {
   return (
     <section id="arsitektur" className="border-y border-line bg-[var(--surface)]/40">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
-        <RevealGroup>
-          <Reveal>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
-              Arsitektur
-            </p>
-          </Reveal>
-          <Reveal>
-            <h2 className="text-h2 mt-4 max-w-2xl text-balance font-semibold">
-              Enam lapisan, seluruhnya berjalan di satu laptop
-            </h2>
-          </Reveal>
+        <Reveal>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
+            Arsitektur
+          </p>
+        </Reveal>
+        <Reveal index={1}>
+          <h2 className="text-h2 mt-4 max-w-2xl text-balance font-semibold">
+            Enam lapisan, seluruhnya berjalan di satu laptop
+          </h2>
+        </Reveal>
 
+        {/*
+          Kisi ini memakai `gap-px` di atas latar `--line` untuk menghasilkan
+          garis pemisah setebal satu piksel. Karena itu `Reveal` TIDAK boleh
+          membungkus tiap selnya — pembungkus tambahan akan menjadi item kisi
+          dan garisnya hilang. Yang dibungkus adalah kisinya, sekali.
+        */}
+        <Reveal index={2}>
           <div className="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-xl)] border border-line bg-[var(--line)] md:grid-cols-2 lg:grid-cols-3">
             {LAPISAN.map(({ icon: Icon, name, stack, note }) => (
-              <motion.div key={name} variants={fadeUp} className="bg-[var(--surface)] p-6">
+              <div key={name} className="bg-[var(--surface)] p-6">
                 <div className="flex items-center gap-2.5">
                   <Icon className="size-4 text-muted" aria-hidden />
                   <h3 className="text-sm font-semibold">{name}</h3>
@@ -195,107 +199,11 @@ export function Arsitektur() {
                   {stack}
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-muted">{note}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </RevealGroup>
+        </Reveal>
       </div>
-    </section>
-  );
-}
-
-/* ── tanya jawab ─────────────────────────────────────────────────────── */
-
-const TANYA = [
-  {
-    q: 'Apakah ini butuh kunci API berbayar?',
-    a: 'Tidak. Seluruh aplikasi berjalan tanpa satu pun kunci. Kategorisasi, anomali, langganan, proyeksi, dan jawaban asisten seluruhnya deterministik. Ringkasan naratif memakai Ollama bila tersedia di mesinmu, dan jatuh ke templat bila tidak — tanpa pesan galat, tanpa fitur yang hilang.',
-  },
-  {
-    q: 'Ke mana data keuanganku pergi?',
-    a: 'Ke PostgreSQL di mesin yang kamu jalankan sendiri. Foto struk dibaca OCR yang berjalan di proses backend yang sama. Tidak ada penyedia pihak ketiga di jalur data mana pun.',
-  },
-  {
-    q: 'Mengapa jumlah uang berupa bilangan bulat?',
-    a: 'Karena pecahan biner tidak dapat mewakili nilai desimal dengan tepat, dan galat pembulatan pada uang adalah uang yang hilang. Nilainya disimpan dalam satuan terkecil yang beredar — untuk rupiah itu rupiah utuh, bukan sen, karena sen tidak beredar.',
-  },
-  {
-    q: 'Apakah saldo disimpan di basis data?',
-    a: 'Tidak. Saldo dihitung dari buku besar setiap kali diminta. Saldo yang disimpan akan menyimpang dari transaksinya pada kegagalan pertama di tengah jalan, dan menyimpang tanpa satu pun galat.',
-  },
-  {
-    q: 'Apakah ini produk komersial?',
-    a: 'Bukan. Ini proyek portofolio dan tugas akhir, dibangun dengan standar produksi. Datanya di demo mana pun adalah data buatan.',
-  },
-  {
-    q: 'Bagaimana kalau perangkatku tidak kuat menjalankan 3D?',
-    a: 'Halaman ini memeriksanya sebelum menyalakan apa pun, dan menurunkan mutu atau mematikannya sepenuhnya. Kalau kamu meminta gerak dikurangi lewat pengaturan sistem, tidak ada satu pun animasi yang berjalan.',
-  },
-] as const;
-
-export function TanyaJawab() {
-  const [terbuka, setTerbuka] = useState<number | null>(0);
-
-  return (
-    <section id="tanya-jawab" className="mx-auto max-w-3xl px-4 py-24 sm:py-32">
-      <RevealGroup>
-        <Reveal>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
-            Tanya jawab
-          </p>
-        </Reveal>
-        <Reveal>
-          <h2 className="text-h2 mt-4 text-balance font-semibold">Yang biasanya ditanyakan</h2>
-        </Reveal>
-
-        <div className="mt-10 divide-y divide-[var(--line)] border-y border-line">
-          {TANYA.map(({ q, a }, index) => {
-            const open = terbuka === index;
-
-            return (
-              <Reveal key={q}>
-                <h3>
-                  <button
-                    type="button"
-                    /* Kontrol asli, bukan div yang diberi `onClick`: pembaca
-                       layar mengumumkan keadaan buka-tutupnya lewat
-                       `aria-expanded`, dan papan ketik mendapat fokus tanpa
-                       satu baris pun kode tambahan. */
-                    aria-expanded={open}
-                    aria-controls={`jawab-${String(index)}`}
-                    onClick={() => {
-                      setTerbuka(open ? null : index);
-                    }}
-                    className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                  >
-                    <span className="text-[15px] font-medium text-ink">{q}</span>
-                    <span
-                      aria-hidden
-                      className={cn(
-                        'grid size-6 shrink-0 place-items-center rounded-full border border-line-strong text-muted',
-                        'transition-transform duration-[var(--dur-fast)]',
-                        open && 'rotate-45',
-                      )}
-                    >
-                      +
-                    </span>
-                  </button>
-                </h3>
-
-                <motion.div
-                  id={`jawab-${String(index)}`}
-                  initial={false}
-                  animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  className="overflow-hidden"
-                >
-                  <p className="pb-5 pr-10 text-sm leading-relaxed text-muted">{a}</p>
-                </motion.div>
-              </Reveal>
-            );
-          })}
-        </div>
-      </RevealGroup>
     </section>
   );
 }
@@ -312,42 +220,38 @@ export function Repositori() {
   return (
     <section id="repositori" className="border-t border-line">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
-        <RevealGroup>
-          <Reveal>
-            <div className="flex items-center gap-2.5">
-              <Code2 className="size-5 text-muted" aria-hidden />
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
-                Kode
-              </p>
-            </div>
-          </Reveal>
-          <Reveal>
-            <h2 className="text-h2 mt-4 max-w-2xl text-balance font-semibold">
-              Tiga repositori, satu kontrak
-            </h2>
-          </Reveal>
-          <Reveal>
-            <p className="mt-5 max-w-2xl text-pretty leading-relaxed text-muted">
-              Kontrak API dibagikan apa adanya antara ketiganya. Ketika sebuah rute berubah, uji
-              kesetaraan OpenAPI dan suite paritas mobile keduanya menjadi merah sebelum ada
-              seorang pun yang menjalankan aplikasinya.
+        <Reveal>
+          <div className="flex items-center gap-2.5">
+            <Code2 className="size-5 text-muted" aria-hidden />
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
+              Kode
             </p>
-          </Reveal>
+          </div>
+        </Reveal>
+        <Reveal index={1}>
+          <h2 className="text-h2 mt-4 max-w-2xl text-balance font-semibold">
+            Tiga repositori, satu kontrak
+          </h2>
+        </Reveal>
+        <Reveal index={2}>
+          <p className="mt-5 max-w-2xl text-pretty leading-relaxed text-muted">
+            Kontrak API dibagikan apa adanya antara ketiganya. Ketika sebuah rute berubah, uji
+            kesetaraan OpenAPI dan suite paritas mobile keduanya menjadi merah sebelum ada
+            seorang pun yang menjalankan aplikasinya.
+          </p>
+        </Reveal>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {REPO.map(({ nama, isi, uji }) => (
-              <motion.div
-                key={nama}
-                variants={fadeUp}
-                className="rounded-[var(--radius-lg)] border border-line bg-[var(--surface)] p-5"
-              >
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {REPO.map(({ nama, isi, uji }, index) => (
+            <Reveal key={nama} index={index}>
+              <div className="rounded-[var(--radius-lg)] border border-line bg-[var(--surface)] p-5">
                 <p className="numeric text-sm text-ink">{nama}</p>
                 <p className="mt-2 text-xs leading-relaxed text-muted">{isi}</p>
                 <p className="numeric mt-3 text-xs text-[var(--color-positive)]">{uji}</p>
-              </motion.div>
-            ))}
-          </div>
-        </RevealGroup>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -368,33 +272,32 @@ export function Keamanan() {
   return (
     <section id="keamanan" className="border-y border-line bg-[var(--surface)]/40">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
-        <RevealGroup>
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
-            <div className="lg:sticky lg:top-28">
-              <Reveal>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
-                  Keamanan
-                </p>
-              </Reveal>
-              <Reveal>
-                <h2 className="text-h2 mt-4 text-balance font-semibold">
-                  Dirancang dengan satu pertanyaan
-                </h2>
-              </Reveal>
-              <Reveal>
-                <p className="mt-5 text-pretty leading-relaxed text-muted">
-                  Apa yang terjadi kalau ini gagal? Setiap keputusan berikut dibuat dengan
-                  menjawab itu lebih dulu — dan beberapa di antaranya membuat jalur
-                  bahagia sedikit lebih lambat. Itu pertukaran yang disengaja.
-                </p>
-              </Reveal>
-            </div>
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+          <div className="lg:sticky lg:top-28">
+            <Reveal>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-holo)]">
+                Keamanan
+              </p>
+            </Reveal>
+            <Reveal index={1}>
+              <h2 className="text-h2 mt-4 text-balance font-semibold">
+                Dirancang dengan satu pertanyaan
+              </h2>
+            </Reveal>
+            <Reveal index={2}>
+              <p className="mt-5 text-pretty leading-relaxed text-muted">
+                Apa yang terjadi kalau ini gagal? Setiap keputusan berikut dibuat dengan
+                menjawab itu lebih dulu — dan beberapa di antaranya membuat jalur
+                bahagia sedikit lebih lambat. Itu pertukaran yang disengaja.
+              </p>
+            </Reveal>
+          </div>
 
-            <ul className="space-y-3">
-              {JAMINAN.map(([title, body]) => (
-                <motion.li
-                  key={title}
-                  variants={fadeUp}
+          <ul className="space-y-3">
+            {JAMINAN.map(([title, body], index) => (
+              <li key={title}>
+                <Reveal
+                  index={index}
                   className="flex gap-4 rounded-xl border border-line bg-[var(--surface)] p-5"
                 >
                   <Lock className="mt-0.5 size-4 shrink-0 text-[var(--color-positive)]" aria-hidden />
@@ -402,14 +305,12 @@ export function Keamanan() {
                     <div className="text-sm font-medium">{title}</div>
                     <div className="mt-1.5 text-sm leading-relaxed text-muted">{body}</div>
                   </div>
-                </motion.li>
-              ))}
-            </ul>
-          </div>
-        </RevealGroup>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
 }
-
-export { stagger };

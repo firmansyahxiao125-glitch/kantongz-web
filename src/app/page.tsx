@@ -5,15 +5,11 @@ import { ArrowRight, Code2, Fingerprint, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MagneticButton } from '@/components/ui/magnetic';
 import { DemoPreview } from '@/components/landing/demo-preview';
-import {
-  Arsitektur,
-  Keamanan,
-  Kemampuan,
-  Repositori,
-  TanyaJawab,
-} from '@/components/landing/sections';
+import { Arsitektur, Keamanan, Kemampuan, Repositori } from '@/components/landing/sections';
+import { TanyaJawab } from '@/components/landing/faq';
 import { CaraKerja, Harga, MesinAi, Suara } from '@/components/landing/story';
-import { Reveal, RevealGroup } from '@/components/ui/reveal';
+import { Reveal, Rise } from '@/components/ui/reveal';
+import { RevealObserver } from '@/components/ui/reveal-observer';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
 import { HeroParallax } from '@/components/three/hero-parallax';
@@ -26,6 +22,13 @@ export const metadata: Metadata = {
 export default function LandingPage() {
   return (
     <div className="relative min-h-dvh overflow-x-hidden">
+      {/*
+        SATU pengamat untuk seluruh halaman, dan satu-satunya JavaScript milik
+        halaman ini di luar adegan 3D. Ia tidak merender apa pun — ia hanya
+        menyalakan atribut yang CSS tunggu.
+      */}
+      <RevealObserver />
+
       {/* ── navigasi ─────────────────────────────────────────────── */}
       <header className="fixed inset-x-0 top-0 z-50">
         <div className="mx-auto mt-4 flex max-w-6xl items-center justify-between gap-4 rounded-2xl glass px-4 py-3 sm:px-5">
@@ -89,54 +92,63 @@ export default function LandingPage() {
           dari mana tanpa satu pun panah.
         */}
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-8">
+          {/*
+            HERO MEMAKAI `Rise`, BUKAN `Reveal`.
+
+            Keduanya terlihat sama; bedanya kapan mereka menyala. `Reveal`
+            menunggu pengamat memberitahu bahwa elemennya masuk layar — dan
+            pengamat itu JavaScript. Isi yang sudah terlihat pada piksel pertama
+            tidak boleh menunggu apa pun untuk muncul, apalagi isi yang menjadi
+            elemen LCP halaman ini.
+
+            `Rise` murni CSS: ia berjalan saat halaman dicat, dan ia berjalan
+            walaupun potongan skripnya masih dalam perjalanan.
+          */}
           <div className="lg:col-span-7">
-            <RevealGroup>
-              <Reveal>
-                <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-[var(--surface)]/60 px-3.5 py-1.5 text-xs text-muted backdrop-blur">
-                  <Sparkles className="size-3.5 text-[var(--color-holo)]" aria-hidden />
-                  AI Financial Operating System
-                </span>
-              </Reveal>
+            <Rise>
+              <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-[var(--surface)]/60 px-3.5 py-1.5 text-xs text-muted backdrop-blur">
+                <Sparkles className="size-3.5 text-[var(--color-holo)]" aria-hidden />
+                AI Financial Operating System
+              </span>
+            </Rise>
 
-              <Reveal>
-                <h1 className="text-display mt-7 text-balance">
-                  Uangmu, dengan{' '}
-                  <span className="text-gradient">mesin yang mengawasinya</span>
-                </h1>
-              </Reveal>
+            <Rise index={1}>
+              <h1 className="text-display mt-7 text-balance">
+                Uangmu, dengan <span className="text-gradient">mesin yang mengawasinya</span>
+              </h1>
+            </Rise>
 
-              <Reveal>
-                <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
-                  Kategorisasi otomatis, anomali yang ketahuan sebelum jadi masalah, dan
-                  jawaban atas pertanyaanmu sendiri — seluruhnya berjalan di mesinmu, tanpa
-                  satu pun kunci API berbayar.
-                </p>
-              </Reveal>
+            <Rise index={2}>
+              <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
+                Kategorisasi otomatis, anomali yang ketahuan sebelum jadi masalah, dan
+                jawaban atas pertanyaanmu sendiri — seluruhnya berjalan di mesinmu, tanpa
+                satu pun kunci API berbayar.
+              </p>
+            </Rise>
 
-              <Reveal>
-                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <Link href="/daftar" className="w-full sm:w-auto">
-                    <MagneticButton>
-                      <Button size="lg" block iconRight={<ArrowRight className="size-4" />}>
-                        Mulai gratis
-                      </Button>
-                    </MagneticButton>
-                  </Link>
-                  <Link href="/masuk" className="w-full sm:w-auto">
-                    <Button size="lg" variant="secondary" block>
-                      Masuk ke akun
+            <Rise index={3}>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Link href="/daftar" className="w-full sm:w-auto">
+                  <MagneticButton>
+                    <Button size="lg" block iconRight={<ArrowRight className="size-4" />}>
+                      Mulai gratis
                     </Button>
-                  </Link>
-                </div>
-              </Reveal>
+                  </MagneticButton>
+                </Link>
+                <Link href="/masuk" className="w-full sm:w-auto">
+                  <Button size="lg" variant="secondary" block>
+                    Masuk ke akun
+                  </Button>
+                </Link>
+              </div>
+            </Rise>
 
-              <Reveal>
-                <p className="mt-6 flex items-center gap-2 text-xs text-dim">
-                  <Fingerprint className="size-3.5" aria-hidden />
-                  Argon2id, rotasi token, dan penguncian otomatis sejak hari pertama
-                </p>
-              </Reveal>
-            </RevealGroup>
+            <Rise index={4}>
+              <p className="mt-6 flex items-center gap-2 text-xs text-dim">
+                <Fingerprint className="size-3.5" aria-hidden />
+                Argon2id, rotasi token, dan penguncian otomatis sejak hari pertama
+              </p>
+            </Rise>
           </div>
 
           {/*
@@ -149,12 +161,12 @@ export default function LandingPage() {
               <MascotScene className="mx-auto aspect-square w-full max-w-[30rem]" />
             </HeroParallax>
 
-            <Reveal>
+            <Rise index={2}>
               <p className="text-center text-xs text-dim">
                 <span className="text-muted">Bruang</span> — mengawasi bukumu, dan melambai
                 kalau kamu lama menatapnya
               </p>
-            </Reveal>
+            </Rise>
           </div>
         </div>
 

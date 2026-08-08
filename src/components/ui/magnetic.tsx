@@ -1,7 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
-import { useRef, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
 
@@ -30,6 +29,18 @@ import { cn } from '@/lib/cn';
  * berada, dan pengguna papan ketik yang men-tab ke sana melihat fokus mendarat
  * di posisi yang bergeser. Delapan piksel cukup untuk terasa, terlalu kecil
  * untuk membingungkan.
+ *
+ * ── MENGAPA TIDAK MEMAKAI PUSTAKA GERAK LAGI ───────────────────────────
+ *
+ * Versi sebelumnya memakai `useSpring` milik Framer Motion, dan itu satu-
+ * satunya alasan pustaka gerak seberat itu ikut ke potongan halaman muka.
+ * Yang dibutuhkan sebenarnya cuma dua angka dan sebuah transisi CSS.
+ *
+ * Posisinya ditulis LANGSUNG ke gaya sebaris lewat ref, bukan lewat state:
+ * `pointermove` menyala puluhan kali per detik, dan satu render React per
+ * peristiwa adalah harga yang tidak perlu dibayar untuk menggeser delapan
+ * piksel. Satu-satunya state di sini adalah preferensi gerak, yang berubah
+ * paling banyak sekali seumur halaman.
  */
 
 const PULL = 8;
@@ -43,15 +54,24 @@ export interface MagneticProps {
 
 export function MagneticButton({ children, className, range = 56 }: MagneticProps) {
   const host = useRef<HTMLSpanElement>(null);
-  const reduced = useReducedMotion();
+  const [reduced, setReduced] = useState(false);
 
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  /* Pegas, bukan transisi: kursor berubah arah puluhan kali per detik, dan
-     transisi berdurasi tetap akan memulai ulang setiap kali — menghasilkan
-     gerak yang tersendat justru saat kursor bergerak paling cepat. */
-  const x = useSpring(rawX, { stiffness: 260, damping: 22, mass: 0.5 });
-  const y = useSpring(rawY, { stiffness: 260, damping: 22, mass: 0.5 });
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => {
+      setReduced(media.matches);
+    };
+    sync();
+    media.addEventListener('change', sync);
+    return () => {
+      media.removeEventListener('change', sync);
+    };
+  }, []);
+
+  function move(x: number, y: number) {
+    const el = host.current;
+    if (el) el.style.translate = x === 0 && y === 0 ? '' : `${String(x)}px ${String(y)}px`;
+  }
 
   function handleMove(event: PointerEvent<HTMLSpanElement>) {
     /* Sentuh tidak punya hover. Menjalankan ini pada jari menghasilkan tombol
@@ -71,8 +91,7 @@ export function MagneticButton({ children, className, range = 56 }: MagneticProp
     const distance = Math.hypot(dx, dy);
     const reach = Math.max(rect.width, rect.height) / 2 + range;
     if (distance > reach) {
-      rawX.set(0);
-      rawY.set(0);
+      move(0, 0);
       return;
     }
 
@@ -80,13 +99,7 @@ export function MagneticButton({ children, className, range = 56 }: MagneticProp
        tombol menempel ke kursor bahkan di tepi jangkauan, yang terbaca sebagai
        macet alih-alih sebagai magnet. */
     const falloff = 1 - distance / reach;
-    rawX.set((dx / reach) * PULL * falloff * 2);
-    rawY.set((dy / reach) * PULL * falloff * 2);
-  }
-
-  function reset() {
-    rawX.set(0);
-    rawY.set(0);
+    move((dx / reach) * PULL * falloff * 2, (dy / reach) * PULL * falloff * 2);
   }
 
   /* Gerak dikurangi: pembungkus menjadi transparan sepenuhnya. Bukan versi
@@ -94,14 +107,23 @@ export function MagneticButton({ children, className, range = 56 }: MagneticProp
   if (reduced) return <span className={cn('inline-block', className)}>{children}</span>;
 
   return (
-    <motion.span
+    <span
       ref={host}
-      style={{ x, y }}
       onPointerMove={handleMove}
-      onPointerLeave={reset}
-      className={cn('inline-block will-change-transform', className)}
+      onPointerLeave={() => {
+        move(0, 0);
+      }}
+      /* Transisi pendek, BUKAN pegas. Pegas dipakai dulu karena kursor berbalik
+         arah puluhan kali per detik dan transisi berdurasi panjang akan
+         memulai ulang setiap kali. Pada 120 ms, memulai ulang tidak terlihat —
+         dan yang tersisa adalah gerak yang mengikuti kursor tanpa tertinggal. */
+      className={cn(
+        'inline-block will-change-transform',
+        'transition-[translate] duration-[var(--dur-instant)] ease-[var(--ease-out)]',
+        className,
+      )}
     >
       {children}
-    </motion.span>
+    </span>
   );
 }

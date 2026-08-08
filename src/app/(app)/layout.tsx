@@ -1,35 +1,17 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-
-import { useSession } from '@/components/session-provider';
-import { AppShell } from '@/components/shell/app-shell';
-import { CoreMark } from '@/components/brand/core-mark';
+import { AppProviders } from '@/components/app-providers';
+import { AppGuard } from '@/components/shell/app-guard';
 
 /**
- * Penjaga rute terautentikasi.
+ * Tata letak rute terautentikasi.
  *
- * Selama status masih `memuat`, TIDAK ADA yang dialihkan. Muat ulang halaman
- * selalu dimulai tanpa token akses — ia hidup di memori — dan mengalihkan pada
- * saat itu akan mengeluarkan setiap pengguna yang menekan F5.
+ * Server Component, dan isinya cuma dua pembungkus — penjaganya ada di
+ * `AppGuard`. Pembagian itu yang membuat penyedia berhenti di sini alih-alih
+ * naik ke tata letak akar, tempat halaman muka publik ikut membayarnya.
  */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const session = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (session.status === 'tamu') router.replace('/masuk');
-  }, [session.status, router]);
-
-  if (session.status !== 'masuk') {
-    return (
-      <div className="grid min-h-dvh place-items-center bg-app" aria-busy="true">
-        <CoreMark className="size-10 animate-pulse text-[var(--ink-dim)]" />
-        <span className="sr-only">Memulihkan sesi</span>
-      </div>
-    );
-  }
-
-  return <AppShell user={session.user}>{children}</AppShell>;
+  return (
+    <AppProviders>
+      <AppGuard>{children}</AppGuard>
+    </AppProviders>
+  );
 }

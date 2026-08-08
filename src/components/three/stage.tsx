@@ -59,8 +59,15 @@ export function Stage({
         }}
         /* Bayangan HANYA pada mutu penuh. Peta bayangan adalah lulus render
            kedua atas seluruh adegan; menyalakannya di `lite` adalah menggandakan
-           biaya pada perangkat yang justru dipilih karena tidak sanggup. */
-        shadows={tier === 'full'}
+           biaya pada perangkat yang justru dipilih karena tidak sanggup.
+
+           `'percentage'` (PCFShadowMap) dan bukan `true` (PCFSoftShadowMap):
+           Three.js sudah MENOLAK yang terakhir dan diam-diam memakai yang ini
+           sebagai gantinya — "PCFSoftShadowMap has been deprecated. Using
+           PCFShadowMap instead", dua puluh delapan kali per pemuatan halaman.
+           Menyebutnya langsung tidak mengubah satu piksel pun; ia hanya
+           berhenti meminta sesuatu yang tidak akan diberikan. */
+        shadows={tier === 'full' ? 'percentage' : false}
         /* Kanvas dekoratif. Pembaca layar tidak boleh menemukan apa pun di
            sini — isinya sudah disampaikan teks di sekelilingnya. */
         aria-hidden

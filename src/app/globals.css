@@ -451,6 +451,184 @@
     font-weight: 600;
   }
 
+  /* ── gerak masuk, TANPA kerangka kerja ──────────────────────────────────
+   *
+   * Halaman muka dulu menganimasikan setiap bagiannya lewat Framer Motion, dan
+   * biayanya terukur: seluruh pohon halaman menjadi Client Component, lalu
+   * dihidrasi. Audit `bootup-time` mencatat 791 ms evaluasi skrip untuk potongan
+   * kerangka kerja saja — pada halaman yang isinya teks statis.
+   *
+   * Yang di bawah ini menggantikannya. Tampilannya sama; yang hilang hanya
+   * JavaScript-nya.
+   */
+
+  /* Di ATAS lipatan: berjalan begitu halaman dicat.
+     Tidak menunggu pengamat, tidak menunggu hidrasi, dan karena itu tidak
+     pernah bisa tertinggal tersembunyi ketika skrip gagal dimuat. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-rise] {
+      animation: rise var(--dur-base) var(--ease-out) both;
+      animation-delay: calc(var(--i, 0) * 55ms);
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+    to {
+      opacity: 1;
+      translate: none;
+    }
+  }
+
+  /*
+   * Di BAWAH lipatan: menunggu masuk layar.
+   *
+   * `scripting: enabled` adalah syaratnya, dan itu bukan hiasan. Elemen ini
+   * disembunyikan oleh CSS dan ditampilkan kembali oleh JavaScript; kalau
+   * skrip mati, aturan ini tidak pernah berlaku sama sekali dan isinya tampil
+   * apa adanya. Menyembunyikan isi tanpa syarat itu adalah cara paling mudah
+   * membuat halaman yang KOSONG bagi sebagian pembaca.
+   *
+   * `once` dipertahankan lewat pengamat yang melepas targetnya, bukan lewat
+   * `animation-timeline: view()` — lini masa gulir MEMBALIK animasinya saat
+   * digulir naik, dan bagian yang memudar setiap kali dilewati membuat halaman
+   * terasa gelisah. Itu persis yang dihindari `once: true` sebelumnya.
+   */
+  @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+    [data-reveal] {
+      opacity: 0;
+      translate: 0 12px;
+    }
+    [data-reveal='in'] {
+      opacity: 1;
+      translate: none;
+      transition:
+        opacity var(--dur-base) var(--ease-out),
+        translate var(--dur-base) var(--ease-out);
+      transition-delay: calc(var(--i, 0) * 50ms);
+    }
+  }
+
+  /* Kartu yang naik saat kursor mendekat (DESIGN — empat piksel, bukan dua
+     belas). Dulu `whileHover` milik Framer; sekarang tidak menuntut satu byte
+     JavaScript pun. `hover: hover` menjaga jari tidak memicunya. */
+  .hover-lift {
+    transition:
+      translate var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+  @media (hover: hover) {
+    .hover-lift:hover {
+      translate: 0 -4px;
+      box-shadow: var(--shadow-lift);
+    }
+  }
+
+  /*
+   * Adegan yang tenggelam saat digulir.
+   *
+   * Sebelumnya `useScroll` + `useTransform`: keduanya membaca posisi gulir di
+   * utas utama pada setiap frame. Lini masa gulir CSS berjalan di utas
+   * KOMPOSITOR — tidak pernah menyentuh utas utama sama sekali, jadi ia tetap
+   * mulus bahkan ketika utas utama sedang sibuk.
+   *
+   * Peramban tanpa dukungan tidak mendapat paralaks, dan hanya itu. Isinya
+   * tetap utuh di tempatnya.
+   */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-sink {
+        animation-name: hero-sink, hero-fade;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        /*
+         * `auto` WAJIB ditulis, dan ini bukan gaya penulisan.
+         *
+         * Bentuk ringkas `animation: nama linear both` menyetel durasi ke 0s
+         * karena tidak menyebutnya. Pada lini masa waktu itu tidak terlihat;
+         * pada lini masa GULIR, animasi berdurasi nol langsung berada di
+         * keadaan AKHIR di setiap posisi gulir — dan keadaan akhir di sini
+         * adalah `opacity: 0`. Gejalanya: maskot tidak pernah terlihat sama
+         * sekali, di seluruh halaman.
+         *
+         * `auto` berarti "sepanjang rentang lini masa", yang memang yang
+         * dimaksud.
+         */
+        animation-duration: auto;
+        animation-timeline: scroll(root block);
+        /* 600px dan 420px — batas yang sama persis dengan versi Framer-nya. */
+        animation-range:
+          0 600px,
+          0 420px;
+        will-change: translate, scale, opacity;
+      }
+    }
+  }
+
+  @keyframes hero-sink {
+    to {
+      translate: 0 140px;
+      scale: 1.08;
+    }
+  }
+  @keyframes hero-fade {
+    to {
+      opacity: 0;
+    }
+  }
+
+  /*
+   * Garis penghubung yang tumbuh mengikuti gulir (bagian "Mesin AI").
+   *
+   * `view-timeline` dideklarasikan pada bagiannya, dan garis di dalamnya
+   * membacanya — lini masa bernama terlihat oleh seluruh keturunan elemen yang
+   * mendeklarasikannya, jadi tidak ada `timeline-scope` yang dibutuhkan.
+   *
+   * Menganimasikan `scale`, BUKAN `height`: yang pertama dikerjakan kompositor,
+   * yang kedua memaksa tata letak dihitung ulang pada setiap frame gulir.
+   */
+  /* Tersembunyi SECARA BAWAAN, dan hanya lini masa gulir yang menumbuhkannya.
+     Ditulis di luar `@supports` dengan sengaja: peramban yang tidak mendukung
+     lini masa gulir lebih baik tidak menampilkan garis kemajuan sama sekali
+     daripada menampilkan garis yang sudah penuh sejak awal — yang terakhir
+     BERBOHONG tentang seberapa jauh pembacanya sudah sampai. */
+  .rail-progress {
+    transform-origin: top;
+    scale: 1 0;
+  }
+
+  @supports (animation-timeline: view()) {
+    .rail-host {
+      view-timeline-name: --rail;
+      view-timeline-axis: block;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .rail-progress {
+        animation-name: rail-grow;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        /* Lihat catatan durasi di `.hero-sink` — alasannya sama persis. */
+        animation-duration: auto;
+        animation-timeline: --rail;
+        /* 10% → 65% dari lintasan bagian ini melewati layar — angka yang sama
+           dengan `useTransform([0.1, 0.65])` sebelumnya. */
+        animation-range: cover 10% cover 65%;
+      }
+    }
+  }
+
+  @keyframes rail-grow {
+    from {
+      scale: 1 0;
+    }
+    to {
+      scale: 1 1;
+    }
+  }
+
   /* ── keadaan memuat ────────────────────────────────────────────────────
      Sapuan, bukan denyut. Denyut meredupkan seluruh blok serentak dan terbaca
      sebagai elemen RUSAK; sapuan yang bergerak terbaca sebagai sesuatu yang
