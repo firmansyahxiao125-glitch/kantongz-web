@@ -512,6 +512,26 @@
     }
   }
 
+  /*
+   * Tautan aksi di kepala kartu ("Lihat analitik", "Semua transaksi").
+   *
+   * Teksnya 12px, jadi kotak kliknya hanya setinggi 16px. Itu LULUS WCAG 2.5.8
+   * lewat pengecualian jarak — tetangga interaktif terdekatnya 314px jauhnya,
+   * jauh melebihi lingkaran 24px yang disyaratkan — jadi ini bukan perbaikan
+   * kepatuhan. Ia perbaikan JARI: 16px tetap sasaran yang meleset di ponsel,
+   * dan yang meleset di kepala kartu akan mendarat di kartunya.
+   *
+   * `padding` menumbuhkan kotak klik; `margin` negatif yang sepadan menariknya
+   * kembali sehingga garis dasar teks tetap sejajar dengan judul di sebelahnya.
+   * Tanpa pasangan itu, setiap kepala kartu bergeser tiga piksel — dan
+   * pergeseran yang sama di sepuluh kartu terbaca sebagai tata letak yang
+   * longgar tanpa ada yang bisa menunjuk sebabnya.
+   */
+  .card-action {
+    padding-block: 0.375rem;
+    margin-block: -0.375rem;
+  }
+
   /* Kartu yang naik saat kursor mendekat (DESIGN — empat piksel, bukan dua
      belas). Dulu `whileHover` milik Framer; sekarang tidak menuntut satu byte
      JavaScript pun. `hover: hover` menjaga jari tidak memicunya. */

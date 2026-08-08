@@ -124,7 +124,7 @@ export default function DasborPage() {
             <CardBody>
               <header className="mb-4 flex items-baseline justify-between">
                 <h2 className="text-sm font-semibold text-ink">Arus kas 30 hari</h2>
-                <Link href="/analitik" className="text-xs text-muted hover:text-ink">
+                <Link href="/analitik" className="card-action text-xs text-muted hover:text-ink">
                   Lihat analitik
                 </Link>
               </header>
@@ -156,7 +156,7 @@ export default function DasborPage() {
             <CardBody>
               <header className="mb-3 flex items-baseline justify-between">
                 <h2 className="text-sm font-semibold text-ink">Transaksi terakhir</h2>
-                <Link href="/transaksi" className="text-xs text-muted hover:text-ink">
+                <Link href="/transaksi" className="card-action text-xs text-muted hover:text-ink">
                   Semua transaksi
                 </Link>
               </header>
@@ -199,7 +199,7 @@ export default function DasborPage() {
               <CardBody>
                 <header className="mb-3 flex items-baseline justify-between">
                   <h2 className="text-sm font-semibold text-ink">Anggaran</h2>
-                  <Link href="/anggaran" className="text-xs text-muted hover:text-ink">
+                  <Link href="/anggaran" className="card-action text-xs text-muted hover:text-ink">
                     Kelola
                   </Link>
                 </header>
