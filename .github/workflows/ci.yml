@@ -43,6 +43,46 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Gerbang tipografi berjalan SESUDAH build, dan itu wajib: ia menguji
+      # kaskade CSS yang sudah dirender, bukan berkas sumbernya.
+      #
+      # Cacat yang dijaganya lolos dari SETIAP langkah di atas. `--font-sans`
+      # menghitung menjadi string kosong karena `var()`-nya disubstitusi di
+      # `:root` sementara masukannya dipasang di `<body>` — deklarasinya tetap
+      # hadir dan benar di CSS terbangun, jadi tidak ada pemeriksaan statis
+      # yang dapat melihatnya. Aplikasinya tampil dengan font sistem sementara
+      # typecheck, lint, uji, dan build seluruhnya hijau.
+      #
+      # Chrome sudah terpasang di runner `ubuntu-latest`; tidak ada peramban
+      # yang diunduh dan tidak ada dependensi yang ditambahkan.
+      #
+      # ── MENGAPA `node server.js`, BUKAN `next start` ────────────────────
+      #
+      # `next.config.ts` memakai `output: 'standalone'`, dan Next MENOLAK
+      # `next start` pada konfigurasi itu:
+      #
+      #   ⚠ "next start" does not work with "output: standalone" configuration.
+      #     Use "node .next/standalone/server.js" instead.
+      #
+      # Yang lebih penting daripada peringatannya: `node server.js` dari bundel
+      # standalone adalah PERSIS yang dijalankan produksi (lihat `CMD` di
+      # Dockerfile). Gerbang yang menguji peladen berbeda dari yang dikirim
+      # sedang menguji sesuatu yang tidak pernah ada di produksi.
+      #
+      # Perakitannya meniru Dockerfile baris demi baris: keluaran `standalone`
+      # SENGAJA tidak memuat aset statis — Next menyerahkan penyalinannya ke
+      # tahap penyebaran. Tanpa `.next/static`, seluruh CSS menjawab 404 dan
+      # gerbang ini akan gagal karena alasan yang SALAH.
+      #
+      # `public/` disalin bersyarat: direktorinya kosong, dan Git tidak melacak
+      # direktori kosong — jadi ia tidak ada sesudah checkout.
+      - name: Tipografi (Inter + JetBrains Mono benar-benar dirender)
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          if [ -d public ]; then cp -r public .next/standalone/public; fi
+          PORT=3100 node .next/standalone/server.js &
+          node scripts/typography.mjs --base http://localhost:3100
+
   security:
     runs-on: ubuntu-latest
     steps:
