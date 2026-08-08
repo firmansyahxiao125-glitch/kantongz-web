@@ -39,7 +39,7 @@ const button = cva(
     variants: {
       variant: {
         primary: [
-          'bg-[var(--color-brass)] text-[#1A1204]',
+          'bg-[var(--color-brass)] text-[var(--color-brass-ink)]',
           /* Sorot dalam di tepi atas + pendar hangat di bawah. Keduanya meniru
              pelat kuningan yang menangkap cahaya dari atas: yang pertama
              memberinya tepi, yang kedua memberinya massa. */

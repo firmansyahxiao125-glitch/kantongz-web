@@ -19,6 +19,7 @@ import { ErrorState, Skeleton } from '@/components/ui/state';
 import { isApiError } from '@/lib/api';
 import { messageFor } from '@/lib/contracts';
 import { keys, ledger } from '@/lib/ledger';
+import { CATEGORY_DEFAULT } from '@/lib/palette';
 
 const THEMES: { value: ThemeChoice; label: string; icon: typeof Sun }[] = [
   { value: 'light', label: 'Terang', icon: Sun },
@@ -167,13 +168,12 @@ function CategoryForm({ onDone }: { onDone: () => void }) {
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    /* `#7f7f8b` adalah warna kategori "Lainnya" pada palet sistem, bukan biru
-       bawaan Tailwind yang dipakai sebelumnya. Nilai itu (`#3b82f6`) persis
-       warna yang `globals.css` nyatakan sudah dibuang dari produk, dan ia
-       masuk kembali lewat pintu belakang: bawaan formulir kategori baru.
-       Netral abu-baja cocok sebagai titik awal — pengguna memilih sendiri
-       lewat pemilih warna, dan bawaannya tidak boleh mendahului pilihan itu. */
-    defaultValues: { name: '', kind: 'expense', color: '#7f7f8b' },
+    /* Bawaannya dulu `#3b82f6` — biru bawaan Tailwind, persis warna yang
+       `globals.css` nyatakan sudah dibuang dari produk, masuk kembali lewat
+       pintu belakang formulir kategori baru. Nilainya kini tinggal di
+       `@/lib/palette` bersama seluruh warna literal lain, supaya gerbang bisa
+       melarang hex di dalam komponen tanpa pengecualian per berkas. */
+    defaultValues: { name: '', kind: 'expense', color: CATEGORY_DEFAULT },
   });
 
   const create = useMutation({

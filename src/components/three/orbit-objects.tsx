@@ -5,6 +5,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 import type { GraphicsTier } from '@/lib/gpu';
+import { MATERIAL, TOKEN } from '@/lib/palette';
 
 /**
  * Benda keuangan yang mengorbit inti: kartu, koin, dan batang emas.
@@ -97,7 +98,7 @@ export interface OrbitObjectsProps {
   accent?: string;
 }
 
-export function OrbitObjects({ tier, accent = '#3b82f6' }: OrbitObjectsProps) {
+export function OrbitObjects({ tier, accent = TOKEN.titaniumRaised }: OrbitObjectsProps) {
   const full = tier === 'full';
 
   const cards = useMemo(() => specsFor(full ? 7 : 4, 3.1), [full]);
@@ -107,33 +108,38 @@ export function OrbitObjects({ tier, accent = '#3b82f6' }: OrbitObjectsProps) {
   return (
     <group>
       {/* Kartu bank: pelat tipis dengan pantulan tinggi. `roughness` rendah
-          memberi kilau logam kartu tanpa peta lingkungan yang harus diunduh. */}
+          memberi kilau logam kartu tanpa peta lingkungan yang harus diunduh.
+
+          TIDAK ADA `emissive` di sini, dan itu aturan dokumen — bukan selera.
+          DESIGN §1.1 menutup bagian titanium dengan satu kalimat: "Titanium
+          tidak pernah memancarkan cahaya. Dia hanya memantulkan." Pelat yang
+          memancar terbaca sebagai plastik yang disinari dari dalam, dan itu
+          persis kebalikan dari benda termesin.
+
+          Sebelumnya kartu ini memancar dengan warnanya sendiri, dan warna itu
+          `#3b82f6` — biru bawaan Tailwind, yakni warna yang `globals.css`
+          sebut sebagai hal pertama yang terbaca sebagai templat. Ia menyala di
+          halaman muka selama itu. */}
       <OrbitInstances specs={cards}>
         <boxGeometry args={[0.86, 0.54, 0.012]} />
-        <meshStandardMaterial
-          color={accent}
-          metalness={0.85}
-          roughness={0.22}
-          emissive={accent}
-          emissiveIntensity={0.14}
-        />
+        <meshStandardMaterial color={accent} metalness={0.85} roughness={0.22} />
       </OrbitInstances>
 
       {/* Koin. Silinder bersegi 24 — di ukuran layar ini, segi ke-25 tidak
           pernah terlihat dan hanya menambah segitiga. */}
       <OrbitInstances specs={coins} spin={2}>
         <cylinderGeometry args={[0.13, 0.13, 0.028, 24]} />
-        <meshStandardMaterial color="#f0b429" metalness={0.95} roughness={0.28} />
+        <meshStandardMaterial color={MATERIAL.goldCoin} metalness={0.95} roughness={0.28} />
       </OrbitInstances>
 
       {/* Batang emas. */}
       <OrbitInstances specs={bars} spin={0.6}>
         <boxGeometry args={[0.38, 0.14, 0.19]} />
         <meshStandardMaterial
-          color="#d4a017"
+          color={MATERIAL.goldBar}
           metalness={0.92}
           roughness={0.32}
-          emissive="#7a5c00"
+          emissive={MATERIAL.goldBarEmissive}
           emissiveIntensity={0.18}
         />
       </OrbitInstances>
@@ -148,7 +154,13 @@ export function OrbitObjects({ tier, accent = '#3b82f6' }: OrbitObjectsProps) {
  * `dashOffset` yang bergerak — yang terbaca sebagai paket data yang mengalir,
  * bukan sebagai cincin yang berputar.
  */
-export function TransactionStreams({ tier, color = '#00f5d4' }: { tier: GraphicsTier; color?: string }) {
+export function TransactionStreams({
+  tier,
+  color = TOKEN.holo,
+}: {
+  tier: GraphicsTier;
+  color?: string;
+}) {
   const group = useRef<THREE.Group>(null);
   const count = tier === 'full' ? 4 : 2;
 

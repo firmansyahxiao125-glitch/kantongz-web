@@ -35,11 +35,30 @@
   --color-s3: #1e242f;
   --color-s3-active: #262d3a;
 
+  /* ── titanium: struktur (DESIGN §1.1) ───────────────────────────────────
+     Dipakai oleh adegan 3D, yang tidak bisa membaca `var()` — Three.js
+     menuntut nilai, bukan rujukan CSS. Nilainya disalin dari DESIGN §1.1 dan
+     `scripts/palette.mjs` MEMBANDINGKANNYA dengan `src/lib/palette.ts`, jadi
+     salinan yang menyimpang memerahkan gerbang alih-alih diam.
+
+     Aturannya satu kalimat di dokumen itu, dan mengikat: titanium tidak pernah
+     memancarkan cahaya, dia hanya memantulkan. */
+  --color-titanium-deep: #242a34;
+  --color-titanium-base: #3a4150;
+  --color-titanium-raised: #4a5262;
+  --color-titanium-edge: #8a93a6;
+  --color-titanium-rim: #e8edf6;
+
   /* ── kuningan: uang (DESIGN §1.4) ────────────────────────────────────── */
   --color-brass-deep: #7a5820;
   --color-brass: #c89440;
   --color-brass-bright: #f0d79a;
   --color-brass-spec: #fff4dc;
+  /* Tinta di ATAS kuningan. Tombol utama satu-satunya tempat teks berdiri di
+     atas pelat kuningan, dan `--ink` di sana hanya 1,9:1. Cokelat-hitam ini
+     mempertahankan rona hangatnya alih-alih memakai hitam netral, yang di
+     sebelah kuningan terbaca sebagai lubang. */
+  --color-brass-ink: #1a1204;
 
   /* ── hologram: informasi (DESIGN §1.3) ───────────────────────────────────
      SENGAJA es kebiruan, bukan cyan jenuh. Menariknya ke arah putih membuatnya
@@ -126,6 +145,18 @@
   --shadow-float: 0 6px 12px rgb(0 0 0 / 0.45), 0 40px 80px -28px rgb(0 0 0 / 0.85);
 
   --glow-brass: 0 0 0 1px rgb(200 148 64 / 0.35), 0 8px 28px -8px rgb(200 148 64 / 0.35);
+
+  /*
+   * Lambang merek.
+   *
+   * Dinyatakan sebagai variabel supaya lambangnya IKUT TEMA. Sebelum ini kedua
+   * warnanya ditulis langsung di SVG, dan yang kedua adalah `#00F5D4` — persis
+   * cyan yang berkas ini nyatakan sudah dibuang dari produk. Warna itu bertahan
+   * karena tidak ada yang memeriksa hex di dalam `.tsx`: audit kontras membaca
+   * berkas INI, dan lambangnya tidak ada di sini.
+   */
+  --mark-ring: var(--color-brass);
+  --mark-core: var(--color-holo);
 }
 
 /**
@@ -188,6 +219,13 @@
   --shadow-float: 0 4px 8px rgb(11 14 20 / 0.07), 0 40px 80px -30px rgb(11 14 20 / 0.26);
 
   --glow-brass: 0 0 0 1px rgb(122 88 32 / 0.3), 0 8px 28px -10px rgb(122 88 32 / 0.28);
+
+  /* Lambang mengikuti aturan tema terang yang sama dengan sisa produk:
+     kuningan dan hologram DIGELAPKAN, artinya tidak berubah. Cincin kuningan
+     terang di atas putih hanya 2,18:1 — WCAG memang mengecualikan logotype dari
+     syarat kontras, jadi ini bukan perkara kepatuhan; ia sekadar pudar. */
+  --mark-ring: var(--color-brass-deep);
+  --mark-core: var(--color-holo-deep);
 }
 
 @layer base {

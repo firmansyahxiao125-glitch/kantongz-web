@@ -24,8 +24,18 @@ export function CoreMark({ className }: { className?: string }) {
           <line key={deg} x1="24" y1="7" x2="24" y2="14" transform={`rotate(${String(deg)} 24 24)`} />
         ))}
       </g>
-      <circle cx="24" cy="24" r="11" stroke="#C89440" strokeOpacity="0.85" strokeWidth="1.5" />
-      <circle cx="24" cy="24" r="5" fill="#00F5D4" fillOpacity="0.9" />
+      {/* Kelas, bukan atribut presentasi: `stroke="var(--x)"` sebagai ATRIBUT
+          tidak sah di SVG dan diabaikan diam-diam. Lewat CSS ia berlaku, dan
+          nilainya berbalik sendiri di tema terang. */}
+      <circle
+        cx="24"
+        cy="24"
+        r="11"
+        className="stroke-[var(--mark-ring)]"
+        strokeOpacity="0.85"
+        strokeWidth="1.5"
+      />
+      <circle cx="24" cy="24" r="5" className="fill-[var(--mark-core)]" fillOpacity="0.9" />
     </svg>
   );
 }

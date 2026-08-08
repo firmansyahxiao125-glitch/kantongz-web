@@ -6,6 +6,7 @@ import * as THREE from 'three';
 
 import { useGraphicsTier, type GraphicsTier } from '@/lib/gpu';
 import { cn } from '@/lib/cn';
+import { TOKEN } from '@/lib/palette';
 
 /**
  * Panggung 3D.
@@ -154,7 +155,7 @@ function Lighting({ tier }: { tier: Exclude<GraphicsTier, 'off'> }) {
       <directionalLight
         position={[3.2, 4.5, 3.5]}
         intensity={2.1}
-        color="#FFF4DC"
+        color={TOKEN.brassSpec}
         castShadow={full}
         shadow-mapSize={full ? [1024, 1024] : [256, 256]}
         shadow-bias={-0.0012}
@@ -165,16 +166,16 @@ function Lighting({ tier }: { tier: Exclude<GraphicsTier, 'off'> }) {
         <orthographicCamera attach="shadow-camera" args={[-4, 4, 4, -4, 0.1, 14]} />
       </directionalLight>
 
-      <directionalLight position={[-4.5, 0.5, 2]} intensity={0.55} color="#7FE3FF" />
+      <directionalLight position={[-4.5, 0.5, 2]} intensity={0.55} color={TOKEN.holo} />
 
       {/* Rim. Di BELAKANG subjek, menghadap kamera. */}
-      <directionalLight position={[-1.5, 2.5, -4]} intensity={1.4} color="#B8F0FF" />
+      <directionalLight position={[-1.5, 2.5, -4]} intensity={1.4} color={TOKEN.holoBright} />
 
       {/* Praktikal hangat dari bawah-depan, hanya pada mutu penuh. Meniru
           cahaya yang memantul dari permukaan meja — halus, dan satu-satunya
           alasan dagu tidak menjadi lubang hitam. */}
       {full ? (
-        <pointLight position={[0, -1.8, 2.4]} intensity={6} distance={8} color="#C89440" />
+        <pointLight position={[0, -1.8, 2.4]} intensity={6} distance={8} color={TOKEN.brass} />
       ) : null}
     </>
   );

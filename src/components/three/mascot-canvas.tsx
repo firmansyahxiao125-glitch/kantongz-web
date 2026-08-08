@@ -8,6 +8,7 @@ import { Bear } from '@/components/three/bear';
 import { OrbitObjects } from '@/components/three/orbit-objects';
 import { Stage } from '@/components/three/stage';
 import { StaticMascot } from '@/components/three/static-mascot';
+import { MATERIAL } from '@/lib/palette';
 
 /**
  * Isi kanvas 3D — dan SELURUH berat Three.js.
@@ -52,7 +53,7 @@ export default function MascotCanvas() {
             blur={2.6}
             far={3}
             resolution={tier === 'full' ? 512 : 128}
-            color="#000000"
+            color={MATERIAL.black}
             frames={tier === 'full' ? Infinity : 1}
           />
 

@@ -40,6 +40,20 @@ jobs:
       - name: Kontras WCAG AA
         run: npm run contrast
 
+      # Gerbang kontras di atas membaca `globals.css`, dan hanya itu. Warna yang
+      # ditulis langsung di dalam `.tsx` tidak terlihat olehnya — celah yang
+      # meloloskan cyan terlarang ke lambang merek di SETIAP layar, dan biru
+      # bawaan Tailwind ke kartu bercahaya di halaman muka, keduanya bertahan
+      # melewati commit yang judulnya berbunyi "berhenti memakai palet bawaan
+      # Tailwind".
+      #
+      # Langkah ini melarang literal warna di dalam komponen, dan membandingkan
+      # dua salinan yang memang tidak terhindarkan — warna adegan 3D (Three.js
+      # tidak bisa membaca `var()`) dan `themeColor` (dibaca peramban sebelum CSS
+      # ada) — dengan token yang sebenarnya.
+      - name: Disiplin palet
+        run: npm run palette
+
       - name: Build
         run: npm run build
 

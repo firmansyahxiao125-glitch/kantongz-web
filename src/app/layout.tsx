@@ -51,8 +51,23 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+    /*
+     * WAJIB sama dengan `--bg` di `globals.css`, dan `scripts/palette.mjs`
+     * memeriksanya — bukan sekadar diminta lewat komentar.
+     *
+     * Nilai sebelumnya `#09090b` dan `#fafafa`: itu zinc-950 dan zinc-50, sisa
+     * palet Tailwind yang tertinggal ketika sistem warnanya diganti. Akibatnya
+     * bilah alamat di ponsel berbeda rona setipis dari halamannya — jenis
+     * ketidakcocokan yang tidak pernah dilaporkan sebagai bug tetapi membuat
+     * aplikasi terbaca sebagai halaman web di dalam peramban alih-alih sebagai
+     * satu bidang utuh.
+     *
+     * Ditulis sebagai literal karena memang harus: `<meta name="theme-color">`
+     * dibaca peramban SEBELUM CSS mana pun dimuat, jadi `var()` di sini tidak
+     * punya apa pun untuk dirujuk.
+     */
+    { media: '(prefers-color-scheme: dark)', color: '#06070a' },
+    { media: '(prefers-color-scheme: light)', color: '#f7f8fa' },
   ],
   width: 'device-width',
   initialScale: 1,

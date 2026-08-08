@@ -5,6 +5,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 import type { GraphicsTier } from '@/lib/gpu';
+import { MATERIAL, TOKEN } from '@/lib/palette';
 
 /**
  * Inti AI.
@@ -140,12 +141,21 @@ const FRAGMENT = /* glsl */ `
 
 export interface AiCoreProps {
   tier: GraphicsTier;
-  /** Warna inti. Diambil dari token tema oleh pemanggil, bukan ditulis di sini. */
+  /**
+   * Warna inti.
+   *
+   * Bawaannya dulu ditulis di sini sebagai `'#00f5d4'` — cyan yang `globals.css`
+   * nyatakan sudah dibuang dari produk — dengan komentar yang mengaku warnanya
+   * "diambil dari token tema oleh pemanggil". Tidak ada pemanggil yang pernah
+   * melewatkannya, jadi yang dirender selalu bawaannya. Sekarang bawaannya
+   * SENDIRI berasal dari token, sehingga pernyataan itu berlaku tanpa menuntut
+   * setiap pemanggil mengingatnya.
+   */
   deep?: string;
   edge?: string;
 }
 
-export function AiCore({ tier, deep = '#0b2a4a', edge = '#00f5d4' }: AiCoreProps) {
+export function AiCore({ tier, deep = MATERIAL.coreDeep, edge = TOKEN.holo }: AiCoreProps) {
   const material = useRef<THREE.ShaderMaterial>(null);
   const group = useRef<THREE.Group>(null);
 

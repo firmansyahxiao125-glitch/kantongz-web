@@ -5,6 +5,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 import type { GraphicsTier } from '@/lib/gpu';
+import { MATERIAL, TOKEN } from '@/lib/palette';
 
 /**
  * BRUANG — maskot KANTONGZ.
@@ -36,14 +37,18 @@ import type { GraphicsTier } from '@/lib/gpu';
  * persis adalah animasi yang setelah lima detik terbaca sebagai mesin.
  */
 
-/* ── warna ────────────────────────────────────────────────────────────── */
+/* ── warna ────────────────────────────────────────────────────────────────
+   Nilainya pindah ke `@/lib/palette` tanpa berubah satu pun. Tiga di antaranya
+   ternyata memang token yang disalin dengan tangan — moncong adalah
+   `titanium.rim`, bulu terang adalah `titanium.base`, dan visor adalah
+   hologram — jadi sekarang gerbang yang menjaganya tetap sama, bukan ingatan. */
 
-const FUR = '#2A2F3A';
-const FUR_LIGHT = '#3A4150';
-const MUZZLE = '#E8EDF6';
-const NOSE = '#0B0E14';
-const EYE = '#0B0E14';
-const VISOR = '#7FE3FF';
+const FUR = MATERIAL.fur;
+const FUR_LIGHT = TOKEN.titaniumBase;
+const MUZZLE = TOKEN.titaniumRim;
+const NOSE = MATERIAL.nearBlack;
+const EYE = MATERIAL.nearBlack;
+const VISOR = TOKEN.holo;
 
 /* ── perilaku ─────────────────────────────────────────────────────────── */
 
