@@ -78,11 +78,54 @@ const themeScript = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    /*
+     * Variabel font hidup di `<html>`, BUKAN di `<body>`.
+     *
+     * ── MENGAPA INI BUKAN SELERA ────────────────────────────────────────
+     *
+     * `globals.css` mendeklarasikan di dalam `@theme`:
+     *
+     *     --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+     *     --font-mono: var(--font-mono-stack), ui-monospace, …;
+     *
+     * Tailwind memancarkan keduanya ke `:root` — dan `:root` ADALAH `<html>`.
+     *
+     * Substitusi `var()` diselesaikan pada elemen tempat DEKLARASINYA berada.
+     * Ketika `--font-inter` hanya dipasang di `<body>`, pencarian di `:root`
+     * tidak menemukan apa-apa, seluruh deklarasi `--font-sans` menjadi
+     * "guaranteed-invalid", dan nilai KOSONG itulah yang diwariskan ke bawah.
+     * Substitusi TIDAK diulang di `<body>`; yang diwariskan adalah hasil
+     * hitungnya, dan hasil hitungnya sudah kosong.
+     *
+     * Akibatnya terukur, bukan diperkirakan: `--font-sans` dan `--font-mono`
+     * menghitung menjadi KOSONG, `.font-sans` jatuh ke tumpukan bawaan
+     * Tailwind, dan seluruh halaman tampil dengan Segoe UI. Diuji dengan
+     * mengukur lebar teks: badan 728,63px — sama persis dengan Segoe UI yang
+     * dipaksa, dan berbeda dari Inter yang dipaksa (775,2px).
+     *
+     * Yang paling mahal: `.numeric` memakai `var(--font-mono)`, jadi SETIAP
+     * nominal uang kehilangan JetBrains Mono — persis jaminan lebar digit rata
+     * yang DESIGN.md sebut sebagai pembeda antara angka yang dapat dipercaya
+     * dan angka yang bergoyang.
+     *
+     * Berkas fontnya sendiri TIDAK PERNAH bermasalah: keduanya terunduh dengan
+     * benar dari `/_next/static/media/`. Ia hanya tidak pernah dirujuk siapa
+     * pun.
+     *
+     * Menaikkan kedua kelas satu tingkat ke `<html>` menempatkan
+     * `--font-inter` dan `--font-mono-stack` pada elemen yang sama dengan
+     * konsumennya. Ini juga pola yang didokumentasikan `next/font` untuk
+     * pemakaian berbasis variabel.
+     */
+    <html
+      lang="id"
+      className={`${inter.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${inter.variable} ${mono.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         {/* Lompat ke konten — pengguna papan ketik tidak boleh dipaksa
             menyusuri seluruh navigasi di setiap halaman. WCAG 2.4.1 */}
         <a
