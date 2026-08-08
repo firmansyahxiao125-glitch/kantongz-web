@@ -167,7 +167,13 @@ function CategoryForm({ onDone }: { onDone: () => void }) {
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', kind: 'expense', color: '#3b82f6' },
+    /* `#7f7f8b` adalah warna kategori "Lainnya" pada palet sistem, bukan biru
+       bawaan Tailwind yang dipakai sebelumnya. Nilai itu (`#3b82f6`) persis
+       warna yang `globals.css` nyatakan sudah dibuang dari produk, dan ia
+       masuk kembali lewat pintu belakang: bawaan formulir kategori baru.
+       Netral abu-baja cocok sebagai titik awal — pengguna memilih sendiri
+       lewat pemilih warna, dan bawaannya tidak boleh mendahului pilihan itu. */
+    defaultValues: { name: '', kind: 'expense', color: '#7f7f8b' },
   });
 
   const create = useMutation({
