@@ -187,7 +187,10 @@ export default function TransaksiPage() {
             <ul className="divide-y divide-[var(--line)]" aria-busy="true">
               {[0, 1, 2, 3, 4, 5].map((i) => (
                 <li key={i} className="flex items-center gap-3 px-5 py-3">
-                  <Skeleton className="size-9 shrink-0 rounded-lg" />
+                  {/* Ikut disembunyikan di bawah 640px, sama dengan barisnya.
+                      Kerangka yang menjanjikan ikon yang tidak akan datang
+                      menggeser seluruh baris begitu data tiba. */}
+                  <Skeleton className="hidden size-9 shrink-0 rounded-lg sm:block" />
                   <div className="min-w-0 flex-1 space-y-1.5">
                     <Skeleton className="h-3.5 w-40 max-w-[60%]" />
                     <Skeleton className="h-3 w-28 max-w-[40%]" />
@@ -269,8 +272,23 @@ export default function TransaksiPage() {
                   variants={fadeUp}
                   className="group flex items-center gap-3 px-5 py-3"
                 >
+                  {/* Ikon disembunyikan di bawah 640px, dan itu keputusan
+                      ruang yang diukur, bukan selera.
+
+                      Di 390px baris ini memperebutkan lebar antara ikon (36px
+                      + jarak 12), nama, nominal, dan dua tombol aksi. Yang
+                      kalah selalu namanya: tangkapan layar dokumentasi
+                      menunjukkan "PT S…", "Kopi Ken…", dan "Nasi Pada…" —
+                      transaksi yang tidak dapat dikenali dari daftarnya
+                      sendiri.
+
+                      Ikonnya `aria-hidden` dan MURNI dekoratif: arah uang
+                      sudah dibawa tanda +/− dan warnanya, keduanya tetap ada.
+                      Membuang 48px dari elemen yang tidak menyampaikan
+                      informasi adalah penukaran yang paling murah di baris
+                      ini. */}
                   <span
-                    className="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--surface-3)]"
+                    className="hidden size-9 shrink-0 place-items-center rounded-lg bg-[var(--surface-3)] sm:grid"
                     aria-hidden
                   >
                     {trx.kind === 'income' ? (
@@ -311,9 +329,13 @@ export default function TransaksiPage() {
                     {formatIdr(trx.amount)}
                   </span>
 
-                  {/* Terlihat saat disorot ATAU saat difokus keyboard — kontrol
-                      yang hanya muncul pada hover tidak pernah bisa dicapai Tab. */}
-                  <div className="flex shrink-0 gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+                  {/* `.action-reveal`, bukan `opacity-0` + `group-hover`.
+                      Cacat yang sama sudah diperbaiki di Dompet, Anggaran, dan
+                      Tujuan; baris ini terlewat. Di layar sentuh tidak pernah
+                      ada `hover`, jadi kedua tombol menghitung `opacity: 0`
+                      sementara kotak kliknya tetap menerima ketukan — tak
+                      terlihat tetapi tetap bisa tertekan tanpa sengaja. */}
+                  <div className="action-reveal flex shrink-0 gap-0.5 focus-within:opacity-100">
                     <Button
                       variant="ghost"
                       size="icon"

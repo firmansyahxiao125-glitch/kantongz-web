@@ -339,11 +339,49 @@ async function main() {
       );
       await sleep(4000);
 
+      /*
+       * SELURUH dua belas halaman interior, bukan empat.
+       *
+       * Sebelumnya hanya Dasbor, Wawasan, Asisten, dan Transaksi yang dipotret.
+       * Delapan halaman sisanya — termasuk sembilan yang baru saja disatukan ke
+       * `PageHeader`/`CardTitle` — tidak muncul di dokumentasi sama sekali,
+       * sehingga pekerjaan yang paling terlihat justru yang paling tidak
+       * terlihat.
+       *
+       * Untuk repositori portofolio, tangkapan layar ADALAH argumennya.
+       * Memotret sepertiga aplikasi berarti membiarkan pembacanya menebak
+       * dua pertiga sisanya.
+       */
       for (const [name, path] of [
         ['04-dasbor', '/dasbor'],
-        ['05-wawasan', '/wawasan'],
-        ['06-asisten', '/asisten'],
-        ['07-transaksi', '/transaksi'],
+        ['05-transaksi', '/transaksi'],
+        ['06-dompet', '/dompet'],
+        ['07-anggaran', '/anggaran'],
+        ['08-tujuan', '/tujuan'],
+        ['09-analitik', '/analitik'],
+        ['10-wawasan', '/wawasan'],
+        ['11-asisten', '/asisten'],
+        ['12-laporan', '/laporan'],
+        ['13-profil', '/profil'],
+        ['14-keamanan', '/keamanan'],
+        ['15-pengaturan', '/pengaturan'],
+      ]) {
+        await goto(cdp, `${BASE}${path}`);
+        await sleep(2600);
+        await settleNumbers(cdp);
+        await shoot(cdp, name);
+      }
+
+      /* Ponsel, dan hanya halaman yang bentuknya benar-benar BERUBAH di layar
+         sempit: dasbor menyusun ulang ubinnya, transaksi memindahkan
+         penyaringnya, dompet berpindah dari tiga kolom ke satu. Memotret
+         seluruh dua belas dalam dua ukuran menggandakan berkas tanpa
+         menggandakan informasi. */
+      await setViewport(cdp, 390, 844, true);
+      for (const [name, path] of [
+        ['16-dasbor-ponsel', '/dasbor'],
+        ['17-transaksi-ponsel', '/transaksi'],
+        ['18-dompet-ponsel', '/dompet'],
       ]) {
         await goto(cdp, `${BASE}${path}`);
         await sleep(2600);
