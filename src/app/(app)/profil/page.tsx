@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Mail, ShieldCheck, User as UserIcon } from 'lucide-react';
 
 import { useSession } from '@/components/session-provider';
+import { PageHeader } from '@/components/shell/page-header';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/state';
@@ -31,7 +32,10 @@ export default function ProfilPage() {
     .join('');
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="space-y-5">
+      <PageHeader title="Profil" description="Identitas akunmu di KANTONGZ." />
+
+      <div className="grid gap-4 lg:grid-cols-3">
       <Card className="lg:col-span-2">
         <CardBody>
           <div className="flex items-center gap-4">
@@ -119,6 +123,7 @@ export default function ProfilPage() {
           )}
         </CardBody>
       </Card>
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, Info, Repeat, TrendingDown, Wand2 } from 'lucide-react';
 
 import { Sparkline } from '@/components/charts/sparkline';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
@@ -89,6 +90,11 @@ export default function WawasanPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-5">
+      <PageHeader
+        title="Wawasan"
+        description="Pengeluaran janggal, langganan yang tampak terlupakan, dan anggaran yang mendekati batas."
+      />
+
       {insights.length === 0 ? (
         <motion.div variants={fadeUp}>
           <Card>

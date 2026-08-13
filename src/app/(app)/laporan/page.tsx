@@ -5,6 +5,7 @@ import { Download, Printer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
@@ -74,6 +75,15 @@ export default function LaporanPage() {
 
   return (
     <div className="space-y-5">
+      {/* `print:hidden` — kepala halaman ini alat, bukan isi laporan. Yang
+          dicetak adalah datanya, dan judul aplikasi di atas kertas hanya
+          memakan baris pertama. */}
+      <PageHeader
+        className="print:hidden"
+        title="Laporan"
+        description="Pilih rentang tanggal, lalu unduh atau cetak rekap transaksinya."
+      />
+
       <Card className="print:hidden">
         <CardBody className="flex flex-wrap items-end gap-3">
           <div className="w-44">

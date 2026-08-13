@@ -34,6 +34,8 @@
  *   3. `themeColor` di `layout.tsx` wajib sama dengan `--bg` tiap tema. Nilainya
  *      harus literal (peramban membacanya sebelum CSS ada), jadi hanya
  *      perbandingan yang bisa menjaganya.
+ *   4. Hologram tidak boleh menjadi cadangan bagi warna yang datang dari data.
+ *      Lihat alasan lengkapnya di atas aturannya sendiri.
  *
  * Jalankan:
  *   npm run palette
@@ -171,6 +173,43 @@ for (const path of berkasSumber(SRC)) {
   }
 }
 
+/* ── aturan 4: hologram bukan warna cadangan ──────────────────────────
+ *
+ * DESIGN §1.3 memberi hologram satu arti — informasi mesin — dan membatasinya
+ * pada satu permukaan aktif per layar.
+ *
+ * Aturan ini SENGAJA tidak mencoba menegakkan hitungan itu. Percobaan pertama
+ * menghitung setiap pemakaian `--color-holo` per berkas, dan hasilnya menuduh
+ * hal-hal yang benar: cincin fokus (`:focus-visible` WAJIB terlihat, WCAG
+ * 2.4.7), garis grafik yang satu permukaan tetapi dua belas deklarasi, dan
+ * label eyebrow halaman muka. Gerbang yang berteriak pada aksesibilitas adalah
+ * gerbang yang dimatikan orang, dan sesudah dimatikan ia tidak menjaga apa pun.
+ *
+ * Yang dijaga di sini jauh lebih sempit dan tidak punya salah tuduh: hologram
+ * dipakai sebagai CADANGAN bagi warna yang datang dari data.
+ *
+ *   account.color ?? 'var(--color-holo)'
+ *
+ * Pola itu selalu berada di dalam daftar, jadi ia berulang sebanyak barisnya —
+ * dan tiap baris yang belum diberi warna oleh pengguna menyalakan satu hologram
+ * lagi. Warna identitas yang belum dipilih bukan "informasi mesin"; ia justru
+ * ketiadaan informasi, dan cadangannya harus netral.
+ *
+ * Alasannya sama dengan yang sudah ditulis proyek ini untuk kuningan di
+ * `stat.tsx`: isyarat yang muncul di setiap baris berhenti menjadi isyarat.
+ */
+
+const CADANGAN_HOLO = /(\?\?|\|\|)\s*['"`]var\(--color-holo\)['"`]/g;
+const cadangan = [];
+
+for (const path of berkasSumber(SRC)) {
+  const rel = relative(ROOT, path).replace(/\\/g, '/');
+  const bersih = tanpaKomentar(readFileSync(path, 'utf8'));
+  for (const m of bersih.matchAll(CADANGAN_HOLO)) {
+    cadangan.push({ rel, baris: barisDari(bersih, m.index) });
+  }
+}
+
 /* ── aturan 2: TOKEN wajib sama dengan globals.css ───────────────────── */
 
 function tokenCss() {
@@ -278,7 +317,18 @@ if (bedaTema.length === 0) {
   for (const b of bedaTema) console.log(`  ✗    ${b}`);
 }
 
-const gagal = pelanggaran.length + beda.length + bedaTema.length;
+console.log('\n4. Hologram sebagai warna cadangan data');
+if (cadangan.length === 0) {
+  console.log('  OK   tidak ada — cadangan identitas memakai netral');
+} else {
+  for (const c of cadangan) {
+    console.log(
+      `  ✗    ${c.rel}:${c.baris}  cadangan data memakai hologram — pakai var(--color-identity-none)`,
+    );
+  }
+}
+
+const gagal = pelanggaran.length + beda.length + bedaTema.length + cadangan.length;
 console.log(`\n${garis}`);
 if (gagal === 0) {
   console.log('  Palet disiplin: tidak ada warna yang masuk lewat pintu belakang.\n');

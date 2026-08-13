@@ -42,6 +42,7 @@ export const TOKEN = {
   titaniumBase: '#3a4150',
   titaniumRaised: '#4a5262',
   titaniumRim: '#e8edf6',
+  identityNone: '#7f7f8b',
 } as const;
 
 /**
@@ -86,5 +87,9 @@ export const MATERIAL = {
  * Nilai ini adalah warna "Lainnya" pada palet kategori di `kantongz-api`
  * (`src/modules/ledger/seed.ts`). Ia bawaan, bukan pilihan: pengguna memilih
  * sendiri lewat pemilih warna, dan bawaannya tidak boleh mendahului pilihan itu.
+ *
+ * Ia menunjuk ke `TOKEN.identityNone` dan bukan menyalin nilainya: keduanya
+ * memang berarti hal yang sama — belum ada identitas yang dipilih — dan dua
+ * literal dengan satu arti adalah dua tempat untuk menyimpang.
  */
-export const CATEGORY_DEFAULT = '#7f7f8b';
+export const CATEGORY_DEFAULT = TOKEN.identityNone;

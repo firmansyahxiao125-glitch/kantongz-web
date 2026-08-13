@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { FormAlert } from '@/components/auth/form-alert';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
@@ -57,19 +58,20 @@ export default function TujuanPage() {
 
   return (
     <div className="space-y-5">
-      <header className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          Target menabung, dengan kemajuan yang kamu catat sendiri.
-        </p>
-        <Button
-          icon={<Plus size={16} aria-hidden />}
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          Buat tujuan
-        </Button>
-      </header>
+      <PageHeader
+        title="Tujuan"
+        description="Target menabung, dengan kemajuan yang kamu catat sendiri."
+        actions={
+          <Button
+            icon={<Plus size={16} aria-hidden />}
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            Buat tujuan
+          </Button>
+        }
+      />
 
       {q.isPending ? (
         <div className="grid gap-4 sm:grid-cols-2" aria-busy="true">
@@ -121,8 +123,8 @@ export default function TujuanPage() {
                         <span
                           className="grid size-9 shrink-0 place-items-center rounded-lg"
                           style={{
-                            background: `color-mix(in oklab, ${goal.color ?? 'var(--color-holo)'} 16%, transparent)`,
-                            color: goal.color ?? 'var(--color-holo)',
+                            background: `color-mix(in oklab, ${goal.color ?? 'var(--color-identity-none)'} 16%, transparent)`,
+                            color: goal.color ?? 'var(--color-identity-none)',
                           }}
                           aria-hidden
                         >
@@ -173,7 +175,7 @@ export default function TujuanPage() {
                         style={{
                           background: goal.achieved
                             ? 'var(--color-positive)'
-                            : (goal.color ?? 'var(--color-holo)'),
+                            : (goal.color ?? 'var(--color-identity-none)'),
                         }}
                         initial={{ width: 0 }}
                         animate={{ width: `${String(ratio * 100)}%` }}

@@ -106,6 +106,22 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
 
           return (
             <li key={slice.label} className="min-w-0 text-sm">
+              {/*
+                NAMA KATEGORI mendapat baris pertama hampir seluruhnya, dan
+                nominalnya turun ke baris batang.
+
+                Susunan sebelumnya menaruh nama dan nominal pada satu baris,
+                dengan nominal `shrink-0`. Diukur di peramban pada kartu
+                sepertiga lebar: "Belanja" dirender 10px dari 48px yang
+                dibutuhkannya, dan "Tagihan & Utilitas" 10px dari 114px. Yang
+                tersisa di layar hanyalah titik warna dan angka rupiah — donut
+                kategori yang tidak menyebut satu pun kategori.
+
+                Rupiah selalu panjang dan tidak pernah boleh dipotong, jadi yang
+                dipindahkan adalah rupiahnya. Persentase menggantikannya di
+                baris pertama: tiga karakter, dan justru itu yang dicari mata
+                ketika membaca komposisi.
+              */}
               <div className="flex items-baseline gap-2.5">
                 <span
                   className="size-2.5 shrink-0 translate-y-px rounded-full"
@@ -113,14 +129,11 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
                   aria-hidden
                 />
                 <span className="min-w-0 flex-1 truncate text-muted">{slice.label}</span>
-                <span className="numeric shrink-0 text-ink">{formatIdr(slice.value)}</span>
+                <span className="numeric shrink-0 text-xs text-dim">{persen}%</span>
               </div>
 
-              {/* Batang proporsi di bawah baris, bukan kolom persen di
-                  sampingnya: kolom keempat memaksa baris meluber pada kartu
-                  sempit, sementara batang selalu muat berapa pun lebarnya. */}
               <div className="mt-1.5 flex items-center gap-2 pl-5">
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--surface-3)]">
+                <div className="h-1 min-w-6 flex-1 overflow-hidden rounded-full bg-[var(--surface-3)]">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ background: slice.color }}
@@ -129,7 +142,7 @@ export function DonutChart({ slices, caption }: { slices: Slice[]; caption: stri
                     transition={{ duration: 0.7, ease: EASE_OUT }}
                   />
                 </div>
-                <span className="numeric shrink-0 text-xs text-dim">{persen}%</span>
+                <span className="numeric shrink-0 text-xs text-ink">{formatIdr(slice.value)}</span>
               </div>
             </li>
           );

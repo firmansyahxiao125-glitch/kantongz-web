@@ -7,7 +7,9 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { TransactionDialog } from '@/components/ledger/transaction-dialog';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
+import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
@@ -69,6 +71,7 @@ export default function TransaksiPage() {
   const accounts = accountsQuery.data ?? [];
   const categories = categoriesQuery.data ?? [];
   const items = list.data?.pages.flatMap((page) => page.items) ?? [];
+  const menyaring = kind !== '' || accountId !== '';
 
   /* Nama dicari lewat peta, bukan lewat `find` di dalam render setiap baris —
      daftar seratus baris dikali dua puluh dompet adalah dua ribu perbandingan
@@ -84,17 +87,38 @@ export default function TransaksiPage() {
 
   return (
     <div className="space-y-5">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-wrap gap-3">
-          <div className="w-44">
+      <PageHeader
+        title="Transaksi"
+        description="Seluruh catatan masuk, keluar, dan transfer antar dompet."
+        actions={
+          <Button
+            icon={<Plus size={16} aria-hidden />}
+            disabled={accounts.length === 0}
+            onClick={() => {
+              setEditing(null);
+              setOpen(true);
+            }}
+          >
+            Catat transaksi
+          </Button>
+        }
+      >
+        {/* Penyaring berada DI BAWAH judul, bukan menggantikannya. Labelnya
+            disembunyikan secara visual — nilai terpilih sudah menjelaskan
+            dirinya ("Semua dompet"), sementara label bergaya formulir di
+            atasnya dulu berbobot sama dengan judul kartu di bawah. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-36 sm:w-40">
             <Select
-              label="Jenis"
+              label="Jenis transaksi"
+              hideLabel
+              scale="sm"
               value={kind}
               onChange={(event) => {
                 setKind(event.target.value as TransactionKind | '');
               }}
               options={[
-                { value: '', label: 'Semua' },
+                { value: '', label: 'Semua jenis' },
                 { value: 'expense', label: 'Pengeluaran' },
                 { value: 'income', label: 'Pemasukan' },
                 { value: 'transfer', label: 'Transfer' },
@@ -102,9 +126,11 @@ export default function TransaksiPage() {
             />
           </div>
 
-          <div className="w-48">
+          <div className="w-40 sm:w-48">
             <Select
               label="Dompet"
+              hideLabel
+              scale="sm"
               value={accountId}
               onChange={(event) => {
                 setAccountId(event.target.value);
@@ -115,28 +141,62 @@ export default function TransaksiPage() {
               ]}
             />
           </div>
-        </div>
 
-        <Button
-          icon={<Plus size={16} aria-hidden />}
-          disabled={accounts.length === 0}
-          onClick={() => {
-            setEditing(null);
-            setOpen(true);
-          }}
-        >
-          Catat transaksi
-        </Button>
-      </header>
+          {menyaring ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setKind('');
+                setAccountId('');
+              }}
+            >
+              Hapus saringan
+            </Button>
+          ) : null}
+
+          {/*
+            Jumlah yang BENAR-BENAR diketahui, dan tidak lebih.
+
+            API memberi halaman berkursor tanpa jumlah total, jadi yang bisa
+            dinyatakan hanyalah berapa yang sudah dimuat. Menuliskan "dari 240"
+            di sini berarti mengarang angka yang tidak pernah dikirim siapa pun.
+          */}
+          {items.length > 0 ? (
+            <p className="ml-auto text-xs text-dim" aria-live="polite">
+              {list.hasNextPage
+                ? `${String(items.length)} transaksi dimuat`
+                : `${String(items.length)} transaksi`}
+            </p>
+          ) : null}
+        </div>
+      </PageHeader>
 
       <Card>
         <CardBody className="p-0">
           {list.isPending ? (
-            <div className="space-y-2 p-5" aria-busy="true">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-12" />
+            /*
+              Kerangka yang MENYERUPAI barisnya, bukan lima kotak abu.
+
+              Sebelumnya lima `h-12` (48px) berjarak 8px di dalam `p-5`,
+              sementara baris aslinya ±60px dan dipisah garis. Jadi begitu data
+              tiba, seluruh daftar bergeser — dan pergeseran itu paling terasa
+              justru pada koneksi paling lambat, tempat kerangka paling lama
+              dilihat.
+            */
+            <ul className="divide-y divide-[var(--line)]" aria-busy="true">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <li key={i} className="flex items-center gap-3 px-5 py-3">
+                  <Skeleton className="size-9 shrink-0 rounded-lg" />
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-40 max-w-[60%]" />
+                    <Skeleton className="h-3 w-28 max-w-[40%]" />
+                  </div>
+                  <Skeleton className="h-3.5 w-20 shrink-0" />
+                </li>
               ))}
-            </div>
+              <span className="sr-only">Memuat transaksi</span>
+            </ul>
           ) : list.isError ? (
             <ErrorState
               error={list.error}
@@ -145,14 +205,57 @@ export default function TransaksiPage() {
               }}
             />
           ) : items.length === 0 ? (
-            <EmptyState
-              title="Belum ada transaksi"
-              description={
-                accounts.length === 0
-                  ? 'Buat dompet dulu di halaman Dompet, lalu catat transaksi pertamamu.'
-                  : 'Catat pemasukan atau pengeluaran pertamamu — dasbor akan langsung mengikuti.'
-              }
-            />
+            /*
+              Keadaan kosong SELALU membawa jalan keluarnya.
+
+              Sebelumnya `action` tidak pernah dilewatkan, jadi halaman ini
+              menyuruh "catat transaksi pertamamu" lalu tidak memberi satu pun
+              tombol untuk melakukannya — dan tombol yang sebenarnya ada berada
+              di kepala halaman, di luar tempat mata sedang membaca.
+
+              Tiga keadaan kosong yang BERBEDA, karena jalan keluarnya berbeda:
+              belum punya dompet, saringan tidak menemukan apa-apa, atau memang
+              belum ada catatan sama sekali.
+            */
+            menyaring ? (
+              <EmptyState
+                title="Tidak ada yang cocok"
+                description="Saringan yang aktif tidak menemukan transaksi. Longgarkan salah satunya untuk melihat lebih banyak."
+                action={
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setKind('');
+                      setAccountId('');
+                    }}
+                  >
+                    Hapus saringan
+                  </Button>
+                }
+              />
+            ) : accounts.length === 0 ? (
+              <EmptyState
+                title="Mulai dari satu dompet"
+                description="Transaksi selalu tercatat pada sebuah dompet, jadi buat dompet pertamamu dulu."
+                action={<ButtonLink href="/dompet">Buat dompet</ButtonLink>}
+              />
+            ) : (
+              <EmptyState
+                title="Belum ada transaksi"
+                description="Catat pemasukan atau pengeluaran pertamamu — dasbor akan langsung mengikuti."
+                action={
+                  <Button
+                    icon={<Plus size={16} aria-hidden />}
+                    onClick={() => {
+                      setEditing(null);
+                      setOpen(true);
+                    }}
+                  >
+                    Catat transaksi
+                  </Button>
+                }
+              />
+            )
           ) : (
             <motion.ul
               variants={stagger}
@@ -195,8 +298,12 @@ export default function TransaksiPage() {
                     </p>
                   </div>
 
+                  {/* `numeric`, BUKAN `tabular` saja. Daftar yang sama di dasbor
+                      sudah memakai `numeric` (mono + tabular-nums); di sini
+                      nominalnya dulu memakai font teks biasa, jadi angka yang
+                      sama tampil dengan dua wajah berbeda di dua halaman. */}
                   <span
-                    className={`shrink-0 text-sm tabular ${
+                    className={`numeric shrink-0 text-sm ${
                       trx.kind === 'income' ? 'text-[var(--color-positive)]' : 'text-ink'
                     }`}
                   >

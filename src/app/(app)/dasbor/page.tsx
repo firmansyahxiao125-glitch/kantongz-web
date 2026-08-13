@@ -7,8 +7,10 @@ import Link from 'next/link';
 
 import { AreaChart } from '@/components/charts/area-chart';
 import { DonutChart } from '@/components/charts/donut-chart';
+import { PageHeader } from '@/components/shell/page-header';
+import { QuickActions } from '@/components/shell/quick-actions';
 import { ButtonLink } from '@/components/ui/button-link';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
 import { Stat } from '@/components/ui/stat';
 import { rasioPengeluaran } from '@/lib/delta';
@@ -46,6 +48,7 @@ export default function DasborPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
+      <PageHeader title="Dasbor" description="Ringkasan keuanganmu bulan ini." />
       {/*
         HIERARKI, bukan empat kotak sama besar.
 
@@ -122,12 +125,14 @@ export default function DasborPage() {
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card>
             <CardBody>
-              <header className="mb-4 flex items-baseline justify-between">
-                <h2 className="text-sm font-semibold text-ink">Arus kas 30 hari</h2>
-                <Link href="/analitik" className="card-action text-xs text-muted hover:text-ink">
-                  Lihat analitik
-                </Link>
-              </header>
+              <CardHeader
+                title="Arus kas 30 hari"
+                action={
+                  <Link href="/analitik" className="card-action text-xs text-muted hover:text-ink">
+                    Lihat analitik
+                  </Link>
+                }
+              />
               <AreaChart points={d.cashflow} label="Arus kas tiga puluh hari terakhir" />
             </CardBody>
           </Card>
@@ -136,7 +141,7 @@ export default function DasborPage() {
         <motion.div variants={fadeUp}>
           <Card>
             <CardBody>
-              <h2 className="mb-4 text-sm font-semibold text-ink">Pengeluaran per kategori</h2>
+              <CardHeader title="Pengeluaran per kategori" />
               <DonutChart
                 caption="Pengeluaran bulan ini per kategori"
                 slices={d.topCategories.map((c) => ({
@@ -154,12 +159,14 @@ export default function DasborPage() {
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card>
             <CardBody>
-              <header className="mb-3 flex items-baseline justify-between">
-                <h2 className="text-sm font-semibold text-ink">Transaksi terakhir</h2>
-                <Link href="/transaksi" className="card-action text-xs text-muted hover:text-ink">
-                  Semua transaksi
-                </Link>
-              </header>
+              <CardHeader
+                title="Transaksi terakhir"
+                action={
+                  <Link href="/transaksi" className="card-action text-xs text-muted hover:text-ink">
+                    Semua transaksi
+                  </Link>
+                }
+              />
 
               {d.recent.length === 0 ? (
                 <p className="py-8 text-center text-sm text-dim">Belum ada transaksi.</p>
@@ -177,13 +184,17 @@ export default function DasborPage() {
         <motion.div variants={fadeUp} className="space-y-4">
           <Card>
             <CardBody>
-              <h2 className="mb-3 text-sm font-semibold text-ink">Dompet</h2>
+              <CardHeader title="Dompet" />
               <ul className="space-y-2.5">
                 {d.accounts.map((account) => (
                   <li key={account.id} className="flex items-center gap-2.5 text-sm">
+                    {/* Cadangannya BUKAN hologram. Titik ini muncul sekali per
+                        dompet, dan DESIGN §1.3 membatasi hologram pada satu
+                        permukaan aktif per layar — tiga dompet saja sudah
+                        melanggarnya tiga kali lipat. */}
                     <span
                       className="size-2.5 shrink-0 rounded-full"
-                      style={{ background: account.color ?? 'var(--color-holo)' }}
+                      style={{ background: account.color ?? 'var(--color-identity-none)' }}
                       aria-hidden
                     />
                     <span className="flex-1 truncate text-muted">{account.name}</span>
@@ -197,12 +208,14 @@ export default function DasborPage() {
           {d.budgets.length > 0 ? (
             <Card>
               <CardBody>
-                <header className="mb-3 flex items-baseline justify-between">
-                  <h2 className="text-sm font-semibold text-ink">Anggaran</h2>
-                  <Link href="/anggaran" className="card-action text-xs text-muted hover:text-ink">
-                    Kelola
-                  </Link>
-                </header>
+                <CardHeader
+                  title="Anggaran"
+                  action={
+                    <Link href="/anggaran" className="card-action text-xs text-muted hover:text-ink">
+                      Kelola
+                    </Link>
+                  }
+                />
                 <ul className="space-y-3">
                   {d.budgets.slice(0, 4).map((budget) => {
                     const ratio = Math.min(budget.spent / budget.amount, 1);
@@ -219,13 +232,24 @@ export default function DasborPage() {
                             {formatIdr(budget.spent)} / {formatIdr(budget.amount)}
                           </span>
                         </div>
+                        {/* Tiga tingkat yang SAMA PERSIS dengan halaman
+                            Anggaran. Sebelumnya dasbor hanya mengenal dua —
+                            lewat atau tidak — sehingga anggaran di 99% terlihat
+                            setenang anggaran di 10%, dan justru pada ambang
+                            itulah peringatan paling berguna.
+
+                            Keadaan tenang netral, bukan hologram: isyaratnya
+                            dibawa merah dan kuning, dan keduanya hanya bekerja
+                            kalau sisanya diam. */}
                         <div className="h-1.5 overflow-hidden rounded-full bg-[var(--surface-3)]">
                           <motion.div
                             className="h-full rounded-full"
                             style={{
                               background: lewat
                                 ? 'var(--color-negative)'
-                                : 'var(--color-holo)',
+                                : ratio > 0.85
+                                  ? 'var(--color-caution)'
+                                  : 'var(--color-identity-none)',
                             }}
                             initial={{ width: 0 }}
                             animate={{ width: `${String(ratio * 100)}%` }}
@@ -241,6 +265,18 @@ export default function DasborPage() {
           ) : null}
         </motion.div>
       </div>
+
+      {/* Aksi cepat DI BAWAH, dan itu bukan kompromi tata letak. Dasbor
+          menjawab "bagaimana keadaanku" lebih dulu; pintu ke halaman lain
+          berguna sesudah pertanyaan itu terjawab, bukan sebelumnya. */}
+      <motion.div variants={fadeUp}>
+        <Card>
+          <CardBody>
+            <CardHeader title="Aksi cepat" />
+            <QuickActions />
+          </CardBody>
+        </Card>
+      </motion.div>
     </motion.div>
   );
 }
@@ -286,13 +322,33 @@ function TransactionRow({ trx }: { trx: Transaction }) {
   );
 }
 
+/**
+ * Kerangka muat.
+ *
+ * Bentuknya WAJIB sama dengan isinya. Sebelum ini ia menggambar empat ubin sama
+ * besar dalam satu deret (`xl:grid-cols-4`), sementara yang datang kemudian
+ * adalah satu ubin H1 selebar penuh ditambah tiga ubin di baris kedua — jadi
+ * begitu data tiba, seluruh halaman melompat.
+ *
+ * Kerangka yang berbeda bentuk dari isinya lebih buruk daripada tidak ada
+ * kerangka sama sekali: ia menjanjikan tata letak yang tidak akan pernah datang,
+ * dan pembacanya sudah mulai mengarahkan mata ke tempat yang salah.
+ *
+ * CATATAN JUJUR: strukturnya kini sama, tetapi tingginya masih perkiraan yang
+ * diturunkan dari kotak `Stat` — belum diukur di peramban, karena dasbor
+ * menuntut sesi login dan backend-nya belum berjalan. Sisa pergeserannya kecil
+ * dan tegak saja, bukan perubahan susunan.
+ */
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-[7.75rem]" />
-        ))}
+      <div className="grid gap-4">
+        <Skeleton className="h-[8.5rem] sm:h-[9.25rem]" />
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[7.75rem]" />
+          ))}
+        </div>
       </div>
       <div className="grid gap-4 xl:grid-cols-3">
         <Skeleton className="h-72 xl:col-span-2" />

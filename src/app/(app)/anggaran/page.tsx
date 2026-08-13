@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { FormAlert } from '@/components/auth/form-alert';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
@@ -71,19 +72,20 @@ export default function AnggaranPage() {
 
   return (
     <div className="space-y-5">
-      <header className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          Batas belanja per kategori. Terpakai dihitung dari transaksi periode berjalan.
-        </p>
-        <Button
-          icon={<Plus size={16} aria-hidden />}
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          Buat anggaran
-        </Button>
-      </header>
+      <PageHeader
+        title="Anggaran"
+        description="Batas belanja per kategori. Terpakai dihitung dari transaksi periode berjalan."
+        actions={
+          <Button
+            icon={<Plus size={16} aria-hidden />}
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            Buat anggaran
+          </Button>
+        }
+      />
 
       {budgets.isPending ? (
         <div className="space-y-3" aria-busy="true">
@@ -133,7 +135,7 @@ export default function AnggaranPage() {
                         <p className="flex items-center gap-2 text-sm font-medium text-ink">
                           <span
                             className="size-2.5 shrink-0 rounded-full"
-                            style={{ background: category?.color ?? 'var(--color-holo)' }}
+                            style={{ background: category?.color ?? 'var(--color-identity-none)' }}
                             aria-hidden
                           />
                           <span className="truncate">{category?.name ?? 'Kategori'}</span>
@@ -181,11 +183,15 @@ export default function AnggaranPage() {
                       <motion.div
                         className="h-full rounded-full"
                         style={{
+                          /* Keadaan sehat NETRAL, bukan hologram. Isyarat di
+                             bilah ini dibawa merah dan kuningnya; kalau keadaan
+                             tenang pun berwarna, tidak ada yang menonjol saat
+                             keadaannya berubah. */
                           background: over
                             ? 'var(--color-negative)'
                             : ratio > 0.85
                               ? 'var(--color-caution)'
-                              : 'var(--color-holo)',
+                              : 'var(--color-identity-none)',
                         }}
                         initial={{ width: 0 }}
                         animate={{ width: `${String(ratio * 100)}%` }}

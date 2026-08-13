@@ -98,13 +98,27 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         }}
       >
         <defs>
+          {/*
+            DUA warna, dan sebelumnya keduanya hologram.
+
+            Terukur di peramban pada dasbor berdata nyata: `stroke` kedua deret
+            menghitung menjadi `rgb(127,227,255)` yang SAMA PERSIS. Legenda di
+            bawah menamai keduanya "Masuk" dan "Keluar", tetapi grafiknya tidak
+            memberi cara apa pun untuk membedakannya — pada grafik ARUS KAS,
+            yang justru satu-satunya hal yang ingin dibaca orang.
+
+            Warnanya kini sinyal semantik (DESIGN §7), bukan aksen: masuk
+            positif, keluar negatif. Keduanya sudah lulus audit kontras di kedua
+            tema, dan keduanya TIDAK berdiri sendiri — legendanya memberi nama,
+            sesuai syarat dokumen bahwa sinyal tidak pernah tanpa label.
+          */}
           <linearGradient id={gradientIncome} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-holo)" stopOpacity="0.32" />
-            <stop offset="100%" stopColor="var(--color-holo)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--color-positive)" stopOpacity="0.30" />
+            <stop offset="100%" stopColor="var(--color-positive)" stopOpacity="0" />
           </linearGradient>
           <linearGradient id={gradientExpense} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-holo)" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="var(--color-holo)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--color-negative)" stopOpacity="0.26" />
+            <stop offset="100%" stopColor="var(--color-negative)" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -141,7 +155,7 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         <motion.path
           d={path(income, max, false)}
           fill="none"
-          stroke="var(--color-holo)"
+          stroke="var(--color-positive)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0 }}
@@ -151,7 +165,7 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         <motion.path
           d={path(expense, max, false)}
           fill="none"
-          stroke="var(--color-holo)"
+          stroke="var(--color-negative)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0 }}
@@ -183,8 +197,8 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
 
       {active ? (
         <>
-          <Dot ratioX={xRatio} value={active.income} max={max} color="var(--color-holo)" />
-          <Dot ratioX={xRatio} value={active.expense} max={max} color="var(--color-holo)" />
+          <Dot ratioX={xRatio} value={active.income} max={max} color="var(--color-positive)" />
+          <Dot ratioX={xRatio} value={active.expense} max={max} color="var(--color-negative)" />
         </>
       ) : null}
 
@@ -201,11 +215,11 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
         >
           <p className="mb-1 font-medium text-ink">{formatDayShort(active.bucket)}</p>
           <p className="flex items-center gap-1.5 text-muted">
-            <span className="size-1.5 rounded-full bg-[var(--color-holo)]" />
+            <span className="size-1.5 rounded-full bg-[var(--color-positive)]" />
             Masuk {formatIdr(active.income)}
           </p>
           <p className="flex items-center gap-1.5 text-muted">
-            <span className="size-1.5 rounded-full bg-[var(--color-holo)]" />
+            <span className="size-1.5 rounded-full bg-[var(--color-negative)]" />
             Keluar {formatIdr(active.expense)}
           </p>
         </div>
@@ -216,11 +230,11 @@ export function AreaChart({ points, label }: { points: AreaPoint[]; label: strin
           bersama grafik yang sudah ditandai `aria-label`. */}
       <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
         <li className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
+          <span className="size-2 rounded-full bg-[var(--color-positive)]" aria-hidden />
           Masuk
         </li>
         <li className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
+          <span className="size-2 rounded-full bg-[var(--color-negative)]" aria-hidden />
           Keluar
         </li>
       </ul>

@@ -38,12 +38,54 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(f
   );
 });
 
-export function CardHeader({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex items-start justify-between gap-4 p-5 pb-0', className)} {...rest} />;
+/**
+ * Judul kartu.
+ *
+ * `<h2>` karena `PageHeader` sudah memegang `<h1>` halaman — kartu adalah
+ * tingkat berikutnya, dan pembaca layar yang melompat antar-heading harus
+ * menemukan struktur itu, bukan lompatan h1 langsung ke h3.
+ *
+ * Kelasnya diambil dari varian yang MEMANG sudah paling banyak dipakai
+ * (`text-sm font-semibold text-ink`, 16 kali), bukan dikarang baru. Sebelum ini
+ * peran yang sama ditulis dengan LIMA kelas berbeda dan tiga jarak bawah yang
+ * berbeda — `mb-4`, `mb-3`, dan tanpa jarak — dua di antaranya berada di
+ * halaman yang sama. `globals.css` sudah menuliskan sendiri akibatnya untuk
+ * radius, dan berlaku persis sama di sini: mata membaca "hampir" sebagai
+ * kecerobohan jauh sebelum akal menemukan sebabnya.
+ */
+export function CardTitle({ className, ...rest }: HTMLAttributes<HTMLHeadingElement>) {
+  return <h2 className={cn('text-sm font-semibold text-ink', className)} {...rest} />;
 }
 
-export function CardTitle({ className, ...rest }: HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn('text-sm font-medium text-[var(--ink-muted)]', className)} {...rest} />;
+/**
+ * Kepala kartu: judul, dan aksi opsional di sisi kanan.
+ *
+ * Dipakai DI DALAM `CardBody`, karena itu ia membawa jarak bawahnya sendiri.
+ * Satu tempat yang memutuskan jarak itu adalah alasan seluruh kartu di aplikasi
+ * ini akhirnya berbaris pada garis yang sama.
+ *
+ * `items-baseline`: judul dan tautan aksi punya ukuran teks berbeda (14px dan
+ * 12px), dan menengahkannya secara vertikal membuat kedua garis dasarnya
+ * meleset — selisih yang tidak pernah disadari tetapi selalu terbaca sebagai
+ * tata letak yang longgar.
+ */
+export function CardHeader({
+  title,
+  action,
+  className,
+  children,
+}: {
+  title?: string;
+  action?: ReactNode;
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className={cn('mb-4 flex items-baseline justify-between gap-4', className)}>
+      {title === undefined ? children : <CardTitle>{title}</CardTitle>}
+      {action ? <div className="shrink-0">{action}</div> : null}
+    </div>
+  );
 }
 
 export function CardBody({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {

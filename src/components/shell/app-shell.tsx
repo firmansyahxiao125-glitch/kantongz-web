@@ -100,9 +100,23 @@ export function AppShell({ user, children }: { user: User; children: React.React
             {drawer ? <X size={19} aria-hidden /> : <Menu size={19} aria-hidden />}
           </Button>
 
-          <h1 className="text-[15px] font-semibold tracking-tight text-ink">
+          {/*
+            KONTEKS, bukan judul.
+
+            Ini dulu `<h1>` halaman, dan itu satu-satunya judul yang dimiliki
+            empat halaman — Transaksi, Dompet, Anggaran, Tujuan. Sejak
+            `PageHeader` ada, judulnya tinggal di area isi tempat mata memang
+            mencarinya, dan baris ini turun menjadi penanda "kamu sedang di
+            mana" pada bilah yang selalu terlihat.
+
+            `aria-hidden` TIDAK dipakai: teksnya tetap berguna dibacakan saat
+            pembaca layar menelusuri bilah atas. Yang dibuang hanya perannya
+            sebagai heading, supaya tidak ada dua judul yang sama di satu
+            dokumen.
+          */}
+          <span className="truncate text-sm font-medium text-muted">
             {current?.label ?? 'KANTONGZ'}
-          </h1>
+          </span>
 
           <div className="ml-auto flex items-center gap-1.5">
             <button

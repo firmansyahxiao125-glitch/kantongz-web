@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { FormAlert } from '@/components/auth/form-alert';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
@@ -22,6 +23,7 @@ import { messageFor } from '@/lib/contracts';
 import { formatIdr } from '@/lib/format';
 import { keys, ledger, type AccountKind } from '@/lib/ledger';
 import { fadeUp, stagger } from '@/lib/motion';
+import { TOKEN } from '@/lib/palette';
 
 const ICON: Record<AccountKind, LucideIcon> = {
   cash: Banknote,
@@ -45,6 +47,20 @@ const schema = z.object({
   /* Saldo awal BOLEH negatif — kartu kredit dimulai dari utang. Yang tidak
      boleh hanyalah pecahan, karena buku besar menyimpan rupiah utuh. */
   openingBalance: z.coerce.number().int('Tulis dalam rupiah utuh, tanpa koma.'),
+  /*
+   * Warna dompet.
+   *
+   * Bukan kemampuan baru: `WalletAccount.color` sudah ada di kontrak,
+   * `POST /v1/accounts` sudah menerimanya, dan kartu di halaman ini sudah
+   * MERENDERNYA sejak awal. Yang tidak ada hanyalah cara pengguna mengisinya —
+   * jadi setiap dompet lahir tanpa warna dan ketiganya tampil sebagai lingkaran
+   * abu yang sama persis. Terukur di peramban: tiga ikon, satu nilai
+   * `rgb(127,127,139)`.
+   *
+   * Polanya sama persis dengan formulir kategori di Pengaturan, supaya tidak
+   * ada dua cara berbeda memilih warna di satu produk.
+   */
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Pilih warnanya.'),
 });
 
 type Values = z.infer<typeof schema>;
@@ -74,29 +90,70 @@ export default function DompetPage() {
 
   return (
     <div className="space-y-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <PageHeader
+        title="Dompet"
+        description="Kas, rekening, dan e-wallet — beserta saldo masing-masing."
+        actions={
+          <Button
+            icon={<Plus size={16} aria-hidden />}
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            Tambah dompet
+          </Button>
+        }
+      >
+        {/* Total tetap di kepala halaman, tetapi sekarang DI BAWAH judulnya
+            alih-alih menggantikannya. `numeric` dan bukan `tabular` saja:
+            nominal yang sama di dasbor dan Transaksi memakai mono, dan angka
+            uang yang berganti wajah antar halaman terbaca sebagai dua sistem. */}
         <div>
           <p className="text-xs text-muted">Total seluruh dompet</p>
-          <p className="text-2xl font-semibold tabular tracking-tight text-ink">
-            {formatIdr(total)}
-          </p>
+          {/*
+            Selama memuat, TIDAK ADA angka.
+
+            `total` dijumlahkan dari daftar yang masih kosong, jadi sebelum
+            perbaikan ini kepala halaman menampilkan "Rp 0" lalu melompat ke
+            nilai sebenarnya — terlihat di tangkapan layar keadaan muat. Nol
+            bukan "belum tahu": ia pernyataan bahwa uangmu habis, dan aplikasi
+            uang yang mengatakannya sekejap pun sudah salah bicara.
+          */}
+          {q.isPending ? (
+            <Skeleton className="mt-1 h-8 w-44" />
+          ) : (
+            <p className="numeric text-2xl font-semibold tracking-tight text-ink">
+              {formatIdr(total)}
+            </p>
+          )}
         </div>
-        <Button
-          icon={<Plus size={16} aria-hidden />}
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          Tambah dompet
-        </Button>
-      </header>
+      </PageHeader>
 
       {q.isPending ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+        /*
+          Kerangka BERBENTUK kartunya, bukan tiga kotak abu.
+
+          Diukur di peramban: kotak lama `h-28` tingginya 112px sementara kartu
+          yang datang 170px — jadi seluruh grid melompat 58px per baris begitu
+          data tiba. Tingginya di bawah diturunkan dari kotak kartu yang sama
+          (padding 20+20, ikon 36 + jarak 12, nama 20, jenis 6+16, saldo 12+28),
+          bukan dikira-kira.
+        */
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-busy="true">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-28" />
+            <li key={i}>
+              <Card>
+                <CardBody>
+                  <Skeleton className="mb-3 size-9 rounded-lg" />
+                  <Skeleton className="h-5 w-32 max-w-[70%]" />
+                  <Skeleton className="mt-1.5 h-4 w-20 max-w-[45%]" />
+                  <Skeleton className="mt-3 h-7 w-40 max-w-[85%]" />
+                </CardBody>
+              </Card>
+            </li>
           ))}
-        </div>
+          <span className="sr-only">Memuat dompet</span>
+        </ul>
       ) : q.isError ? (
         <ErrorState
           error={q.error}
@@ -140,8 +197,8 @@ export default function DompetPage() {
                       <span
                         className="grid size-9 place-items-center rounded-lg"
                         style={{
-                          background: `color-mix(in oklab, ${account.color ?? 'var(--color-holo)'} 16%, transparent)`,
-                          color: account.color ?? 'var(--color-holo)',
+                          background: `color-mix(in oklab, ${account.color ?? 'var(--color-identity-none)'} 16%, transparent)`,
+                          color: account.color ?? 'var(--color-identity-none)',
                         }}
                         aria-hidden
                       >
@@ -156,7 +213,7 @@ export default function DompetPage() {
                         onClick={() => {
                           archive.mutate(account.id);
                         }}
-                        className="opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+                        className="action-reveal"
                       >
                         <Archive size={15} aria-hidden />
                       </Button>
@@ -165,8 +222,13 @@ export default function DompetPage() {
                     <p className="truncate text-sm font-medium text-ink">{account.name}</p>
                     <p className="text-xs text-dim">{LABEL[account.kind]}</p>
 
+                    {/* `numeric`, BUKAN `tabular` saja. Diukur di peramban:
+                        saldo ini menghitung `font-family: Inter`, sementara
+                        total di kepala halaman yang sama — dan setiap nominal
+                        di Dasbor maupun Transaksi — memakai mono. Dua wajah
+                        angka uang dalam satu layar terbaca sebagai dua sistem. */}
                     <p
-                      className={`mt-auto pt-3 text-xl font-semibold tabular tracking-tight ${
+                      className={`numeric mt-auto pt-3 text-xl font-semibold tracking-tight ${
                         account.balance < 0 ? 'text-[var(--color-negative)]' : 'text-ink'
                       }`}
                     >
@@ -203,7 +265,9 @@ function AccountForm({ onDone }: { onDone: () => void }) {
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', kind: 'cash', openingBalance: 0 },
+    /* Bawaannya netral, bukan warna pilihan: pengguna memilih sendiri, dan
+       bawaan tidak boleh mendahului pilihan itu. */
+    defaultValues: { name: '', kind: 'cash', openingBalance: 0, color: TOKEN.identityNone },
   });
 
   const create = useMutation({
@@ -261,6 +325,15 @@ function AccountForm({ onDone }: { onDone: () => void }) {
         hint="Boleh negatif untuk kartu kredit."
         error={form.formState.errors.openingBalance?.message}
         {...form.register('openingBalance')}
+      />
+
+      <Field
+        label="Warna"
+        type="color"
+        className="h-11 px-2 py-1"
+        hint="Membedakan dompet ini di dasbor, analitik, dan daftar."
+        error={form.formState.errors.color?.message}
+        {...form.register('color')}
       />
 
       <div className="flex gap-2 pt-1">

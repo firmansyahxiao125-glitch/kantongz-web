@@ -5,8 +5,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Send, Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
 
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { ErrorState, Skeleton } from '@/components/ui/state';
 import { isApiError } from '@/lib/api';
@@ -71,13 +72,18 @@ export default function AsistenPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-5">
+      <PageHeader
+        title="Asisten"
+        description="Tanya apa pun tentang uangmu, atau uji sebuah pengandaian sebelum memutuskan."
+      />
+
       <motion.div variants={fadeUp}>
         <Card>
           <CardBody>
-            <header className="mb-3 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-2">
               <Sparkles size={16} className="text-[var(--color-holo)]" aria-hidden />
-              <h2 className="text-sm font-semibold text-ink">Ringkasan bulan ini</h2>
-            </header>
+              <CardTitle>Ringkasan bulan ini</CardTitle>
+            </div>
 
             {summary.isPending ? (
               <Skeleton className="h-16" />

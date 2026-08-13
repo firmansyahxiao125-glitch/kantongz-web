@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { KeyRound, LogOut, ShieldCheck, Timer } from 'lucide-react';
 import { useState } from 'react';
 
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody } from '@/components/ui/card';
@@ -30,6 +31,11 @@ export default function KeamananPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
+      <PageHeader
+        title="Keamanan"
+        description="Bagaimana sesimu dijaga, dan apa yang bisa kamu kendalikan sendiri."
+      />
+
       <Card>
         <CardBody className="flex items-start gap-4">
           <span

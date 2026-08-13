@@ -6,8 +6,9 @@ import { useState } from 'react';
 
 import { AreaChart } from '@/components/charts/area-chart';
 import { DonutChart } from '@/components/charts/donut-chart';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorState, Skeleton } from '@/components/ui/state';
 import { formatIdr } from '@/lib/format';
 import { keys, ledger } from '@/lib/ledger';
@@ -39,38 +40,49 @@ export default function AnalitikPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-5">
-      <motion.header variants={fadeUp} className="flex flex-wrap items-center gap-2">
-        {WINDOWS.map((w, i) => (
-          <Button
-            key={w.label}
-            size="sm"
-            variant={i === index ? 'primary' : 'secondary'}
-            aria-pressed={i === index}
-            onClick={() => {
-              setIndex(i);
-            }}
-          >
-            {w.label}
-          </Button>
-        ))}
-      </motion.header>
+      <PageHeader title="Analitik" description="Tren arus kas dan komposisi pengeluaran per periode.">
+        <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2">
+          {WINDOWS.map((w, i) => (
+            <Button
+              key={w.label}
+              size="sm"
+              variant={i === index ? 'primary' : 'secondary'}
+              aria-pressed={i === index}
+              onClick={() => {
+                setIndex(i);
+              }}
+            >
+              {w.label}
+            </Button>
+          ))}
+        </motion.div>
+      </PageHeader>
 
       <motion.div variants={fadeUp}>
         <Card>
           <CardBody>
-            <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="text-sm font-semibold text-ink">Arus kas</h2>
+            {/* Titik di sini menamai deret yang SAMA dengan yang digambar
+                `AreaChart`, jadi warnanya wajib ikut. Ketika grafiknya berhenti
+                memakai hologram untuk kedua deret, dua titik ini tertinggal —
+                terlihat di peramban sebagai empat titik legenda pada satu kartu,
+                dua di antaranya menamai garis dengan warna yang bukan warnanya.
+                Legenda yang salah warna lebih buruk daripada tanpa legenda.
+
+                `numeric` menggantikan `tabular`: nominal di sini uang, sama
+                seperti di seluruh halaman lain. */}
+            <CardHeader className="flex-wrap gap-3">
+              <CardTitle>Arus kas</CardTitle>
               <div className="flex gap-4 text-xs">
                 <span className="flex items-center gap-1.5 text-muted">
-                  <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
-                  Masuk <span className="tabular text-ink">{formatIdr(totalIn)}</span>
+                  <span className="size-2 rounded-full bg-[var(--color-positive)]" aria-hidden />
+                  Masuk <span className="numeric text-ink">{formatIdr(totalIn)}</span>
                 </span>
                 <span className="flex items-center gap-1.5 text-muted">
-                  <span className="size-2 rounded-full bg-[var(--color-holo)]" aria-hidden />
-                  Keluar <span className="tabular text-ink">{formatIdr(totalOut)}</span>
+                  <span className="size-2 rounded-full bg-[var(--color-negative)]" aria-hidden />
+                  Keluar <span className="numeric text-ink">{formatIdr(totalOut)}</span>
                 </span>
               </div>
-            </header>
+            </CardHeader>
 
             {flow.isPending ? (
               <Skeleton className="h-50" />
@@ -153,7 +165,7 @@ export default function AnalitikPage() {
                               background:
                                 account.balance < 0
                                   ? 'var(--color-negative)'
-                                  : (account.color ?? 'var(--color-holo)'),
+                                  : (account.color ?? 'var(--color-identity-none)'),
                             }}
                             initial={{ width: 0 }}
                             animate={{ width: `${String(ratio * 100)}%` }}

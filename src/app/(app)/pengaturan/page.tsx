@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { FormAlert } from '@/components/auth/form-alert';
 import { useTheme, type ThemeChoice } from '@/components/theme-provider';
+import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
@@ -44,6 +45,8 @@ export default function PengaturanPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
+      <PageHeader title="Pengaturan" description="Tampilan aplikasi dan kategori transaksimu." />
+
       <Card>
         <CardBody>
           <h2 className="text-sm font-semibold text-ink">Tampilan</h2>
