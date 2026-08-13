@@ -12,7 +12,7 @@ import type { PendingVerification, Session, User } from '@/lib/contracts';
  * JavaScript mana pun — ia tinggal di kuki `httpOnly` yang ditulis BFF.
  */
 
-export type SessionStatus = 'memuat' | 'tamu' | 'masuk';
+export type SessionStatus = 'memuat' | 'tamu' | 'masuk' | 'galat';
 
 /**
  * Serikat terdiskriminasi, bukan `user: User | null`.
@@ -20,11 +20,27 @@ export type SessionStatus = 'memuat' | 'tamu' | 'masuk';
  * Dengan bentuk ini `status === 'masuk'` sudah cukup bagi TypeScript untuk tahu
  * penggunanya ada, dan tidak ada satu pun `!` atau `?? fallback` yang perlu
  * ditulis di komponen — yang keduanya adalah tempat bug tumbuh diam-diam.
+ *
+ * ── MENGAPA ADA `galat`, TERPISAH DARI `tamu` ──────────────────────────
+ *
+ * "Kamu belum masuk" dan "kami tidak bisa menghubungi peladen" adalah dua
+ * kenyataan yang berbeda, dan sebelumnya keduanya berakhir sebagai `tamu`.
+ *
+ * Akibatnya diukur di peramban: dengan backend diblokir, pemulihan sesi
+ * BERHASIL menyegarkan token lewat BFF, lalu gagal pada satu `GET /v1/auth/me`
+ * — dan `catch` yang tidak membedakan sebab memanggil `forget()`. Pengguna
+ * dilempar ke halaman masuk padahal kuki refresh-nya masih sah.
+ *
+ * Artinya: satu blip jaringan, atau satu restart API selama sepuluh detik,
+ * mengeluarkan setiap pengguna yang sedang membuka aplikasi. Yang benar adalah
+ * mengatakan sambungannya putus dan menawarkan mencoba lagi — persis seperti
+ * yang sudah dilakukan setiap layar berdata.
  */
 export type SessionState =
   | { status: 'memuat'; user: null }
   | { status: 'tamu'; user: null }
-  | { status: 'masuk'; user: User };
+  | { status: 'masuk'; user: User }
+  | { status: 'galat'; user: null };
 
 /** §6 — batas diam. Sama dengan aplikasi mobile, karena aturannya satu. */
 const IDLE_TIMEOUT_MS = 15 * 60_000;
@@ -184,8 +200,25 @@ export function refresh(): Promise<boolean> {
       }
 
       return true;
-    } catch {
-      forget();
+    } catch (error) {
+      /*
+       * SEBABNYA MENENTUKAN AKIBATNYA.
+       *
+       * Sesi yang benar-benar tidak sah harus dilupakan — kuki refresh sudah
+       * dicabut BFF, dan menahan token mati hanya menunda kebingungan.
+       *
+       * Kegagalan JARINGAN bukan itu. Kukinya masih ada dan masih sah; yang
+       * gagal hanyalah perjalanan permintaannya. Melupakan sesi di sini
+       * mengubah gangguan sepuluh detik menjadi logout paksa, dan pengguna
+       * kehilangan apa pun yang sedang ia isi.
+       */
+      if (sesiTidakSah(error)) {
+        forget();
+      } else {
+        setAccessToken(null);
+        expiresAt = 0;
+        emit({ status: 'galat', user: null });
+      }
       return false;
     } finally {
       inFlight = null;
@@ -221,6 +254,17 @@ export async function ensureFreshToken(): Promise<boolean> {
  * satu pun. Kuki refresh yang masih berlaku memulihkan sesinya; yang tidak,
  * mendarat di `tamu` tanpa satu pun pesan galat — belum masuk bukan kegagalan.
  */
+/**
+ * Membedakan "sesi ini tidak sah" dari "permintaannya tidak sampai".
+ *
+ * 401 berarti backend sudah menjawab dan menolak. Kegagalan jaringan (`network`,
+ * status 0) dan 5xx berarti backend TIDAK pernah menjawab — dan tidak ada yang
+ * boleh disimpulkan tentang keabsahan sesi dari sesuatu yang tidak menjawab.
+ */
+function sesiTidakSah(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 401;
+}
+
 export async function restore(): Promise<void> {
   await refresh();
   if (state.status === 'memuat') emit({ status: 'tamu', user: null });

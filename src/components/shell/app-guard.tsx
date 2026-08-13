@@ -6,6 +6,9 @@ import { useEffect } from 'react';
 import { useSession } from '@/components/session-provider';
 import { AppShell } from '@/components/shell/app-shell';
 import { CoreMark } from '@/components/brand/core-mark';
+import { ErrorState } from '@/components/ui/state';
+import { ApiError } from '@/lib/api';
+import { restore } from '@/lib/session';
 
 /**
  * Penjaga rute terautentikasi.
@@ -25,6 +28,38 @@ export function AppGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session.status === 'tamu') router.replace('/masuk');
   }, [session.status, router]);
+
+  /*
+   * Peladen tidak terjangkau — dan itu BUKAN alasan mengeluarkan pengguna.
+   *
+   * Sebelum keadaan ini ada, kegagalan jaringan saat memulihkan sesi berakhir
+   * sebagai `tamu` dan mengalihkan ke halaman masuk, padahal kuki refresh masih
+   * sah. Yang benar adalah mengatakan apa yang terjadi dan menawarkan mencoba
+   * lagi, sama seperti setiap layar berdata di aplikasi ini.
+   */
+  if (session.status === 'galat') {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-app px-6">
+        <div className="w-full max-w-sm">
+          <ErrorState
+            error={new ApiError(
+              {
+                code: 'network',
+                message:
+                  'Tidak bisa terhubung ke server. Sesimu masih tersimpan — periksa koneksimu, lalu coba lagi.',
+                details: null,
+                retryAfter: null,
+              },
+              0,
+            )}
+            onRetry={() => {
+              void restore();
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (session.status !== 'masuk') {
     return (
