@@ -177,6 +177,48 @@ async function revealAll(cdp) {
   );
 }
 
+/**
+ * Menunggu angka berhenti berhitung.
+ *
+ * ── CACAT YANG DIPERBAIKINYA ────────────────────────────────────────────
+ *
+ * `CountUp` menganimasikan angka ringkasan dengan pegas, dan `aria-label`-nya
+ * memuat nilai AKHIR yang sudah diformat — sementara teks yang terlihat masih
+ * bergerak menuju nilai itu. Tidur tetap 2600 ms memotretnya sebelum reda:
+ *
+ *   ubin "Keluar bulan ini"  Rp 4.229.988   ← masih berhitung
+ *   total donat di kartu sebelahnya  Rp 4.230.000   ← sudah final
+ *
+ * Dua angka untuk satu besaran, di dalam SATU tangkapan layar, dan yang
+ * dipajang di dokumentasi adalah yang salah. Pada aplikasi uang itu bukan
+ * cacat kosmetik — pembacanya tidak punya cara tahu angka mana yang benar.
+ *
+ * Pegasnya (`stiffness: 90, damping: 22, mass: 0.9`) teredam-lebih dan butuh
+ * ~3,6 detik untuk mendarat tepat pada nilai 29 juta. Menaikkan tidurnya
+ * menjadi 4 detik akan "cukup" hari ini dan menjadi salah lagi begitu ada
+ * angka yang lebih besar atau mesin yang lebih lambat.
+ *
+ * Karena itu yang ditunggu KONDISI, bukan waktu: setiap elemen `CountUp` sudah
+ * membawa jawabannya sendiri di `aria-label`.
+ */
+async function settleNumbers(cdp, timeoutMs = 12000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const belum = await evaluate(
+      cdp,
+      `[...document.querySelectorAll('span[aria-label^="Rp"]')]
+         .filter((el) => el.textContent.trim() !== el.getAttribute('aria-label').trim()).length`,
+    );
+    if (belum === 0) return true;
+    await sleep(120);
+  }
+  /* Tidak melempar: dokumentasi yang gagal dibuat lebih buruk daripada
+     dokumentasi yang satu angkanya meleset — tetapi kelesetannya HARUS
+     terdengar, bukan lewat diam-diam. */
+  console.warn('  ! angka belum reda dalam batas waktu — periksa tangkapannya');
+  return false;
+}
+
 async function shoot(cdp, name, { fullPage = false } = {}) {
   const { data } = await cdp.send('Page.captureScreenshot', {
     format: 'png',
@@ -305,6 +347,7 @@ async function main() {
       ]) {
         await goto(cdp, `${BASE}${path}`);
         await sleep(2600);
+        await settleNumbers(cdp);
         await shoot(cdp, name);
       }
     } else {
