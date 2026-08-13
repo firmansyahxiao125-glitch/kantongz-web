@@ -20,7 +20,7 @@
  */
 
 import { spawn } from 'node:child_process';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -219,6 +219,38 @@ async function settleNumbers(cdp, timeoutMs = 12000) {
   return false;
 }
 
+/** Nama yang benar-benar ditulis jalankan ini. Dipakai untuk menyapu sisa. */
+const ditulis = new Set();
+
+/**
+ * Membuang PNG yang TIDAK ditulis jalankan ini.
+ *
+ * ── CACAT YANG DIPERBAIKINYA ────────────────────────────────────────────
+ *
+ * Alat ini menimpa berkas per nama, dan tidak pernah membuang apa pun. Begitu
+ * daftar halamannya berubah, berkas lama tetap tinggal:
+ *
+ *   05-wawasan.png   ditinggalkan saat 05 menjadi Transaksi
+ *   06-asisten.png   ditinggalkan saat 06 menjadi Dompet
+ *   07-transaksi.png ditinggalkan saat 07 menjadi Anggaran
+ *
+ * Yang terakhir paling merugikan: ia memotret tata letak SEBELUM perbaikan
+ * baris transaksi, dan duduk di direktori yang sama dengan versi sesudahnya.
+ * Dokumentasi yang memuat dua kebenaran sekaligus lebih buruk daripada
+ * dokumentasi yang usang seluruhnya — pembacanya tidak punya cara tahu mana
+ * yang berlaku.
+ *
+ * HANYA `.png` yang disapu, dan hanya di direktori keluaran: berkas lain yang
+ * kebetulan diletakkan orang di sana bukan urusan alat ini.
+ */
+async function sapuSisa() {
+  const sisa = (await readdir(OUT)).filter((f) => f.endsWith('.png') && !ditulis.has(f));
+  for (const f of sisa) {
+    await rm(resolve(OUT, f), { force: true });
+    console.log(`  − ${f} (sisa jalankan sebelumnya)`);
+  }
+}
+
 async function shoot(cdp, name, { fullPage = false } = {}) {
   const { data } = await cdp.send('Page.captureScreenshot', {
     format: 'png',
@@ -228,6 +260,7 @@ async function shoot(cdp, name, { fullPage = false } = {}) {
 
   const file = resolve(OUT, `${name}.png`);
   await writeFile(file, Buffer.from(data, 'base64'));
+  ditulis.add(`${name}.png`);
   console.log(`  ✓ ${name}.png`);
 }
 
@@ -391,6 +424,11 @@ async function main() {
     } else {
       console.log('  · Layar aplikasi dilewati (butuh --email dan --password).');
     }
+
+    /* Disapu HANYA ketika layar aplikasi ikut dipotret. Tanpa kredensial,
+       jalankan ini hanya menghasilkan tiga berkas halaman muka — menyapu di
+       situ akan MENGHAPUS seluruh layar aplikasi yang masih berlaku. */
+    if (EMAIL && PASSWORD) await sapuSisa();
 
     cdp.close();
   } finally {
