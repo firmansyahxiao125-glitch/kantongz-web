@@ -14,8 +14,14 @@ npm ci
 npm run dev
 ```
 
-Berjalan di **http://localhost:3001** — bukan 3000, karena API sudah memakainya.
-Asal itu sudah ada di daftar CORS pengembangan `kantongz-api/docker-compose.yml`.
+Berjalan di **http://localhost:3100** — bukan 3000, karena API sudah memakainya.
+Portanya ditulis di skrip `dev` itu sendiri, bukan diserahkan ke bawaan Next:
+tanpa itu `npm run dev` mendarat di 3000 dan bertabrakan dengan API pada
+perintah pertama yang diketik orang.
+
+3100 adalah porta yang dipakai SELURUH perkakas repositori ini — gerbang
+peramban di CI, `npm run screenshots`, dan skrip verifikasi — dan asalnya sudah
+ada di daftar CORS pengembangan `kantongz-api/docker-compose.yml`.
 
 Membutuhkan API yang berjalan:
 
