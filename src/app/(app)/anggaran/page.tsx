@@ -153,7 +153,11 @@ export default function AnggaranPage() {
                       </div>
 
                       <div className="flex shrink-0 items-center gap-2">
-                        <span className="text-sm tabular text-ink">
+                        {/* `numeric`, bukan `tabular` saja — nominal uang
+                            memakai mono di Dasbor, Transaksi, dan Dompet, dan
+                            angka yang berganti wajah antar halaman terbaca
+                            sebagai dua sistem. */}
+                        <span className="numeric text-sm text-ink">
                           {formatIdr(budget.spent)}{' '}
                           <span className="text-dim">/ {formatIdr(budget.amount)}</span>
                         </span>
@@ -165,7 +169,7 @@ export default function AnggaranPage() {
                           onClick={() => {
                             close.mutate(budget.id);
                           }}
-                          className="opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+                          className="action-reveal"
                         >
                           <Trash2 size={15} aria-hidden />
                         </Button>

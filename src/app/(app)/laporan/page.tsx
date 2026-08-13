@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
 import { downloadText, transactionsToCsv } from '@/lib/export';
@@ -128,9 +128,15 @@ export default function LaporanPage() {
 
       <Card>
         <CardBody>
-          <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-4">
+          {/* Satu-satunya judul kartu yang SENGAJA lebih besar dari `text-sm`.
+              Kartu ini adalah laporannya sendiri, dan kepala halaman di atas
+              memakai `print:hidden` — jadi di atas kertas baris inilah judul
+              dokumennya. Judul cetak setinggi 14px terbaca sebagai keterangan,
+              bukan judul. Tingkatnya tetap `CardTitle` supaya strukturnya sama
+              dengan kartu mana pun. */}
+          <CardHeader className="mb-4 flex-wrap gap-3 border-b border-line pb-4">
             <div>
-              <h2 className="text-base font-semibold tracking-tight text-ink">Laporan transaksi</h2>
+              <CardTitle className="text-base tracking-tight">Laporan transaksi</CardTitle>
               <p className="text-sm text-muted">
                 {formatDate(range.from)} — {formatDate(range.to)}
               </p>
@@ -139,22 +145,22 @@ export default function LaporanPage() {
             <dl className="flex gap-6 text-sm">
               <div>
                 <dt className="text-xs text-muted">Pemasukan</dt>
-                <dd className="tabular text-[var(--color-positive)]">{formatIdr(income)}</dd>
+                <dd className="numeric text-[var(--color-positive)]">{formatIdr(income)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Pengeluaran</dt>
-                <dd className="tabular text-ink">{formatIdr(expense)}</dd>
+                <dd className="numeric text-ink">{formatIdr(expense)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Selisih</dt>
                 <dd
-                  className={`tabular ${income - expense < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
+                  className={`numeric ${income - expense < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                 >
                   {formatIdr(income - expense)}
                 </dd>
               </div>
             </dl>
-          </header>
+          </CardHeader>
 
           {list.isPending ? (
             <div className="space-y-2" aria-busy="true">
@@ -208,7 +214,7 @@ export default function LaporanPage() {
                         </td>
                         <td className="py-2 pr-3 text-muted">{account?.name ?? '—'}</td>
                         <td
-                          className={`py-2 pl-3 text-right tabular whitespace-nowrap ${
+                          className={`numeric py-2 pl-3 text-right whitespace-nowrap ${
                             trx.kind === 'income' ? 'text-[var(--color-positive)]' : 'text-ink'
                           }`}
                         >

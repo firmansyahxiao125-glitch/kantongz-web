@@ -148,13 +148,13 @@ export default function TujuanPage() {
                         onClick={() => {
                           remove.mutate(goal.id);
                         }}
-                        className="shrink-0 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+                        className="action-reveal shrink-0"
                       >
                         <Trash2 size={15} aria-hidden />
                       </Button>
                     </div>
 
-                    <p className="text-xl font-semibold tabular tracking-tight text-ink">
+                    <p className="numeric text-xl font-semibold tracking-tight text-ink">
                       {formatIdr(goal.savedAmount)}
                       <span className="text-sm font-normal text-dim">
                         {' '}

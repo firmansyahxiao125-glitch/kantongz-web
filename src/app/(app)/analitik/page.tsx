@@ -104,9 +104,7 @@ export default function AnalitikPage() {
         <motion.div variants={fadeUp}>
           <Card className="h-full">
             <CardBody>
-              <h2 className="mb-4 text-sm font-semibold text-ink">
-                Pengeluaran per kategori bulan ini
-              </h2>
+              <CardHeader title="Pengeluaran per kategori bulan ini" />
               {summary.isPending ? (
                 <Skeleton className="h-40" />
               ) : summary.isError ? (
@@ -133,7 +131,7 @@ export default function AnalitikPage() {
         <motion.div variants={fadeUp}>
           <Card className="h-full">
             <CardBody>
-              <h2 className="mb-4 text-sm font-semibold text-ink">Saldo per dompet</h2>
+              <CardHeader title="Saldo per dompet" />
 
               {summary.isPending ? (
                 <Skeleton className="h-40" />
@@ -153,7 +151,7 @@ export default function AnalitikPage() {
                         <div className="mb-1 flex justify-between text-xs">
                           <span className="truncate text-muted">{account.name}</span>
                           <span
-                            className={`tabular ${account.balance < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
+                            className={`numeric ${account.balance < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                           >
                             {formatIdr(account.balance)}
                           </span>

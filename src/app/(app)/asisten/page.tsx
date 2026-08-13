@@ -110,18 +110,18 @@ export default function AsistenPage() {
                 <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-4 text-sm">
                   <div>
                     <dt className="text-xs text-muted">Masuk</dt>
-                    <dd className="tabular text-[var(--color-positive)]">
+                    <dd className="numeric text-[var(--color-positive)]">
                       {formatIdr(summary.data.income)}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-muted">Keluar</dt>
-                    <dd className="tabular text-ink">{formatIdr(summary.data.expense)}</dd>
+                    <dd className="numeric text-ink">{formatIdr(summary.data.expense)}</dd>
                   </div>
                   <div>
                     <dt className="text-xs text-muted">Selisih</dt>
                     <dd
-                      className={`tabular ${summary.data.net < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
+                      className={`numeric ${summary.data.net < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                     >
                       {formatIdr(summary.data.net)}
                     </dd>
@@ -136,7 +136,7 @@ export default function AsistenPage() {
       <motion.div variants={fadeUp}>
         <Card>
           <CardBody>
-            <h2 className="text-sm font-semibold text-ink">Tanya datamu</h2>
+            <CardTitle>Tanya datamu</CardTitle>
             <p className="mt-1 text-sm leading-relaxed text-muted">
               Seluruh angka dihitung dari transaksimu sendiri. Setiap jawaban menyebut dari mana
               angkanya.
@@ -264,7 +264,7 @@ function SimulationCard() {
   return (
     <Card>
       <CardBody>
-        <h2 className="text-sm font-semibold text-ink">Kalau aku ambil komitmen ini…</h2>
+        <CardTitle>Kalau aku ambil komitmen ini…</CardTitle>
         <p className="mt-1 text-sm leading-relaxed text-muted">
           Cicilan, langganan, atau apa pun yang berulang tiap bulan. Dihitung dari pemasukan dan
           pengeluaranmu sembilan puluh hari terakhir.
@@ -319,14 +319,14 @@ function SimulationCard() {
             <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
               <div>
                 <dt className="text-xs text-muted">Sisa bulanan sekarang</dt>
-                <dd className="tabular text-ink">
+                <dd className="numeric text-ink">
                   {formatIdr(simulate.data.currentMonthlySurplus)}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Setelah komitmen</dt>
                 <dd
-                  className={`tabular ${simulate.data.projectedMonthlySurplus < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
+                  className={`numeric ${simulate.data.projectedMonthlySurplus < 0 ? 'text-[var(--color-negative)]' : 'text-ink'}`}
                 >
                   {formatIdr(simulate.data.projectedMonthlySurplus)}
                 </dd>

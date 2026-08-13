@@ -198,7 +198,7 @@ export default function DasborPage() {
                       aria-hidden
                     />
                     <span className="flex-1 truncate text-muted">{account.name}</span>
-                    <span className="tabular text-ink">{formatIdr(account.balance)}</span>
+                    <span className="numeric text-ink">{formatIdr(account.balance)}</span>
                   </li>
                 ))}
               </ul>
@@ -228,7 +228,14 @@ export default function DasborPage() {
                             {d.topCategories.find((c) => c.categoryId === budget.categoryId)
                               ?.categoryName ?? 'Kategori'}
                           </span>
-                          <span className={lewat ? 'text-[var(--color-negative)]' : 'text-muted'}>
+                          {/* `numeric`: pasangan angka yang SAMA PERSIS di
+                              halaman Anggaran memakai mono, dan nominal yang
+                              berganti wajah antar halaman terbaca sebagai dua
+                              sistem. Terukur di peramban — empat nominal dasbor
+                              menghitung sans, tiga di antaranya baris ini. */}
+                          <span
+                            className={`numeric ${lewat ? 'text-[var(--color-negative)]' : 'text-muted'}`}
+                          >
                             {formatIdr(budget.spent)} / {formatIdr(budget.amount)}
                           </span>
                         </div>

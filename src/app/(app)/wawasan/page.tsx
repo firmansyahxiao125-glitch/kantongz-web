@@ -7,7 +7,7 @@ import { AlertTriangle, Info, Repeat, TrendingDown, Wand2 } from 'lucide-react';
 import { Sparkline } from '@/components/charts/sparkline';
 import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/state';
 import { formatDate, formatIdr } from '@/lib/format';
 import {
@@ -119,10 +119,12 @@ export default function WawasanPage() {
       <motion.div variants={fadeUp}>
         <Card>
           <CardBody>
-            <header className="mb-4 flex items-center gap-2">
-              <TrendingDown size={16} className="text-muted" aria-hidden />
-              <h2 className="text-sm font-semibold text-ink">Proyeksi arus kas</h2>
-            </header>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <TrendingDown size={16} className="text-muted" aria-hidden />
+                <CardTitle>Proyeksi arus kas</CardTitle>
+              </div>
+            </CardHeader>
 
             {!projection.reliable ? (
               /* `reliable: false` dinyatakan terbuka, bukan disamarkan sebagai
@@ -136,7 +138,7 @@ export default function WawasanPage() {
                 <p className="text-sm text-muted">
                   Arus bersih{' '}
                   <span
-                    className={`tabular ${projection.dailyNet < 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'}`}
+                    className={`numeric ${projection.dailyNet < 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'}`}
                   >
                     {formatIdr(projection.dailyNet)}
                   </span>{' '}
@@ -160,12 +162,12 @@ export default function WawasanPage() {
                     <li key={point.horizonDays}>
                       <div className="flex items-baseline justify-between text-sm">
                         <span className="text-muted">{point.horizonDays} hari</span>
-                        <span className="tabular text-ink">{formatIdr(point.expected)}</span>
+                        <span className="numeric text-ink">{formatIdr(point.expected)}</span>
                       </div>
                       {/* Pita ketidakpastian ditampilkan, bukan disembunyikan.
                           Angka tunggal pada proyeksi keuangan terlihat tepat dan
                           tidak pernah tepat. */}
-                      <p className="text-xs tabular text-dim">
+                      <p className="numeric text-xs text-dim">
                         {formatIdr(point.low)} – {formatIdr(point.high)}
                       </p>
                     </li>
@@ -187,10 +189,12 @@ export default function WawasanPage() {
         <motion.div variants={fadeUp}>
           <Card>
             <CardBody>
-              <header className="mb-3 flex items-center gap-2">
-                <Repeat size={16} className="text-muted" aria-hidden />
-                <h2 className="text-sm font-semibold text-ink">Tagihan berulang</h2>
-              </header>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Repeat size={16} className="text-muted" aria-hidden />
+                  <CardTitle>Tagihan berulang</CardTitle>
+                </div>
+              </CardHeader>
 
               <ul className="divide-y divide-[var(--line)]">
                 {recurring.map((charge) => (
@@ -202,7 +206,7 @@ export default function WawasanPage() {
                         {formatDate(charge.lastChargedAt)}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm tabular text-ink">
+                    <span className="numeric shrink-0 text-sm text-ink">
                       {formatIdr(charge.monthlyCost)}
                       <span className="text-dim">/bln</span>
                     </span>
@@ -218,10 +222,15 @@ export default function WawasanPage() {
         <motion.div variants={fadeUp}>
           <Card>
             <CardBody>
-              <header className="mb-1 flex items-center gap-2">
-                <Wand2 size={16} className="text-muted" aria-hidden />
-                <h2 className="text-sm font-semibold text-ink">Usulan kategori</h2>
-              </header>
+              {/* `mb-1` menahan jarak bawaan: yang menyusul BUKAN isi kartu
+                  melainkan kalimat penjelas judulnya sendiri, dan judul yang
+                  menjauh dari penjelasnya terbaca sebagai dua hal. */}
+              <CardHeader className="mb-1">
+                <div className="flex items-center gap-2">
+                  <Wand2 size={16} className="text-muted" aria-hidden />
+                  <CardTitle>Usulan kategori</CardTitle>
+                </div>
+              </CardHeader>
               <p className="mb-3 text-sm text-muted">
                 Diterapkan satu per satu, bukan otomatis — kategorisasi yang berubah sendiri membuat
                 laporan bulan lalu berbeda setiap kali dibuka.
@@ -268,7 +277,10 @@ function InsightCard({ insight }: { insight: Insight }) {
         <div className="flex items-start gap-3">
           <Icon size={17} className={`mt-0.5 shrink-0 ${tone.text}`} aria-hidden />
           <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-ink">{insight.title}</h3>
+            {/* `CardTitle` (h2) dan bukan `h3`: setiap wawasan adalah kartunya
+                sendiri, jadi tingkatnya sama dengan judul kartu mana pun.
+                `h3` di sini melompati satu tingkat dari `h1` halaman. */}
+            <CardTitle>{insight.title}</CardTitle>
             <p className="mt-1 text-sm leading-relaxed text-muted">{insight.body}</p>
             {/* MENGAPA wawasan ini muncul. Wawasan tanpa ini adalah tebakan yang
                 menyamar sebagai analisis. */}

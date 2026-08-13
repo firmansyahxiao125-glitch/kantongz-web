@@ -6,7 +6,7 @@ import { Mail, ShieldCheck, User as UserIcon } from 'lucide-react';
 import { useSession } from '@/components/session-provider';
 import { PageHeader } from '@/components/shell/page-header';
 import { ButtonLink } from '@/components/ui/button-link';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/state';
 import { keys, ledger } from '@/lib/ledger';
 import { formatIdr } from '@/lib/format';
@@ -46,9 +46,13 @@ export default function ProfilPage() {
               {initials}
             </span>
             <div className="min-w-0">
-              <h2 className="truncate text-lg font-semibold tracking-tight text-ink">
+              {/* Judul kartu ini adalah ORANGNYA, jadi ia lebih besar dari
+                  `text-sm` bawaan — kartu identitas yang menamai pemiliknya
+                  sekecil label bagian terbaca seperti metadata. Tingkatnya
+                  tetap `CardTitle` agar strukturnya sama dengan kartu lain. */}
+              <CardTitle className="truncate text-lg tracking-tight">
                 {session.user.fullName}
-              </h2>
+              </CardTitle>
               <p className="truncate text-sm text-muted">{session.user.email}</p>
             </div>
           </div>
@@ -89,7 +93,7 @@ export default function ProfilPage() {
 
       <Card>
         <CardBody>
-          <h2 className="mb-4 text-sm font-semibold text-ink">Ringkasan</h2>
+          <CardHeader title="Ringkasan" />
 
           {summary.isPending ? (
             <div className="space-y-2">
@@ -103,19 +107,19 @@ export default function ProfilPage() {
             <dl className="space-y-4 text-sm">
               <div>
                 <dt className="text-xs text-muted">Kekayaan bersih</dt>
-                <dd className="text-lg font-semibold tabular text-ink">
+                <dd className="numeric text-lg font-semibold text-ink">
                   {formatIdr(summary.data.netWorth)}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Dompet aktif</dt>
-                <dd className="text-lg font-semibold tabular text-ink">
+                <dd className="numeric text-lg font-semibold text-ink">
                   {summary.data.accounts.length}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Tujuan berjalan</dt>
-                <dd className="text-lg font-semibold tabular text-ink">
+                <dd className="numeric text-lg font-semibold text-ink">
                   {summary.data.goals.filter((g) => !g.achieved).length}
                 </dd>
               </div>

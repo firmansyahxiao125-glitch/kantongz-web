@@ -12,7 +12,7 @@ import { FormAlert } from '@/components/auth/form-alert';
 import { useTheme, type ThemeChoice } from '@/components/theme-provider';
 import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
 import { Select } from '@/components/ui/select';
@@ -49,7 +49,7 @@ export default function PengaturanPage() {
 
       <Card>
         <CardBody>
-          <h2 className="text-sm font-semibold text-ink">Tampilan</h2>
+          <CardTitle>Tampilan</CardTitle>
           <p className="mt-1 text-sm text-muted">
             Pilihan disimpan di peramban ini dan berlaku sebelum halaman dicat.
           </p>
@@ -85,27 +85,30 @@ export default function PengaturanPage() {
 
       <Card>
         <CardBody>
-          <header className="flex items-center justify-between gap-3">
+          <CardHeader
+            action={
+              <Button
+                size="sm"
+                icon={<Plus size={15} aria-hidden />}
+                onClick={() => {
+                  setOpen(true);
+                }}
+              >
+                Tambah
+              </Button>
+            }
+          >
             <div>
-              <h2 className="text-sm font-semibold text-ink">Kategori</h2>
+              <CardTitle>Kategori</CardTitle>
               <p className="mt-1 text-sm text-muted">
                 Kategori bawaan dipakai bersama semua pengguna dan tidak dapat diubah. Yang kamu
                 buat sendiri hanya milikmu.
               </p>
             </div>
-            <Button
-              size="sm"
-              icon={<Plus size={15} aria-hidden />}
-              onClick={() => {
-                setOpen(true);
-              }}
-            >
-              Tambah
-            </Button>
-          </header>
+          </CardHeader>
 
           {categories.isPending ? (
-            <div className="mt-4 space-y-2">
+            <div className="space-y-2">
               {[0, 1, 2].map((i) => (
                 <Skeleton key={i} className="h-9" />
               ))}
@@ -118,7 +121,7 @@ export default function PengaturanPage() {
               }}
             />
           ) : (
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               {(['expense', 'income'] as const).map((kind) => (
                 <section key={kind}>
                   <h3 className="mb-2 text-[11px] uppercase tracking-wider text-dim">

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
-import { Card, CardBody } from '@/components/ui/card';
+import { Card, CardBody, CardTitle } from '@/components/ui/card';
 import { signOut } from '@/lib/session';
 
 /**
@@ -45,7 +45,7 @@ export default function KeamananPage() {
             <ShieldCheck size={19} />
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-ink">Sesi ini terlindungi</h2>
+            <CardTitle>Sesi ini terlindungi</CardTitle>
             <p className="mt-1 text-sm leading-relaxed text-muted">
               Token akses hanya hidup di memori tab ini dan tidak pernah ditulis ke penyimpanan
               peramban. Token penyegaran disimpan dalam kuki <code>httpOnly</code> yang tidak dapat
@@ -64,7 +64,7 @@ export default function KeamananPage() {
             <Timer size={19} />
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-ink">Keluar otomatis saat diam</h2>
+            <CardTitle>Keluar otomatis saat diam</CardTitle>
             <p className="mt-1 text-sm leading-relaxed text-muted">
               Setelah 15 menit tanpa aktivitas, sesi berakhir sendiri. Kamu akan diminta masuk lagi
               saat kembali.
@@ -82,7 +82,7 @@ export default function KeamananPage() {
             <KeyRound size={19} />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold text-ink">Ganti kata sandi</h2>
+            <CardTitle>Ganti kata sandi</CardTitle>
             <p className="mt-1 text-sm leading-relaxed text-muted">
               Penggantian berjalan lewat kode yang dikirim ke emailmu. Setelah berhasil, seluruh
               perangkat dikeluarkan — termasuk yang ini.
@@ -103,7 +103,7 @@ export default function KeamananPage() {
             <LogOut size={19} />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold text-ink">Akhiri sesi di peramban ini</h2>
+            <CardTitle>Akhiri sesi di peramban ini</CardTitle>
             <p className="mt-1 text-sm leading-relaxed text-muted">
               Mencabut token penyegaran di server dan membersihkan kukinya. Pakai ini sebelum
               meninggalkan komputer bersama.
