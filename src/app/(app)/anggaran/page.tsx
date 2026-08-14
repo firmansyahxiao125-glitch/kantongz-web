@@ -130,7 +130,28 @@ export default function AnggaranPage() {
               <motion.li key={budget.id} variants={fadeUp}>
                 <Card className="group">
                   <CardBody>
-                    <div className="mb-2.5 flex items-start justify-between gap-3">
+                    {/*
+                      Menumpuk di ponsel, berdampingan mulai 640px.
+
+                      Sebelumnya SELALU berdampingan, dan blok nominal di
+                      kanan `shrink-0`. Di 390px pasangan "Rp 594.000 /
+                      Rp 1.500.000" ditambah tombol memakan seluruh baris,
+                      sehingga nama kategori — satu-satunya elemen yang boleh
+                      menyusut — runtuh ke lebar NOL:
+
+                        "Makan & Minum"  0px, butuh 107px
+                        "Belanja"        0px, butuh 49px
+                        "Transportasi"   9px, butuh 84px
+
+                      Yang terlihat pengguna: tiga kartu anggaran tanpa nama,
+                      dengan "per bulan" bertindih di atas nominalnya. Halaman
+                      anggaran yang anggarannya tidak dapat dibedakan satu sama
+                      lain sudah berhenti menjadi halaman anggaran.
+
+                      Tidak terdeteksi gerbang mana pun karena isinya DIPOTONG,
+                      bukan meluap — tidak ada yang melewati tepi layar.
+                    */}
+                    <div className="mb-2.5 flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                       <div className="min-w-0">
                         <p className="flex items-center gap-2 text-sm font-medium text-ink">
                           <span

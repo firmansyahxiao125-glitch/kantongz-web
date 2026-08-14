@@ -234,9 +234,53 @@ const CEK = `(() => {
     }
   }
 
+  /*
+   * Isi yang TERPOTONG HABIS, bukan sekadar diberi elipsis.
+   *
+   * Gerbang ini pernah melaporkan halaman Anggaran hijau di 390px sementara
+   * nama kategorinya TIDAK TERLIHAT SAMA SEKALI: elemen ber-truncate di dalam
+   * baris yang kehabisan ruang menyusut ke lebar NOL, dan pengguna tidak dapat
+   * membedakan satu anggaran dari yang lain.
+   *
+   * Pemeriksaan luapan tidak dapat melihatnya — isinya justru DIPOTONG, jadi
+   * tidak ada yang meluap. Yang membedakan "dipendekkan dengan sopan" dari
+   * "hilang" adalah berapa lebar yang tersisa, bukan ada-tidaknya elipsis.
+   *
+   * Ambang 24px: di bawah itu tidak ada kata yang tersisa untuk dibaca.
+   */
+  let terpotongHabis = 0;
+  const contohPotong = [];
+  for (const el of document.querySelectorAll('main *')) {
+    if (el.children.length) continue;
+    const t = (el.textContent ?? '').trim();
+    if (t.length === 0) continue;
+    if (el.scrollWidth <= el.clientWidth + 1) continue;
+    if (el.clientWidth >= 24) continue;
+    const g = getComputedStyle(el);
+    if (g.visibility === 'hidden' || g.display === 'none') continue;
+    /*
+     * Label sr-only DIKECUALIKAN, dan bukan dengan melonggarkan ambangnya.
+     *
+     * Pola sr-only adalah kotak 1x1 piksel: sengaja tak terlihat mata, sengaja
+     * TERBACA pembaca layar, dan wajib ada pada penyaring yang labelnya
+     * disembunyikan. Tanpa pengecualian ini gerbang menuduh justru hal yang
+     * membuat halaman dapat diakses — dan gerbang yang menghukum aksesibilitas
+     * akan dimatikan orang.
+     *
+     * Tingginya yang membedakan: teks yang benar-benar dirender punya tinggi
+     * satu baris, sedangkan sr-only tingginya 1px.
+     */
+    if (el.clientHeight < 8) continue;
+    terpotongHabis++;
+    if (contohPotong.length < 3) {
+      contohPotong.push(t.slice(0, 24) + ' (' + String(el.clientWidth) + 'px, butuh ' + String(el.scrollWidth) + ')');
+    }
+  }
+
   return {
     url: location.pathname,
     h1n: h1.length,
+    terpotongHabis, contohPotong,
     nVarian: varian.size,
     varian: [...varian.entries()].map(([k, n]) => k + 'x' + n),
     lompat,
@@ -316,6 +360,7 @@ async function main() {
         if (d.nVarian > batasVarian) alasan.push(`varian judul=${String(d.nVarian)} ${d.varian.join(' ')}`);
         if (d.lompat > 0) alasan.push(`lompatan heading=${String(d.lompat)}`);
         if (d.uangSans > 0) alasan.push(`nominal non-mono=${String(d.uangSans)} ${JSON.stringify(d.contohUang)}`);
+        if (d.terpotongHabis > 0) alasan.push(`isi terpotong habis=${String(d.terpotongHabis)} ${JSON.stringify(d.contohPotong)}`);
         /* Tersembunyi di DESKTOP itu benar — kontrol menyingkir sampai kursor
            mendekat. Yang salah hanya bila tidak ada kursor sama sekali. */
         if (ponsel && d.tersembunyi > 0) {
