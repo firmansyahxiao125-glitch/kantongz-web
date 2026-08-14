@@ -7,6 +7,10 @@ import type { Session } from '@/lib/contracts';
 const schema = z.object({
   email: z.string().email().max(254),
   password: z.string().min(1).max(512),
+  /* Longgar SENGAJA: kolom yang sama menerima kode TOTP enam digit MAUPUN kode
+     pemulihan bertanda hubung. Skema yang hanya menerima enam digit menolak
+     kode pemulihan sebelum API sempat memeriksanya. */
+  totpCode: z.string().trim().min(6).max(20).optional(),
 });
 
 export async function POST(request: NextRequest): Promise<Response> {

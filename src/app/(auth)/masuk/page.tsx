@@ -18,6 +18,9 @@ import { signIn } from '@/lib/session';
 const schema = z.object({
   email: z.string().min(1, 'Masukkan emailmu.').email('Format email belum benar.'),
   password: z.string().min(1, 'Masukkan kata sandimu.'),
+  /* Tidak wajib: sebagian besar akun tidak memakai 2FA, dan kolomnya baru
+     muncul sesudah server memintanya. */
+  totpCode: z.string().optional(),
 });
 
 type Values = z.infer<typeof schema>;
@@ -25,16 +28,25 @@ type Values = z.infer<typeof schema>;
 export default function MasukPage() {
   const router = useRouter();
   const [failure, setFailure] = useState<string | null>(null);
+  /*
+   * Dua langkah, bukan satu formulir dengan kolom kode yang selalu terlihat.
+   *
+   * Klien TIDAK dapat tahu apakah sebuah akun memakai 2FA sebelum kata
+   * sandinya terbukti benar — dan itu memang disengaja di sisi server, sebab
+   * memberitahukannya lebih awal memilah daftar target untuk penyerang.
+   * Karena itu kolom kode baru muncul ketika server menjawab `totp_required`.
+   */
+  const [mintaKode, setMintaKode] = useState(false);
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', totpCode: '' },
   });
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
     try {
-      await signIn(values.email, values.password);
+      await signIn(values.email, values.password, values.totpCode?.trim() || undefined);
       router.replace('/dasbor');
     } catch (error) {
       /*
@@ -42,6 +54,13 @@ export default function MasukPage() {
        * itulah yang menjaga backend bebas mengubah kalimatnya tanpa mengubah
        * bahasa produk, dan yang mencegah detail internal bocor ke layar.
        */
+      if (isApiError(error) && error.code === 'totp_required') {
+        /* Bukan kegagalan — kata sandinya BENAR. Menampilkannya sebagai galat
+           membuat pengguna mengetik ulang sandi yang sudah tepat. */
+        setMintaKode(true);
+        setFailure(null);
+        return;
+      }
       setFailure(isApiError(error) ? messageFor(error.code) : messageFor('unknown'));
     }
   });
@@ -81,6 +100,21 @@ export default function MasukPage() {
           {...form.register('password')}
         />
 
+        {mintaKode ? (
+          <Field
+            label="Kode autentikasi"
+            /* `inputMode` numerik, tetapi `type="text"`: kode PEMULIHAN berisi
+               huruf, dan input numerik akan menolaknya. */
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            autoFocus
+            placeholder="123456"
+            hint="Dari aplikasi autentikatormu. Kehilangan ponsel? Masukkan salah satu kode pemulihanmu."
+            error={form.formState.errors.totpCode?.message}
+            {...form.register('totpCode')}
+          />
+        ) : null}
+
         <div className="flex justify-end">
           <Link
             href="/pulihkan"
@@ -91,7 +125,7 @@ export default function MasukPage() {
         </div>
 
         <Button type="submit" size="lg" block loading={form.formState.isSubmitting}>
-          Masuk
+          {mintaKode ? 'Verifikasi' : 'Masuk'}
         </Button>
       </form>
     </AuthPanel>

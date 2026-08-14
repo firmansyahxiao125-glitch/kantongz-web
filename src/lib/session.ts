@@ -97,10 +97,15 @@ function forget(): void {
 
 /* ── operasi ─────────────────────────────────────────────────────────── */
 
-export async function signIn(email: string, password: string): Promise<void> {
+export async function signIn(
+  email: string,
+  password: string,
+  /* Kode faktor kedua ATAU kode pemulihan — keduanya lewat kolom yang sama. */
+  totpCode?: string,
+): Promise<void> {
   const session = await request<Session>('/api/auth/sign-in', {
     method: 'POST',
-    body: { email, password },
+    body: { email, password, ...(totpCode ? { totpCode } : {}) },
     auth: false,
     absolute: true,
   });

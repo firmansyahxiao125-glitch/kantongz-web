@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody, CardTitle } from '@/components/ui/card';
 import { SessionList } from '@/components/security/session-list';
+import { TotpCard } from '@/components/security/totp-card';
 import { signOut } from '@/lib/session';
 
 /**
@@ -43,8 +44,11 @@ export default function KeamananPage() {
         description="Bagaimana sesimu dijaga, dan apa yang bisa kamu kendalikan sendiri."
       />
 
-      {/* Paling atas: satu-satunya kartu di halaman ini yang menjawab
-          "apakah ada orang lain di akunku sekarang". Sisanya menjelaskan. */}
+      {/* Dua kartu teratas adalah satu-satunya yang benar-benar MENGUBAH
+          keamanan akun: yang pertama menutup pintu untuk seterusnya, yang
+          kedua menjawab "apakah ada orang lain di dalam sekarang". Sisanya
+          menjelaskan. */}
+      <TotpCard />
       <SessionList />
 
       <Card>

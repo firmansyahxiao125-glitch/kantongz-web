@@ -17,6 +17,9 @@ export type AuthErrorCode =
   | 'network'
   | 'rate_limited'
   | 'session_expired'
+  /* Kata sandi BENAR, akun ini memakai faktor kedua. Kode tersendiri supaya
+     antarmuka dapat meminta kodenya alih-alih menuduh sandinya salah. */
+  | 'totp_required'
   | 'unknown';
 
 /**
@@ -92,6 +95,9 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   email_taken: 'Email ini sudah terdaftar. Masuk dengan akun itu, atau pulihkan sandinya.',
   weak_password: 'Kata sandi terlalu mudah ditebak. Perpanjang atau campur jenis karakternya.',
   invalid_code: 'Kode tidak cocok. Periksa kembali angkanya, lalu masukkan ulang.',
+  /* Jarang terlihat: halaman masuk menangkap kode ini dan menampilkan kolom
+     kodenya, bukan pesan galat. Kalimat ini cadangan bagi pemanggil lain. */
+  totp_required: 'Akun ini memakai verifikasi dua langkah. Masukkan kode dari aplikasimu.',
   code_expired: 'Kode sudah kedaluwarsa. Minta kode baru untuk melanjutkan.',
   network: 'Tidak bisa terhubung ke server. Periksa koneksi internetmu, lalu coba lagi.',
   rate_limited: 'Terlalu banyak percobaan masuk. Tunggu sebentar sebelum mencoba lagi.',

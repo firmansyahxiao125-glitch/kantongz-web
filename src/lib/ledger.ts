@@ -329,3 +329,32 @@ export const sessions = {
 };
 
 export const sessionKeys = { list: ['auth', 'sessions'] as const };
+
+/* ── faktor kedua ────────────────────────────────────────────────────── */
+
+export interface TotpStatus {
+  enabled: boolean;
+  recoveryCodesLeft: number;
+}
+
+export interface TotpSetup {
+  secret: string;
+  otpauthUri: string;
+}
+
+export const totp = {
+  status: () => request<TotpStatus>('/v1/auth/totp'),
+  setup: () => request<TotpSetup>('/v1/auth/totp/setup', { method: 'POST' }),
+  enable: (code: string) =>
+    request<{ recoveryCodes: string[] }>('/v1/auth/totp/enable', {
+      method: 'POST',
+      body: { code },
+    }),
+  disable: (password: string) =>
+    request<Record<string, never>>('/v1/auth/totp/disable', {
+      method: 'POST',
+      body: { password },
+    }),
+};
+
+export const totpKeys = { status: ['auth', 'totp'] as const };
