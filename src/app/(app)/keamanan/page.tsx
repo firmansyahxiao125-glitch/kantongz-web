@@ -8,16 +8,23 @@ import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody, CardTitle } from '@/components/ui/card';
+import { SessionList } from '@/components/security/session-list';
 import { signOut } from '@/lib/session';
 
 /**
  * Pusat Keamanan.
  *
- * Berisi HANYA yang benar-benar dapat dilakukan hari ini: mengganti sandi lewat
- * alur pemulihan, dan mengakhiri sesi peramban ini. Daftar perangkat aktif dan
- * pencabutan sesi jarak jauh belum punya endpoint — dan tombol yang tidak
- * melakukan apa-apa di halaman keamanan lebih berbahaya daripada tombol yang
- * belum ada, karena ia membuat orang mengira dirinya sudah aman.
+ * Berisi HANYA yang benar-benar dapat dilakukan hari ini. Aturan itu tidak
+ * berubah; yang berubah adalah apa yang MASUK ke dalamnya.
+ *
+ * Catatan lama di sini berbunyi "daftar perangkat aktif dan pencabutan sesi
+ * jarak jauh belum punya endpoint". Sekarang keduanya ada
+ * (`GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/:id`), jadi daftarnya
+ * ikut — dan ia melakukan sesuatu yang nyata, bukan sekadar tampil.
+ *
+ * Tombol yang tidak melakukan apa-apa di halaman keamanan tetap lebih
+ * berbahaya daripada tombol yang belum ada: ia membuat orang mengira dirinya
+ * sudah aman.
  */
 export default function KeamananPage() {
   const router = useRouter();
@@ -35,6 +42,10 @@ export default function KeamananPage() {
         title="Keamanan"
         description="Bagaimana sesimu dijaga, dan apa yang bisa kamu kendalikan sendiri."
       />
+
+      {/* Paling atas: satu-satunya kartu di halaman ini yang menjawab
+          "apakah ada orang lain di akunku sekarang". Sisanya menjelaskan. */}
+      <SessionList />
 
       <Card>
         <CardBody className="flex items-start gap-4">

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 import type { AuthErrorCode } from '@/lib/contracts';
+import { namaPeramban } from '@/lib/device';
 
 /**
  * Lapisan BFF.
@@ -55,9 +56,8 @@ export async function deviceOf(userAgent: string | null): Promise<DevicePayload>
   return {
     deviceId: existing && existing.length >= 8 ? existing : `web-${crypto.randomUUID()}`,
     platform: 'web',
-    /* Bukan sidik jari: hanya nama peramban, dipotong, supaya daftar perangkat
-       di Pusat Keamanan dapat dibaca manusia. */
-    model: (userAgent ?? 'peramban').slice(0, 120),
+    /* Nama peramban saja, bukan User-Agent utuh — lihat `lib/device.ts`. */
+    model: namaPeramban(userAgent),
     appVersion: APP_VERSION,
   };
 }

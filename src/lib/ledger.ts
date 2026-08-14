@@ -1,4 +1,5 @@
 import { request } from '@/lib/api';
+import type { ActiveSession } from '@/lib/contracts';
 
 /**
  * Kontrak buku besar, cermin dari `src/contracts/ledger.ts` di backend.
@@ -311,3 +312,20 @@ export const intelligenceKeys = {
   suggestions: ['insights', 'suggestions'] as const,
   summary: ['assistant', 'summary'] as const,
 };
+
+/* ── sesi aktif ──────────────────────────────────────────────────────── */
+
+/**
+ * Sesi terbuka milik pengguna, dan pengakhiran satu per satu.
+ *
+ * Rute ini adalah auth, bukan buku besar, tetapi memakai `request` yang sama —
+ * jadi ia ikut mendapat penyegaran token otomatis dan penanganan 401 terpusat.
+ * Klien terpisah hanya akan menduplikasi keduanya.
+ */
+export const sessions = {
+  list: () => request<ActiveSession[]>('/v1/auth/sessions'),
+  revoke: (id: string) =>
+    request<Record<string, never>>(`/v1/auth/sessions/${id}`, { method: 'DELETE' }),
+};
+
+export const sessionKeys = { list: ['auth', 'sessions'] as const };

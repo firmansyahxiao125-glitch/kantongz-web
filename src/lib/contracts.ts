@@ -53,6 +53,26 @@ export interface PendingVerification {
   codeLength: number;
 }
 
+/**
+ * Satu sesi yang masih terbuka, sebagaimana dilihat pemiliknya.
+ *
+ * Tidak memuat token, hash perangkat, maupun alamat IP — hanya yang dibutuhkan
+ * untuk menjawab "apakah ini aku?" lalu menindaknya. `current` menandai sesi
+ * yang sedang dipakai peramban ini; tanpa penanda itu daftar berisi baris-baris
+ * serupa dan pengguna yang ingin mengakhiri sesi asing punya peluang besar
+ * mengakhiri sesinya sendiri.
+ */
+export interface ActiveSession {
+  id: string;
+  platform: string;
+  model: string | null;
+  appVersion: string | null;
+  createdAt: number;
+  lastSeenAt: number;
+  absoluteExpiresAt: number;
+  current: boolean;
+}
+
 export interface DeviceInfo {
   deviceId: string;
   platform: 'ios' | 'android' | 'web';
