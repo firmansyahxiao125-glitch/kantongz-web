@@ -154,3 +154,45 @@ aturan `prefers-reduced-motion` di CSS tidak pernah menyentuhnya.
 | GSAP, Motion One, Lottie | Framer Motion sudah mengerjakan seluruhnya, termasuk gerak terkait-gulir |
 | Puppeteer / Playwright | Skrip tangkapan layar memakai Chrome yang sudah ada lewat CDP |
 | Pustaka komponen | Primitif di `ui/` berjumlah belasan berkas dan seluruhnya dapat dibaca |
+| Pustaka pembaca CSV | `lib/csv.ts` butuh kebiasaan angka Indonesia dan galat PER BARIS bernomor; pustaka umum mengembalikan objek |
+
+---
+
+## Zod 3 di sini, Zod 4 di API — dan itu keputusan, bukan kelalaian
+
+`kantongz-api` memakai zod 4 dan TypeScript 6; repositori ini memakai zod 3
+dan TypeScript 5. Selisih itu SUDAH DICOBA dihapus, dan hasilnya dicatat di
+sini supaya tidak dicoba ulang tanpa tahu apa yang menanti.
+
+Zod 4 mengubah tipe MASUKAN `z.coerce.number()` dari `number` menjadi
+`unknown`. Akibatnya `z.infer` tidak lagi cukup: setiap formulir uang di
+aplikasi ini gagal kompilasi, karena `useForm<Values>` menerima satu tipe
+sementara `zodResolver` kini menghasilkan dua yang berbeda.
+
+```
+Resolver<{ amount: unknown }, any, { amount: number }>
+  tidak dapat diberikan ke
+Resolver<{ amount: number },  any, { amount: number }>
+```
+
+Tujuh galat di empat berkas: Dompet, Tujuan (dua formulir), dan dialog
+transaksi.
+
+**Resepnya diketahui**, dan sengaja tidak dikerjakan tergesa:
+
+1. `useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>`
+2. `defaultValues` mengikuti tipe MASUKAN — `'' as unknown as number`
+   yang sekarang ada di setiap formulir menjadi tidak perlu
+3. Panggilan mutasi mengikuti tipe KELUARAN
+4. Setiap pesan validasi diperiksa ulang di peramban: yang berubah bukan
+   hanya tipenya, tetapi juga kapan pesan "Masukkan jumlahnya" muncul
+
+Langkah 4 yang membuatnya bukan pekerjaan lima menit. Gerbang `alur` dan
+`interior` memeriksa alur yang berhasil; jalur validasi yang GAGAL diperiksa
+mata. Menaikkan versi tanpa langkah itu berarti menukar selisih versi yang
+tidak berbahaya dengan formulir uang yang mungkin diam-diam menerima angka
+kosong.
+
+Sampai itu dikerjakan: selisihnya tidak menimbulkan risiko. Tidak ada satu
+baris kode pun yang dibagi antara kedua repositori — kontraknya JSON di batas
+HTTP, dan JSON tidak punya versi zod.
