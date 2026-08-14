@@ -96,16 +96,25 @@
   /*
    * ENERGI RONIN — permukaan publik saja. ROADMAP §7.1.
    *
-   * Hijau jenuh di atas hampir-hitam, satu-satunya warna yang bersaing di
-   * halaman muka. Ia TIDAK pernah masuk ke permukaan dalam-aplikasi: di sana
-   * hijau berarti "positif" dan memakai zamrud teredam, dan dua hijau dengan
-   * dua arti di satu produk adalah dua arti yang akan tertukar.
+   * Ungu jenuh di atas hampir-hitam, satu-satunya warna yang bersaing di
+   * halaman muka.
    *
-   * Bukan hijau Tailwind mana pun — dicari supaya tepi yang menyala terbaca
-   * sebagai cahaya, bukan sebagai garis stabilo.
+   * Ia TIDAK pernah masuk ke permukaan dalam-aplikasi, dan tidak pernah
+   * menyentuh tombol aksi. Kuningan tetap satu-satunya warna uang dan
+   * perbuatan; ungu adalah energi Ronin. Dua peran, dua warna, dan tidak
+   * pernah tertukar — sebab isyarat yang muncul di dua tempat dengan dua arti
+   * berhenti menjadi isyarat.
+   *
+   * Nilai sebelumnya hijau (#35f58c), diambil dari rujukan visual yang lebih
+   * awal. Diganti 14 Agustus 2026 mengikuti rujukan baru. Dicatat, bukan
+   * dihapus: nilai yang berubah tanpa jejak adalah nilai yang akan diubah
+   * kembali oleh orang berikutnya yang tidak tahu mengapa.
    */
-  --color-ronin: #35f58c;
-  --color-ronin-bright: #c9ffe4;
+  --color-ronin: #a855ff;
+  --color-ronin-bright: #e5ccff;
+  /* Nyala terdalam untuk visor dan mata pisau — nyaris putih, supaya bloom
+     punya sesuatu yang benar-benar melampaui ambangnya. */
+  --color-ronin-core: #f6ecff;
 
   /* ── sinyal: semantik, TERPISAH dari aksen (DESIGN §7) ──────────────────
      Tidak pernah berdiri sendiri tanpa bentuk atau label — sepuluh persen

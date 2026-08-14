@@ -44,8 +44,9 @@ export const TOKEN = {
   titaniumRim: '#e8edf6',
   identityNone: '#7f7f8b',
   /* Energi Ronin. Permukaan publik saja — lihat catatan di globals.css. */
-  ronin: '#35f58c',
-  roninBright: '#c9ffe4',
+  ronin: '#a855ff',
+  roninBright: '#e5ccff',
+  roninCore: '#f6ecff',
 } as const;
 
 /**

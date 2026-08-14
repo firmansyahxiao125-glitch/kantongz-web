@@ -19,7 +19,8 @@
     "gates": "node scripts/gates.mjs",
     "test": "vitest run",
     "grafis": "node scripts/grafis.mjs",
-    "sintaks": "node scripts/sintaks.mjs"
+    "sintaks": "node scripts/sintaks.mjs",
+    "ronin": "node scripts/ronin.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",

@@ -61,26 +61,48 @@ const FRAGMENT = /* glsl */ `
 
   void main() {
     float f = 1.0 - max(dot(normalize(vNormalView), normalize(vViewDir)), 0.0);
-    f = pow(clamp(f, 0.0, 1.0), uPangkat) * uKuat;
+    /*
+      DIJEPIT SESUDAH dikalikan, dan itu bukan detail.
+
+      Tanpa jepitan, uKuat > 1 membuat campurannya MELAMPAUI warna rim: pada
+      f serendah 0,6 seluruh permukaan sudah 96% warna tepi, dan zirah yang
+      seharusnya gelap menyala rata dari pinggir sampai perut. Yang tersisa
+      bukan rim light melainkan benda yang bersinar seluruhnya — persis
+      kebalikan dari yang membuat siluet terbaca.
+    */
+    f = clamp(pow(clamp(f, 0.0, 1.0), uPangkat) * uKuat, 0.0, 1.0);
     gl_FragColor = vec4(mix(uDalam, uTepi, f), 1.0);
   }
 `;
 
-/** Zirah: gelap di dalam, tepi hijau. Inilah wajah seluruh adegan. */
-function useZirah(kuat = 1) {
-  return useMemo(() => {
-    const m = new THREE.ShaderMaterial({
-      vertexShader: VERTEX,
-      fragmentShader: FRAGMENT,
-      uniforms: {
-        uDalam: { value: new THREE.Color(MATERIAL.nearBlack) },
-        uTepi: { value: new THREE.Color(TOKEN.ronin) },
-        uPangkat: { value: 2.6 },
-        uKuat: { value: kuat },
-      },
-    });
-    return m;
-  }, [kuat]);
+/**
+ * Zirah: gelap di perut, menyala HANYA di pinggir.
+ *
+ * `uPangkat` menentukan setipis apa pitanya. 2,6 menghasilkan gradien lembut
+ * yang menutupi separuh permukaan — indah sendirian, tetapi ia menghapus
+ * siluetnya: benda yang bersinar seluruhnya tidak punya tepi untuk dibaca
+ * mata. 5,0 menjadikannya pita tipis di sepanjang pinggir, dan perutnya
+ * kembali gelap. Itulah yang membuat bentuk sederhana terbaca bervolume.
+ *
+ * `kuat` di atas 1 dipakai untuk bagian yang memang harus menonjol — helm,
+ * pelat bahu, tsuba — dan tetap dijepit di shader supaya ia tidak pernah
+ * membanjiri permukaan.
+ */
+function useZirah(kuat = 1, pangkat = 5) {
+  return useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader: VERTEX,
+        fragmentShader: FRAGMENT,
+        uniforms: {
+          uDalam: { value: new THREE.Color(MATERIAL.nearBlack) },
+          uTepi: { value: new THREE.Color(TOKEN.ronin) },
+          uPangkat: { value: pangkat },
+          uKuat: { value: kuat },
+        },
+      }),
+    [kuat, pangkat],
+  );
 }
 
 /**
@@ -115,7 +137,7 @@ export function Ronin({ tier, kendali }: RoninProps) {
   const nafas = useRef(0);
 
   const zirah = useZirah();
-  const zirahTerang = useZirah(1.6);
+  const zirahTerang = useZirah(1.25, 4);
 
   /* Bilah: hijau nyaris putih, ADITIF, jadi ia benar-benar menyala alih-alih
      sekadar berwarna terang. Ini yang ditangkap bloom. */
