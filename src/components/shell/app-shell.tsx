@@ -50,7 +50,10 @@ export function AppShell({ user, children }: { user: User; children: React.React
 
   return (
     <div className="min-h-dvh bg-app">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 border-r border-line bg-[var(--surface)] lg:block">
+      {/* `kanvas-gelap` men-scope ulang token warna di dalamnya, jadi seluruh
+          isi bilah sisi terbalik tanpa satu pun kelas kondisional. Lihat
+          globals.css — nilainya dipinjam dari tema gelap yang sudah diaudit. */}
+      <aside className="kanvas-gelap fixed inset-y-0 left-0 hidden w-60 border-r border-line lg:block">
         <Sidebar />
       </aside>
 
@@ -73,7 +76,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: DURATION.base, ease: EASE_OUT }}
-              className="fixed inset-y-0 left-0 z-50 w-64 border-r border-line bg-[var(--surface)] lg:hidden"
+              className="kanvas-gelap fixed inset-y-0 left-0 z-50 w-64 border-r border-line lg:hidden"
             >
               <Sidebar
                 onNavigate={() => {

@@ -88,7 +88,8 @@ Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
 | V1 | todo | — | — | permukaan publik: landing + masuk + daftar + pulihkan |
-| V2 | selesai | ini | contrast hijau (2 tema) · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | token hangat + terang jadi bawaan per-permukaan. Bilah sisi gelap menyusul di V3 |
+| V2 | selesai | b36893b | contrast hijau (2 tema) · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | token hangat + terang jadi bawaan per-permukaan |
+| V2b | selesai | ini | contrast hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | bilah sisi arang lewat `.kanvas-gelap`, nilainya dipinjam dari tema gelap yang sudah diaudit |
 | V3 | todo | — | — | dasbor — **titik henti manusia Y5 #2** |
 | V4a | todo | — | — | transaksi |
 | V4b | todo | — | — | dompet |

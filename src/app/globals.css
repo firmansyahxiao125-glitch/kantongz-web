@@ -829,4 +829,48 @@
   .glow-brass {
     box-shadow: var(--glow-brass);
   }
+
+  /*
+   * BILAH SISI GELAP DI ATAS KANVAS TERANG. ROADMAP §7.1.
+   *
+   * ── MENGAPA IA TIDAK MENGIKUTI TEMA ──────────────────────────────────
+   *
+   * Bilah sisi bukan isi — ia tempat berdiri. Menjadikannya sewarna kanvas
+   * berarti dua wilayah dengan tugas yang sama sekali berbeda dibedakan hanya
+   * oleh satu garis setebal satu piksel, dan mata harus mengerjakan sendiri
+   * pemisahan yang seharusnya sudah selesai sebelum ia mulai membaca.
+   *
+   * Kontras antara arang dan kertas itulah tata letaknya. Bukan hiasan.
+   *
+   * ── MENGAPA NILAINYA DIPINJAM, BUKAN DIKARANG ────────────────────────
+   *
+   * Seluruh pasangan di bawah adalah pasangan TEMA GELAP yang sudah diaudit
+   * `contrast.mjs` dan lulus WCAG AA dengan lapang (ink 15.9, muted 8.4,
+   * dim 5.1 di atas s0). Mengarang enam nilai baru di sini berarti enam
+   * pasangan yang tidak diperiksa siapa pun — di dalam satu-satunya wilayah
+   * yang muncul di SETIAP halaman.
+   *
+   * Karena token-nya di-scope ulang, seluruh komponen di dalamnya —
+   * `text-ink`, `text-muted`, `border-line` — ikut terbalik tanpa satu pun
+   * kelas kondisional. Bilah sisi tetap gelap di tema gelap, dan itu benar:
+   * di sana ia sudah gelap sejak awal.
+   */
+  .kanvas-gelap {
+    --surface: var(--color-s1);
+    --surface-2: var(--color-s2);
+    --surface-3: var(--color-s3);
+    --surface-4: var(--color-s3-active);
+
+    --ink: #e4e9f2;
+    --ink-muted: #a9b2c6;
+    --ink-dim: #7e8aa9;
+    --ink-faint: #616c8f;
+
+    --line: rgb(138 147 166 / 0.14);
+    --line-strong: rgb(138 147 166 / 0.26);
+    --edge: rgb(232 237 246 / 0.08);
+
+    background: var(--color-s0);
+    color: var(--ink);
+  }
 }
