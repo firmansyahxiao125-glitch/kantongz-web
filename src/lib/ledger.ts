@@ -175,6 +175,68 @@ export const ledger = {
     request<CashflowPoint[]>(`/v1/analytics/cashflow${query({ ...params })}`),
 };
 
+/* ── aturan berulang ─────────────────────────────────────────────────── */
+
+export type Cadence = 'daily' | 'weekly' | 'monthly';
+
+export interface RecurringRule {
+  id: string;
+  name: string;
+  accountId: string;
+  counterAccountId: string | null;
+  categoryId: string | null;
+  kind: TransactionKind;
+  amount: number;
+  currency: string;
+  merchant: string | null;
+  note: string | null;
+  cadence: Cadence;
+  interval: number;
+  startsOn: string;
+  endsOn: string | null;
+  /** Tanggal kejadian berikutnya yang BELUM dicatat. `YYYY-MM-DD` lokal. */
+  nextRunOn: string;
+  lastRunOn: string | null;
+  paused: boolean;
+  postedCount: number;
+}
+
+export interface RecurringInput {
+  name: string;
+  accountId: string;
+  counterAccountId?: string;
+  categoryId?: string;
+  kind: TransactionKind;
+  amount: number;
+  merchant?: string;
+  note?: string;
+  cadence: Cadence;
+  interval: number;
+  startsOn: string;
+  endsOn?: string;
+}
+
+export interface RunSummary {
+  posted: number;
+  failed: number;
+}
+
+export const recurring = {
+  list: () => request<RecurringRule[]>('/v1/recurring'),
+  create: (body: RecurringInput) =>
+    request<RecurringRule>('/v1/recurring', { method: 'POST', body }),
+  update: (id: string, body: RecurringInput) =>
+    request<RecurringRule>(`/v1/recurring/${id}`, { method: 'PUT', body }),
+  pause: (id: string, paused: boolean) =>
+    request<RecurringRule>(`/v1/recurring/${id}/pause`, { method: 'POST', body: { paused } }),
+  remove: (id: string) =>
+    request<Record<string, never>>(`/v1/recurring/${id}`, { method: 'DELETE' }),
+  /** Menjalankan yang jatuh tempo sekarang, tanpa menunggu pekerja latar. */
+  run: () => request<RunSummary>('/v1/recurring/run', { method: 'POST' }),
+};
+
+export const recurringKeys = { list: ['recurring'] as const };
+
 /**
  * Kunci cache TanStack Query.
  *

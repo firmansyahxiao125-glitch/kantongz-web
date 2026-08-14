@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   PiggyBank,
+  Repeat,
   Settings,
   Shield,
   Sparkles,
@@ -49,6 +50,12 @@ export const NAV: NavGroup[] = [
     items: [
       { href: '/anggaran', label: 'Anggaran', icon: PiggyBank, keywords: 'budget batas' },
       { href: '/tujuan', label: 'Tujuan', icon: Target, keywords: 'goal tabungan target' },
+      {
+        href: '/berulang',
+        label: 'Berulang',
+        icon: Repeat,
+        keywords: 'langganan tagihan cicilan jadwal rutin',
+      },
     ],
   },
   {

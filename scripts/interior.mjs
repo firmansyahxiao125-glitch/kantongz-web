@@ -5,8 +5,8 @@
  * ── APA YANG DIJAGA, DAN MENGAPA GERBANG LAIN TIDAK BISA ───────────────
  *
  * `typography.mjs` dan `render.mjs` menjaga halaman MUKA — halaman publik yang
- * dapat dibuka tanpa sesi. Dua belas halaman di balik login tidak pernah
- * tersentuh gerbang mana pun, dan di sanalah seluruh produk sebenarnya berada.
+ * dapat dibuka tanpa sesi. Halaman di balik login tidak pernah tersentuh
+ * gerbang mana pun, dan di sanalah seluruh produk sebenarnya berada.
  *
  * Kelas cacat yang dijaga berkas ini BUKAN hipotesis. Keempatnya sudah terjadi
  * di repositori ini, dan tidak satu pun memerahkan typecheck, lint, uji unit,
@@ -81,7 +81,8 @@ if (!EMAIL || !PASSWORD) {
 
 const HALAMAN = [
   ['dasbor', '/dasbor'], ['transaksi', '/transaksi'], ['dompet', '/dompet'],
-  ['anggaran', '/anggaran'], ['tujuan', '/tujuan'], ['analitik', '/analitik'],
+  ['anggaran', '/anggaran'], ['tujuan', '/tujuan'], ['berulang', '/berulang'],
+  ['analitik', '/analitik'],
   ['wawasan', '/wawasan'], ['asisten', '/asisten'], ['laporan', '/laporan'],
   ['profil', '/profil'], ['keamanan', '/keamanan'], ['pengaturan', '/pengaturan'],
 ];
