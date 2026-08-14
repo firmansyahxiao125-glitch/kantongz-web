@@ -60,6 +60,12 @@ export interface Budget {
   currency: string;
   startsOn: string;
   spent: number;
+  /** Sisa periode lalu ikut ke periode ini. */
+  rollover: boolean;
+  /** Positif = sisa, NEGATIF = utang dari periode yang jebol. 0 bila mati. */
+  carryOver: number;
+  /** `amount + carryOver`, tidak pernah di bawah nol. Ini yang diukur `spent`. */
+  limit: number;
 }
 
 export interface Goal {
@@ -163,6 +169,8 @@ export const ledger = {
     request<Budget>('/v1/budgets', { method: 'POST', body }),
   closeBudget: (id: string) =>
     request<Record<string, never>>(`/v1/budgets/${id}`, { method: 'DELETE' }),
+  setBudgetRollover: (id: string, rollover: boolean) =>
+    request<Budget>(`/v1/budgets/${id}`, { method: 'PATCH', body: { rollover } }),
 
   goals: () => request<Goal[]>('/v1/goals'),
   createGoal: (body: { name: string; targetAmount: number; targetDate?: string; color?: string }) =>

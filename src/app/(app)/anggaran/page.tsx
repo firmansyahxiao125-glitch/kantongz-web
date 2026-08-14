@@ -63,6 +63,25 @@ export default function AnggaranPage() {
     },
   });
 
+  const rollover = useMutation({
+    mutationFn: ({ id, rollover: aktif }: { id: string; rollover: boolean }) =>
+      ledger.setBudgetRollover(id, aktif),
+    onSuccess: async (budget) => {
+      toast.success(
+        budget.rollover
+          ? 'Sisa periode ini akan dibawa ke periode berikutnya.'
+          : 'Bawaan dihentikan. Batasnya kembali ke jatah polos.',
+      );
+      await Promise.all([
+        client.invalidateQueries({ queryKey: keys.budgets }),
+        client.invalidateQueries({ queryKey: keys.dashboard }),
+      ]);
+    },
+    onError: () => {
+      toast.error('Gagal mengubah. Coba lagi.');
+    },
+  });
+
   const nameOf = useMemo(
     () => new Map((categories.data ?? []).map((c) => [c.id, c])),
     [categories.data],
@@ -122,9 +141,12 @@ export default function AnggaranPage() {
         <motion.ul variants={stagger} initial="hidden" animate="show" className="space-y-3">
           {rows.map((budget) => {
             const category = nameOf.get(budget.categoryId);
-            const ratio = Math.min(budget.spent / budget.amount, 1);
-            const over = budget.spent > budget.amount;
-            const sisa = budget.amount - budget.spent;
+            /* Diukur terhadap `limit`, BUKAN `amount`. Anggaran yang membawa
+               sisa Rp 300.000 tetapi bilahnya dihitung dari jatah polos akan
+               terlihat jebol pada Rp 1.050.000 — padahal amplopnya masih ada. */
+            const ratio = budget.limit > 0 ? Math.min(budget.spent / budget.limit, 1) : 1;
+            const over = budget.spent > budget.limit;
+            const sisa = budget.limit - budget.spent;
 
             return (
               <motion.li key={budget.id} variants={fadeUp}>
@@ -180,7 +202,7 @@ export default function AnggaranPage() {
                             sebagai dua sistem. */}
                         <span className="numeric text-sm text-ink">
                           {formatIdr(budget.spent)}{' '}
-                          <span className="text-dim">/ {formatIdr(budget.amount)}</span>
+                          <span className="text-dim">/ {formatIdr(budget.limit)}</span>
                         </span>
                         <Button
                           variant="ghost"
@@ -222,6 +244,37 @@ export default function AnggaranPage() {
                         animate={{ width: `${String(ratio * 100)}%` }}
                         transition={{ duration: 0.6 }}
                       />
+                    </div>
+
+                    {/*
+                      Bawaan dinyatakan DI SEBELAH tombolnya, bukan hanya
+                      sebagai keadaan menyala/mati.
+
+                      "Bawaan +Rp 300.000" menjelaskan dari mana batas
+                      Rp 1.300.000 datang. Tanpa kalimat itu, angka pembagi di
+                      atas berubah tanpa sebab yang terlihat — dan angka yang
+                      berubah sendiri adalah angka yang berhenti dipercaya.
+                    */}
+                    <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                      <p className="text-xs text-dim">
+                        {budget.rollover
+                          ? budget.carryOver === 0
+                            ? 'Sisa dibawa ke periode berikutnya'
+                            : budget.carryOver > 0
+                              ? `Bawaan +${formatIdr(budget.carryOver)} dari periode lalu`
+                              : `Utang ${formatIdr(-budget.carryOver)} dari periode lalu`
+                          : `Jatah ${formatIdr(budget.amount)}, sisanya hangus tiap periode`}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        loading={rollover.isPending && rollover.variables?.id === budget.id}
+                        onClick={() => {
+                          rollover.mutate({ id: budget.id, rollover: !budget.rollover });
+                        }}
+                      >
+                        {budget.rollover ? 'Hentikan bawaan' : 'Bawa sisa'}
+                      </Button>
                     </div>
                   </CardBody>
                 </Card>
