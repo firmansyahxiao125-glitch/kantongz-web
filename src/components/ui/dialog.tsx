@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { useEffect, useId, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 import { DURATION, EASE_OUT } from '@/lib/motion';
 
@@ -54,11 +54,31 @@ function DialogBody({
 }) {
   const titleId = useId();
   const descriptionId = useId();
+  const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+
+    /*
+     * FOKUS DIPINDAHKAN KE DALAM. Selama ini komentar di atas menjanjikannya
+     * dan kodenya hanya mengerjakan separuh pulangnya — dialog terbuka,
+     * fokus tetap tertinggal di tombol yang membukanya, dan pengguna papan tik
+     * harus menyeberangi seluruh halaman di belakang untuk sampai ke
+     * formulir yang baru saja ia minta.
+     *
+     * Yang difokus adalah PANELNYA, bukan kolom pertama: pembaca layar
+     * membacakan judul dan keterangan dialog lebih dulu, dan orang berhak tahu
+     * ia sedang berada di mana sebelum diminta mengisi apa pun.
+     *
+     * Kecuali ada yang sudah meminta fokus untuk dirinya sendiri lewat
+     * `autoFocus` — permintaan yang lebih spesifik itu dihormati.
+     */
+    const t = window.setTimeout(() => {
+      const p = panel.current;
+      if (p && !p.contains(document.activeElement)) p.focus();
+    }, 0);
 
     function onKey(event: KeyboardEvent): void {
       if (event.key === 'Escape') onClose();
@@ -66,6 +86,7 @@ function DialogBody({
     window.addEventListener('keydown', onKey);
 
     return () => {
+      window.clearTimeout(t);
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = overflow;
       previous?.focus();
@@ -88,15 +109,24 @@ function DialogBody({
       />
 
       <motion.div
+        ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
+        /* `-1`: dapat difokus lewat kode, TIDAK ikut urutan Tab. Panel adalah
+           tempat berpijak, bukan kontrol — memasukkannya ke urutan Tab berarti
+           satu perhentian kosong yang tidak melakukan apa pun. */
+        tabIndex={-1}
         initial={{ opacity: 0, y: 24, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 24, scale: 0.99 }}
         transition={{ duration: DURATION.base, ease: EASE_OUT }}
-        className="glass-strong relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-[var(--radius-xl)] p-6 shadow-[var(--shadow-float)] sm:rounded-[var(--radius-xl)]"
+        /* `outline-none` aman di sini justru KARENA `tabIndex={-1}`: panel ini
+           tidak pernah dapat dicapai lewat Tab, jadi tidak ada seorang pun
+           yang kehilangan penanda fokusnya. Cincin selebar dialog hanya akan
+           terbaca sebagai galat gambar. */
+        className="glass-strong relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-[var(--radius-xl)] p-6 shadow-[var(--shadow-float)] outline-none sm:rounded-[var(--radius-xl)]"
       >
         <header className="mb-5 pr-8">
           <h2 id={titleId} className="text-lg font-semibold tracking-tight text-ink">

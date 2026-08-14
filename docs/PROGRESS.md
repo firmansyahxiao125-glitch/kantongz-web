@@ -13,6 +13,9 @@ berselisih dengan repositori.
 - **`terhalang` menuntut satu kalimat** yang menyebut persis apa yang
   menghalanginya. Item terhalang yang dicatat jujur adalah hasil kerja; repo
   yang diam-diam rusak bukan.
+- Kolom `commit` bertuliskan `ini` berarti barisnya ikut di dalam commit yang
+  menuntaskannya. Itu satu-satunya cara baris dan pekerjaannya tidak pernah
+  terpisah — hash tidak dapat ditulis ke dalam commit yang belum ada.
 
 ## Protokol lanjut sesi
 
@@ -45,7 +48,40 @@ Turun di bawah angka mana pun di sini adalah regresi.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| E1 | todo | — | — | `npm run akses`, lalu perbaiki semua temuannya di halaman hari ini |
+| E1 | selesai | ini | akses 455/455 · interior hijau · alur hijau · contrast hijau · palette hijau · 63 uji · build 0 | 2 cacat nyata ditemukan dan diperbaiki — lihat di bawah |
+
+### Yang ditemukan E1, dan diperbaiki
+
+1. **Dialog tidak pernah memindahkan fokus ke dalam.** `dialog.tsx` baris 17
+   menjanjikannya sejak ditulis; kodenya hanya mengerjakan separuh pulangnya.
+   Pengguna papan tik yang membuka dialog tetap tertinggal fokusnya di tombol
+   pembuka, dan harus menyeberangi seluruh halaman di belakang untuk mencapai
+   formulir yang baru saja ia minta. Diperbaiki: panel difokus saat terbuka
+   (`tabIndex={-1}`, jadi tidak menambah perhentian Tab), `autoFocus` yang lebih
+   spesifik tetap dihormati.
+
+2. **Halaman muka tidak punya `<main>` sama sekali.** Tautan "Lompat ke konten"
+   sudah ada sejak lama dan menunjuk ke sebuah `<section>`. Pembaca layar yang
+   melompat antar-tengara menemukan header, nav, sebelas section, dan footer —
+   tanpa satu pun yang berkata "isi halamannya mulai di sini". Diperbaiki:
+   `<main id="konten">` membungkus isinya, `id` pindah ke tengara sungguhan.
+
+### Hitungan titik henti Tab — garis dasar
+
+Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
+
+| halaman | lebar | ponsel | | halaman | lebar | ponsel |
+|---|---|---|---|---|---|---|
+| muka | 26 | 19 | | analitik | 21 | 8 |
+| masuk | 9 | 9 | | wawasan | 39 | 26 |
+| daftar | 11 | 11 | | asisten | 26 | 13 |
+| pulihkan | 6 | 6 | | laporan | 23 | 10 |
+| dasbor | 26 | 13 | | profil | 21 | 8 |
+| transaksi | 73 | 60 | | keamanan | 84 | 71 |
+| dompet | 22 | 9 | | pengaturan | 22 | 9 |
+| anggaran | 25 | 12 | | | | |
+| tujuan | 25 | 12 | | | | |
+| berulang | 41 | 28 | | | | |
 
 ## Langkah 2 — sistem visual: dua permukaan
 
@@ -152,4 +188,4 @@ Belum ada.
 
 | tanda | menandai |
 |---|---|
-| — | belum ada |
+| `pra-step1` | garis dasar terverifikasi sebelum program dimulai |

@@ -74,8 +74,22 @@ export default function LandingPage() {
         </div>
       </header>
 
+      {/*
+        <main>, dan bukan sekadar kerapian semantik.
+
+        Tautan "Lompat ke konten" di atas sudah ada sejak awal dan menunjuk ke
+        `#konten` — yang selama ini melekat pada sebuah `<section>`. Halaman ini
+        karena itu tidak punya SATU pun tengara utama: pembaca layar yang
+        melompat antar-landmark menemukan header, nav, sebelas section, dan
+        footer, tanpa apa pun yang mengatakan "isi halamannya mulai di sini".
+
+        `id` pindah ke sini supaya tautan lewati-navigasi mendarat di tengara
+        yang sebenarnya, bukan di potongan pertamanya.
+      */}
+      <main id="konten">
+
       {/* ── hero ─────────────────────────────────────────────────── */}
-      <section id="konten" className="aurora relative isolate overflow-hidden px-4 pb-20 pt-32 sm:pt-40">
+      <section className="aurora relative isolate overflow-hidden px-4 pb-20 pt-32 sm:pt-40">
         <div className="grid-lines pointer-events-none absolute inset-0 -z-10" aria-hidden />
 
         {/*
@@ -212,6 +226,8 @@ export default function LandingPage() {
           </div>
         </Reveal>
       </section>
+
+      </main>
 
       <footer className="border-t border-[var(--line)]">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-[var(--ink-dim)] sm:flex-row">

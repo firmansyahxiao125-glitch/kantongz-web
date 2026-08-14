@@ -15,6 +15,7 @@
     "render": "node scripts/render.mjs",
     "interior": "node scripts/interior.mjs",
     "alur": "node scripts/alur.mjs",
+    "akses": "node scripts/akses.mjs",
     "gates": "node scripts/gates.mjs",
     "test": "vitest run"
   },
