@@ -200,22 +200,43 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --bg: #f7f8fa;
+  /*
+   * KERTAS, BUKAN LAYAR. ROADMAP §7.1.
+   *
+   * Nilai sebelumnya (#f7f8fa dan turunannya) adalah putih ber-rona BIRU —
+   * pilihan yang wajar ketika tema terang hanyalah kebalikan dari tema gelap.
+   * Tetapi permukaan dalam-aplikasi bukan kebalikan dari apa pun; ia tempat
+   * orang duduk lama, dan biru-abu pada penggunaan kelima puluh terbaca
+   * sebagai dokumen kantor, bukan sebagai catatan sendiri.
+   *
+   * Ronanya digeser ke hangat, dan JARAK antar-permukaannya dipertahankan
+   * persis: kanvas paling hangat dan paling gelap, kartu PUTIH MURNI di
+   * atasnya. Kontras itulah yang membuat kartu terbaca MELAYANG tanpa satu
+   * pun bayangan tambahan — dan itu sebabnya `--surface` tidak ikut
+   * dihangatkan.
+   */
+  --bg: #faf8f4;
   --surface: #ffffff;
-  --surface-2: #f2f4f7;
-  --surface-3: #e7eaef;
-  --surface-4: #dbdfe7;
+  --surface-2: #f4f1ea;
+  /* Luminansinya DIPERTAHANKAN, ronanya yang digeser.
+     Pilihan pertama (#eae5db) hangat dan benar secara rasa, tetapi 4% lebih
+     gelap dari nilai lamanya — dan itu cukup menjatuhkan positive, negative,
+     caution, serta holo-deep di bawah ambang AA sekaligus. Keempatnya sudah
+     ditala dengan margin tipis di sini, jadi permukaannyalah yang mengalah,
+     bukan sinyalnya. */
+  --surface-3: #efeae0;
+  --surface-4: #ded7c9;
 
-  --ink: #0b0e14;
-  --ink-muted: #4a5468;
+  --ink: #171310;
+  --ink-muted: #4c443c;
   /* `dim` dan `faint` DIGELAPKAN dari nilai pilihan pertama (#67718a, #8a93a8).
      Keduanya gagal WCAG AA di atas `surface-3` — 4.04 dan 2.55 — dan gagalnya
      tepat di tempat yang paling sulit dilihat mata: teks abu di atas panel
      terang. Rona biru-abunya dipertahankan; kanalnya diskalakan proporsional
      alih-alih diganti warna lain, persis seperti perbaikan yang sama pernah
      dilakukan pada tema gelap di DESIGN §8. */
-  --ink-dim: #606980;
-  --ink-faint: #7e8699;
+  --ink-dim: #645a4f;
+  --ink-faint: #7d7367;
 
   /*
    * Sinyal DIGELAPKAN untuk tema terang, dan ini bukan penyesuaian kosmetik.
@@ -232,14 +253,17 @@
   --color-negative: #bf3745;
   --color-caution: #8b6221;
 
-  --line: rgb(11 14 20 / 0.09);
-  --line-strong: rgb(11 14 20 / 0.16);
-  --edge: rgb(11 14 20 / 0.05);
+  /* Garis dan bayangan ikut hangat. Bayangan ber-rona biru di atas kanvas
+     krem terbaca sebagai noda, bukan sebagai kedalaman — dan itu satu-satunya
+     hal yang paling cepat membuat palet hangat terlihat seperti kecelakaan. */
+  --line: rgb(23 19 16 / 0.10);
+  --line-strong: rgb(23 19 16 / 0.17);
+  --edge: rgb(23 19 16 / 0.05);
 
-  --shadow-contact: 0 1px 2px rgb(11 14 20 / 0.06);
-  --shadow-soft: 0 1px 2px rgb(11 14 20 / 0.05), 0 8px 24px -12px rgb(11 14 20 / 0.14);
-  --shadow-lift: 0 2px 4px rgb(11 14 20 / 0.06), 0 18px 44px -18px rgb(11 14 20 / 0.2);
-  --shadow-float: 0 4px 8px rgb(11 14 20 / 0.07), 0 40px 80px -30px rgb(11 14 20 / 0.26);
+  --shadow-contact: 0 1px 2px rgb(23 19 16 / 0.06);
+  --shadow-soft: 0 1px 2px rgb(23 19 16 / 0.05), 0 8px 24px -12px rgb(23 19 16 / 0.14);
+  --shadow-lift: 0 2px 4px rgb(23 19 16 / 0.06), 0 18px 44px -18px rgb(23 19 16 / 0.2);
+  --shadow-float: 0 4px 8px rgb(23 19 16 / 0.07), 0 40px 80px -30px rgb(23 19 16 / 0.26);
 
   --glow-brass: 0 0 0 1px rgb(122 88 32 / 0.3), 0 8px 28px -10px rgb(122 88 32 / 0.28);
 

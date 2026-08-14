@@ -67,7 +67,7 @@ export const viewport: Viewport = {
      * punya apa pun untuk dirujuk.
      */
     { media: '(prefers-color-scheme: dark)', color: '#06070a' },
-    { media: '(prefers-color-scheme: light)', color: '#f7f8fa' },
+    { media: '(prefers-color-scheme: light)', color: '#faf8f4' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -80,12 +80,26 @@ export const viewport: Viewport = {
  * memuat halaman — dan kedipan itu adalah hal pertama yang membuat aplikasi
  * terasa rakitan.
  */
+/**
+ * Bawaannya berbeda per PERMUKAAN — ROADMAP §7.1.
+ *
+ * Halaman publik menjual; halaman di balik login dipakai. Yang pertama gelap
+ * dan sinematik, yang kedua terang dan tenang. Keduanya tetap punya kedua tema
+ * — yang berbeda hanya di mana masing-masing dimulai.
+ *
+ * Pilihan pengguna SELALU menang. Yang dikorbankan adalah `prefers-color-
+ * scheme` sebagai penentu bawaan di halaman dalam-aplikasi, dan itu memang
+ * biaya yang nyata: sebagian orang memilih tema gelap di sistemnya justru
+ * karena mata. Penyeimbangnya adalah tombol tema yang tetap ada di kepala
+ * halaman, dan pilihannya bertahan sejak ketukan pertama.
+ */
 const themeScript = `
 (function () {
   try {
+    var PUBLIK = ['/', '/masuk', '/daftar', '/pulihkan'];
     var stored = localStorage.getItem('kantongz-theme');
-    var system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    var theme = stored === 'light' || stored === 'dark' ? stored : system;
+    var bawaan = PUBLIK.indexOf(location.pathname) === -1 ? 'light' : 'dark';
+    var theme = stored === 'light' || stored === 'dark' ? stored : bawaan;
     document.documentElement.setAttribute('data-theme', theme);
   } catch (e) {}
 })();
