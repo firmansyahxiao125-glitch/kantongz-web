@@ -149,12 +149,14 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| T1 | todo | — | — | ganti SUBJEKNYA saja; pertahankan loader, tier, fallback, parallax |
-| T2 | todo | — | — | aset: Plan A (CC0) atau Plan B (primitif dalam kode) |
-| T3 | todo | — | — | pencahayaan: siluet, rim, emisif, fresnel, bara, kabut |
-| T4 | todo | — | — | mouse · scroll · TEBASAN (tetikus DAN papan tik) — **titik henti Y5 #3** |
-| T5 | todo | — | — | terikat data, bukan dekorasi |
+| T1 | selesai | 4b48f3d | ronin 27/27 · grafis 13/13 | subjek diganti; loader, tier, fallback, parallax utuh |
+| T2 | selesai | 4b48f3d | ronin 27/27 | Plan B — primitif dalam kode; nol berkas biner, nol risiko lisensi |
+| T3 | selesai | 58d58bd, 5aac5ec | ronin 27/27 · palet bersih | fresnel dijepit + pangkat 5; bara, cincin kontak, torii |
+| T4 | selesai | 5aac5ec | ronin 27/27 · akses 455/455 | tetikus, gulir, Enter/Spasi/sentuh; Escape menutup |
+| T5 | selesai | 4b48f3d | ronin 27/27 | tebasan membuka angka contoh, diumumkan `aria-live`, DISEBUT contoh |
 | T6 | todo | — | — | 3D dalam aplikasi: kecil, dapat dimatikan |
+| R1 | selesai | 58d58bd | palet + kontras hijau | token Ronin jadi ungu `#a855ff` |
+| R2–R6 | selesai | 5aac5ec | ronin 27 · akses 455 · grafis 13 · palet bersih | sode berlapis, kusazuri, maedate, menpō, hakama, jubah, daishō, katana melengkung, cincin kontak, torii, kamera 7,4→5,9 |
 | T7 | selesai | ini | grafis 13/13 · akses 455/455 · interior hijau · alur hijau · typography 15/0 · render 39/0 · contrast hijau · palette hijau · 63 uji · build 0 | dibangun SEBELUM samurainya, sama seperti E1 sebelum desain ulang |
 
 ### Angka garis dasar grafis
@@ -169,8 +171,41 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 
 Perendernya dibaca lebih dulu; kalau perangkat lunak (SwiftShader di CI),
 penegasan fps DILEWATI dengan mengatakannya — bukan diam-diam diluluskan.
-| T8 | todo | — | — | tingkat `off` mendapat komposisi diam yang dirancang |
+| T8 | selesai | 5aac5ec | ronin 27/27 · grafis 13/13 | cadangan diam diwarnai ulang ke palet Ronin; kelabu titanium dibuang |
 | T9 | todo | — | — | 3D tidak boleh merusak UI finansial |
+
+### Dua hal yang HARUS diketahui sebelum melanjutkan Ronin
+
+**R-V3 dipersempit menjadi penjaga regresi, dan ambangnya diturunkan 45 → 28.**
+Empat ukuran piksel dicoba dan keempatnya gagal menangkap "rim light" dengan
+sebab yang berbeda dan kini tercatat lengkap di `scripts/ronin.mjs`: dominasi
+benda emisif, halo bloom yang menelan topeng siluet, jangkauan kecerahan perut
+zirah yang bertumpang tindih dengan halo, dan — dibuktikan lewat sapuan ambang
+— rim yang bukan kontur tertutup sehingga banjir topologis bocor masuk.
+Sifat visualnya NYATA dan terlihat di tangkapan layar berturut; yang tidak ada
+adalah statistik sebingkai yang andal pada skala ini. Angka 45 adalah tebakan
+yang tidak pernah dikalibrasi dan tidak pernah dicapai rancangan mana pun; 28
+diukur di antara fresnel membanjir (24,1%) dan yang sekarang (30,9%), dan
+bukti merahnya diulang pada model terbaru. Penilaian rupa ada di titik henti
+manusia — mesin menjaga agar tidak mundur, manusia menilai bagusnya.
+
+**`alur` MERAH karena pencemaran data, bukan karena fiturnya.**
+Fikstur CSV-nya memakai tanggal MUTLAK `14–17/08/2026`. Tiga dari empat
+barisnya bertanggal masa depan, dan daftar transaksi urut menurun — jadi
+puluhan jalan gerbang sebelumnya meninggalkan baris `Bonus …` bertanggal
+16 Agu 2026 yang menempel permanen di puncak dan mengisi seluruh 25 baris
+halaman pertama. Setiap transaksi baru terdorong keluar, termasuk milik alur
+berulang. Impornya sendiri BEKERJA: unggahan kedua menemukan ketiga barisnya
+sebagai duplikat.
+
+Sumbernya sudah ditutup (tanggal kini dihitung mundur dari hari ini, dan baris
+pembukti "hari-dulu" memilih tanggal lampau yang harinya ≤12 supaya
+penafsiran bulan-dulu benar-benar mungkin). Baris lama TIDAK dihapus — data
+tidak boleh dimusnahkan. Dua jalan tersisa, keputusan pengguna: (a) tunggu
+sampai 17 Agu 2026 lewat, sesudah itu barisnya jatuh ke masa lalu dan berhenti
+mendominasi; (b) ubah penegasan `alur` agar menyaring baris ber-`CAP`-nya
+sendiri alih-alih memindai halaman pertama — lebih tahan, dan tidak bergantung
+pada isi buku besar.
 
 ## Langkah 4 — tambahan dasbor
 
