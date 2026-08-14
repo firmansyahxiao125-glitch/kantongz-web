@@ -88,7 +88,14 @@ function adopt(session: Session): void {
   emit({ status: 'masuk', user: session.user });
 }
 
-function forget(): void {
+/**
+ * Membuang sesi LOKAL saja, tanpa memanggil peladen.
+ *
+ * Dipakai ketika sesi di peladen sudah tidak ada — akun baru saja ditutup.
+ * Memanggil `signOut` di situ berarti mencabut sesi yang sudah dicabut, dan
+ * kegagalannya muncul di layar sebagai galat jaringan tepat pada perpisahan.
+ */
+export function forget(): void {
   setAccessToken(null);
   expiresAt = 0;
   inFlight = null;

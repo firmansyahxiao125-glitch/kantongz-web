@@ -6,6 +6,7 @@ import { Mail, ShieldCheck, User as UserIcon } from 'lucide-react';
 import { useSession } from '@/components/session-provider';
 import { PageHeader } from '@/components/shell/page-header';
 import { ButtonLink } from '@/components/ui/button-link';
+import { AccountData } from '@/components/security/account-data';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/state';
 import { keys, ledger } from '@/lib/ledger';
@@ -34,6 +35,7 @@ export default function ProfilPage() {
   return (
     <div className="space-y-5">
       <PageHeader title="Profil" description="Identitas akunmu di KANTONGZ." />
+      <AccountData />
 
       <div className="grid gap-4 lg:grid-cols-3">
       <Card className="lg:col-span-2">

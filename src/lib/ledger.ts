@@ -358,3 +358,13 @@ export const totp = {
 };
 
 export const totpKeys = { status: ['auth', 'totp'] as const };
+
+/* ── akun ────────────────────────────────────────────────────────────── */
+
+export const account = {
+  /* Unduhan, bukan pemanggilan biasa: `request` mengurai JSON menjadi objek,
+     dan yang dibutuhkan di sini berkasnya. */
+  exportData: () => request<Record<string, unknown>>('/v1/account/export'),
+  close: (password: string) =>
+    request<Record<string, never>>('/v1/account/close', { method: 'POST', body: { password } }),
+};
