@@ -2,7 +2,10 @@
 
 import { Bloom, DepthOfField, EffectComposer, Vignette } from '@react-three/postprocessing';
 
-import { Bara, Lingkungan, Ronin, type KendaliRonin } from '@/components/three/ronin';
+import { Suspense } from 'react';
+
+import { Bara, Lingkungan, type KendaliRonin } from '@/components/three/ronin';
+import { RoninModel } from '@/components/three/ronin-model';
 import { Stage } from '@/components/three/stage';
 import { RoninDiam } from '@/components/three/ronin-diam';
 
@@ -26,10 +29,21 @@ export default function RoninCanvas({ kendali }: { kendali: { current: KendaliRo
    * hasilnya.
    */
   return (
-    <Stage className="size-full" distance={5.9} parallax={0.34} fallback={<RoninDiam />}>
+    <Stage className="size-full" distance={5.2} parallax={0.34} fallback={<RoninDiam />}>
       {(tier) => (
         <>
-          <Ronin tier={tier} kendali={kendali} />
+          {/*
+            `Suspense` di SINI, bukan di sekitar seluruh kanvas.
+
+            `useGLTF` menangguhkan sampai modelnya tiba. Kalau batasnya
+            dipasang di luar kanvas, seluruh adegan ikut hilang selama
+            pengunduhan — termasuk lingkungan dan bara yang sudah siap. Di
+            dalam, yang kosong hanya samurainya, dan panggungnya tetap hidup
+            sejak bingkai pertama.
+          */}
+          <Suspense fallback={null}>
+            <RoninModel tier={tier} kendali={kendali} />
+          </Suspense>
           <Lingkungan tier={tier} />
           <Bara tier={tier} />
 

@@ -53,27 +53,86 @@ const VERTEX = /* glsl */ `
 const FRAGMENT = /* glsl */ `
   uniform vec3 uDalam;
   uniform vec3 uTepi;
+  uniform vec3 uKunci;
+  uniform vec3 uArah;
   uniform float uPangkat;
   uniform float uKuat;
+  uniform float uBentuk;
+  uniform float uKilau;
 
   varying vec3 vNormalView;
   varying vec3 vViewDir;
 
   void main() {
-    float f = 1.0 - max(dot(normalize(vNormalView), normalize(vViewDir)), 0.0);
-    /*
-      DIJEPIT SESUDAH dikalikan, dan itu bukan detail.
+    vec3 N = normalize(vNormalView);
+    vec3 V = normalize(vViewDir);
 
-      Tanpa jepitan, uKuat > 1 membuat campurannya MELAMPAUI warna rim: pada
-      f serendah 0,6 seluruh permukaan sudah 96% warna tepi, dan zirah yang
-      seharusnya gelap menyala rata dari pinggir sampai perut. Yang tersisa
-      bukan rim light melainkan benda yang bersinar seluruhnya — persis
-      kebalikan dari yang membuat siluet terbaca.
+    /*
+      ── CAHAYA BENTUK, DAN MENGAPA IA HARUS ADA ────────────────────────
+
+      Versi sebelumnya hanya punya fresnel: bagian dalam satu warna rata,
+      tepinya menyala. Hasilnya menggambar KONTUR dan tidak pernah
+      menggambar VOLUME — dan benda tanpa volume terbaca sebagai manekin
+      kawat, betapa pun banyak bagian yang ditambahkan padanya. Menambah
+      pelat ke sosok yang tidak punya gradien permukaan hanya menambah
+      kontur.
+
+      Yang membuat permukaan terbaca padat adalah cahaya yang MELINTASINYA:
+      terang di sisi yang menghadap sumber, meredup memutari bentuknya,
+      gelap di sisi seberang. Setengah-Lambert dipakai alih-alih Lambert
+      penuh supaya sisi bayangannya tidak jatuh ke hitam pekat seketika —
+      pada adegan sesudah ini seluruh sisi gelapnya akan lenyap ke latar
+      dan siluetnya justru hilang.
     */
+    float lam = dot(N, normalize(uArah)) * 0.5 + 0.5;
+    /*
+      Pangkat 2,6, bukan 1,7.
+
+      Pada 1,7 setengah-Lambert menaikkan SELURUH permukaan: sisi yang
+      membelakangi cahaya pun tetap berwarna, dan sosoknya berubah menjadi
+      patung yang dicat rata ungu. Yang hilang bukan volumenya melainkan
+      KONTRASNYA — dan tanpa sisi gelap tidak ada yang namanya cahaya
+      sinematik, hanya penerangan.
+
+      2,6 menekan tengahnya ke bawah sambil membiarkan puncaknya tetap
+      terang: pelat yang menghadap cahaya menyala, sisi seberangnya jatuh ke
+      hampir hitam, dan siluetnya kembali terbaca di atas latar.
+    */
+    lam = pow(clamp(lam, 0.0, 1.0), 3.2) * uBentuk;
+    vec3 dasar = mix(uDalam, uKunci, lam);
+
+    /*
+      Sorot spekular sempit — hanya di tempat pelat benar-benar menghadap
+      cahaya. Inilah yang membedakan baja dari kain pada bentuk yang sama,
+      dan ia dimatikan (uKilau = 0) untuk bahan yang memang tidak berkilat.
+    */
+    vec3 H = normalize(normalize(uArah) + V);
+    float spek = pow(max(dot(N, H), 0.0), 42.0) * uKilau;
+    dasar += uKunci * spek;
+
+    /*
+      Fresnel tetap ada, DI ATAS cahaya bentuknya. Dijepit sesudah dikalikan:
+      tanpa jepitan, uKuat > 1 membuat campurannya melampaui warna rim dan
+      seluruh permukaan menyala rata — kebalikan dari yang membuat siluet
+      terbaca.
+    */
+    float f = 1.0 - max(dot(N, V), 0.0);
     f = clamp(pow(clamp(f, 0.0, 1.0), uPangkat) * uKuat, 0.0, 1.0);
-    gl_FragColor = vec4(mix(uDalam, uTepi, f), 1.0);
+
+    gl_FragColor = vec4(mix(dasar, uTepi, f), 1.0);
   }
 `;
+
+/**
+ * Arah cahaya kunci, dipakai bersama oleh SELURUH bahan.
+ *
+ * Satu sumber, satu arah. Kalau tiap bahan memilih arahnya sendiri, tiap
+ * bagian sosoknya akan disinari dari tempat berbeda — dan mata membaca itu
+ * sebagai kumpulan benda yang kebetulan berdekatan, bukan sebagai satu
+ * tubuh. Dari kiri-atas-depan: arah yang paling lazim dipakai untuk memahat
+ * wajah dan bahu, dan paling sedikit menimbulkan bentuk yang membingungkan.
+ */
+const ARAH_KUNCI = new THREE.Vector3(-0.55, 0.72, 0.42).normalize();
 
 /**
  * Zirah: gelap di perut, menyala HANYA di pinggir.
@@ -88,7 +147,7 @@ const FRAGMENT = /* glsl */ `
  * pelat bahu, tsuba — dan tetap dijepit di shader supaya ia tidak pernah
  * membanjiri permukaan.
  */
-function useZirah(kuat = 1, pangkat = 5, duaSisi = false) {
+export function useZirah(kuat = 1, pangkat = 5, duaSisi = false, bentuk = 0.5, kilau = 0) {
   return useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -98,11 +157,15 @@ function useZirah(kuat = 1, pangkat = 5, duaSisi = false) {
         uniforms: {
           uDalam: { value: new THREE.Color(MATERIAL.nearBlack) },
           uTepi: { value: new THREE.Color(TOKEN.ronin) },
+          uKunci: { value: new THREE.Color(TOKEN.ronin) },
+          uArah: { value: ARAH_KUNCI },
           uPangkat: { value: pangkat },
           uKuat: { value: kuat },
+          uBentuk: { value: bentuk },
+          uKilau: { value: kilau },
         },
       }),
-    [kuat, pangkat, duaSisi],
+    [kuat, pangkat, duaSisi, bentuk, kilau],
   );
 }
 
@@ -579,7 +642,7 @@ export function Lingkungan({ tier }: { tier: GraphicsTier }) {
    * berkali-kali lipat badan Ronin, jadi kecerahan yang sama sekali-kali tidak
    * berarti berat yang sama.
    */
-  const jauh = useZirah(0.16, 7);
+  const jauh = useZirah(0.16, 7, false, 0.05, 0);
 
   const cincinMat = useMemo(
     () =>

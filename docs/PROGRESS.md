@@ -174,6 +174,55 @@ penegasan fps DILEWATI dengan mengatakannya — bukan diam-diam diluluskan.
 | T8 | selesai | 5aac5ec | ronin 27/27 · grafis 13/13 | cadangan diam diwarnai ulang ke palet Ronin; kelabu titanium dibuang |
 | T9 | todo | — | — | 3D tidak boleh merusak UI finansial |
 
+### R13 — karakter pindah ke GLB humanoid berangka
+
+| id | status | commit | gerbang | catatan |
+|---|---|---|---|---|
+| R13 | sebagian | ini | akses 455 · grafis 14 · palet bersih · 83 uji · ronin 26/27 | humanoid GLB + animasi; **R-V3 merah, tidak ditutup** |
+
+Pipeline GLB DIBUKTIKAN dua arah sebelum satu baris karakter ditulis:
+`GLTFLoader` dan `GLTFExporter` keduanya terpasang (three 0.185), `useGLTF` /
+`useAnimations` ada di drei 10.7.8, dan ekspor GLB berjalan headless di Node
+sesudah `FileReader` ditambal (`scripts/aset/node-gltf.mjs`).
+
+**Batasan aset, dinyatakan sebelum memilih.** Repositori tidak punya satu pun
+`.glb/.gltf/.fbx/.vrm`. Aset berbayar di luar anggaran; biner pihak ketiga
+menuntut izin unduh dan verifikasi lisensi, dan berkas biner yang tidak dapat
+diperiksa dalam diff melanggar nilai yang sudah dinyatakan berkas adegan ini
+sejak awal. Jalan yang dipilih: GLB DIBANGUN dari sumber terbaca
+(`scripts/aset/bangun-ronin.mjs`), sehingga yang di-commit tetap dapat
+di-diff dan GLB-nya menjadi keluaran seperti bundel JavaScript.
+
+Rangkanya sungguhan: pinggul, perut, dada, leher, kepala, dua bahu, dua lengan
+berlengan-bawah dan telapak, dua paha, dua betis, dua telapak kaki. Tinggi 2,4
+satuan = 7,5 kepala. Dua klip glTF: `diam` (4s) dan `tebas` (0,95s).
+
+Yang paling menentukan bukan jumlah bagian melainkan CAHAYA BENTUK. Selama
+shader-nya hanya fresnel, ia menggambar kontur dan tidak pernah menggambar
+volume — dan sosok tanpa volume terbaca sebagai manekin kawat berapa pun pelat
+yang ditambahkan. Setengah-Lambert berpangkat 3,2 dengan sorot spekular
+per-bahan yang menutup jarak itu.
+
+**Anggaran baru: `LANGIT_MODEL_KB = 280`.** Ketika karakternya pindah dari
+primitif ke `public/ronin.glb`, beratnya berpindah ke kelas aset yang TIDAK
+diukur gerbang mana pun — bundelnya justru mengecil dan 212 KiB masuk tanpa
+satu pemeriksaan pun menyentuhnya. Gerbang yang membaik ketika beban bertambah
+adalah gerbang yang berbohong, jadi kelas asetnya diberi anggarannya sendiri.
+
+**R-V3 MERAH dan sengaja tidak ditutup (16% dari ambang 28).** Ambang 28
+dikalibrasi terhadap komposisi lama: sosok prosedural kecil yang mengisi
+seperenam bingkai, disinari rim saja. Komposisinya kini berubah total —
+humanoid GLB, pembingkaian hero, cahaya bentuk — dan pada sosok yang mengisi
+bingkai hampir setiap piksel tubuh berada di atas ambang "gelap", sehingga
+ember itu hanya menangkap pinggiran latar. Buktinya: menurunkan `uBentuk`
+hampir setengahnya hanya menggeser angkanya 15,5% -> 16%. Metriknya tidak peka
+terhadap hal yang seharusnya ia jaga.
+
+Ambangnya TIDAK diturunkan dan gerbangnya TIDAK dihapus. Ia menunggu
+kalibrasi ulang terhadap komposisi baru, dengan bukti merah-sebelum-hijau yang
+sama seperti sebelumnya. Sampai itu selesai, `ronin` berjalan 26/27 dan
+angkanya dilaporkan apa adanya.
+
 ### Dua hal yang HARUS diketahui sebelum melanjutkan Ronin
 
 **R-V3 dipersempit menjadi penjaga regresi, dan ambangnya diturunkan 45 → 28.**

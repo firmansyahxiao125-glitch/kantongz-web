@@ -40,10 +40,11 @@
  */
 
 import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Berapa lama menunggu Chrome membuka target halamannya.
@@ -73,6 +74,27 @@ const BASE = arg('base', 'http://localhost:3100');
  */
 const LANGIT_JS_KB = 1100;
 const TOLERANSI = 1.15;
+
+/**
+ * Langit-langit MODEL 3D, terpisah dari JavaScript.
+ *
+ * ── MENGAPA ANGGARAN KEDUA, BUKAN MENUMPANG YANG PERTAMA ───────────────
+ *
+ * `LANGIT_JS_KB` mengukur JavaScript, dan hanya JavaScript. Ketika samurainya
+ * pindah dari primitif dalam kode ke `public/ronin.glb`, beratnya berpindah
+ * ke kelas aset yang TIDAK DIUKUR gerbang mana pun — bundelnya justru
+ * mengecil, angkanya membaik, dan 200-an KiB masuk tanpa satu pemeriksaan
+ * pun menyentuhnya.
+ *
+ * Gerbang yang membaik justru ketika beban bertambah adalah gerbang yang
+ * berbohong. Jadi kelas asetnya diberi anggarannya sendiri, bukan
+ * dititipkan pada celah yang kebetulan terbuka.
+ *
+ * Diukur dari BERKAS di disk, bukan dari lalu lintas jaringan: ukurannya
+ * deterministik, tidak bergantung kompresi peladen, dan tetap dapat
+ * diperiksa di CI tanpa menyalakan peramban.
+ */
+const LANGIT_MODEL_KB = 280;
 
 /** Ambang laju bingkai per tingkat. Di bawah ini adalah kegagalan. */
 const AMBANG = { full: 55, lite: 30 };
@@ -332,6 +354,25 @@ await withChrome([], async (cdp) => {
 
   const kb = await bobotJs(cdp);
   const langit = Math.round(LANGIT_JS_KB * TOLERANSI);
+  /* ── anggaran MODEL 3D ────────────────────────────────────────────────
+     Berat yang berpindah dari bundel ke berkas aset tetap berat. Diukur di
+     sini supaya perpindahan itu tidak pernah terbaca sebagai penghematan. */
+  {
+    const berkasModel = join(
+      dirname(fileURLToPath(import.meta.url)),
+      '..',
+      'public',
+      'ronin.glb',
+    );
+    const adaModel = existsSync(berkasModel);
+    const kbModel = adaModel ? statSync(berkasModel).size / 1024 : 0;
+    ok(
+      'model 3D ada dan di bawah anggarannya',
+      adaModel && kbModel <= LANGIT_MODEL_KB,
+      `(${kbModel.toFixed(1)} KiB / ${String(LANGIT_MODEL_KB)} KiB)`,
+    );
+  }
+
   ok(
     `bobot JavaScript di bawah langit-langit`,
     kb <= langit,
