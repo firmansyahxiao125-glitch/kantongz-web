@@ -35,7 +35,38 @@ cd ../kantongz-api && docker compose up -d
 | `npm run build` | Build produksi (`output: 'standalone'`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
+| `npm run interior` | Gerbang 12 halaman interior (butuh API + akun; lihat bawah) |
 | `npm run screenshots` | Tangkapan layar dokumentasi (butuh Chrome) |
+
+### Gerbang halaman interior
+
+`typography` dan `render` menjaga halaman muka — halaman publik yang dapat
+dibuka tanpa sesi, dan keduanya berjalan di CI. Dua belas halaman di balik
+login tidak dapat diperiksa di sana: mereka menuntut API hidup, basis data, dan
+satu akun berdata, sementara alur peramban CI hanya menyalakan peladen
+standalone tanpa backend sama sekali.
+
+`npm run interior` menutup celah itu secara LOKAL. Yang diukur pada keluaran
+terender, bukan pada nama kelas di sumber:
+
+- satu `<h1>` per halaman, dan tidak ada lompatan tingkat heading;
+- judul kartu seragam — varian (ukuran, tebal) dihitung dari `getComputedStyle`;
+- nominal uang memakai mono, untuk elemen yang isinya memang hanya angka;
+- kontrol yang tak terlihat TETAPI masih dapat ditekan di layar sentuh —
+  opacity efektif dikalikan sepanjang rantai leluhur, bukan opacity elemennya
+  sendiri;
+- nol luapan horizontal, nol galat konsol.
+
+```bash
+npm run build
+cp -r .next/static .next/standalone/.next/static
+PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
+npm run interior -- --email you@contoh.id --password '…'
+```
+
+Statusnya **lokal, bukan CI**, dan itu dinyatakan apa adanya alih-alih
+disamarkan. Gerbang ini sudah menemukan empat cacat nyata yang lolos typecheck,
+lint, uji unit, build, kontras, dan palet.
 
 ---
 

@@ -13,6 +13,7 @@
     "palette": "node scripts/palette.mjs",
     "typography": "node scripts/typography.mjs",
     "render": "node scripts/render.mjs",
+    "interior": "node scripts/interior.mjs",
     "gates": "node scripts/gates.mjs",
     "test": "vitest run"
   },
