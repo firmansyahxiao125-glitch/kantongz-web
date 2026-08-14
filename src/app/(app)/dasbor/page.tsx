@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 import { AreaChart } from '@/components/charts/area-chart';
 import { DonutChart } from '@/components/charts/donut-chart';
+import { ProgressRing } from '@/components/charts/progress-ring';
 import { PageHeader } from '@/components/shell/page-header';
 import { QuickActions } from '@/components/shell/quick-actions';
 import { ButtonLink } from '@/components/ui/button-link';
@@ -61,18 +62,25 @@ export default function DasborPage() {
       <motion.section
         variants={stagger}
         /*
-          DUA BARIS, bukan satu deret ubin sama besar.
+          SATU BARIS BERISI EMPAT, dan hierarkinya dibawa WARNA, bukan ukuran.
 
-          Percobaan pertama memakai satu grid enam kolom dengan H1 selebar
-          tiga. Angkanya TERPOTONG: "Rp 4.723.000" dalam mono 28px menuntut
-          sekitar 310px, sementara kolom sempitnya hanya memberi 175px. Uang
-          yang terpotong bukan masalah estetika — ia salah baca.
+          Susunan sebelumnya memberi kekayaan bersih satu baris penuh untuk
+          dirinya sendiri, karena percobaan yang lebih awal lagi memotong
+          angkanya: "Rp 4.723.000" dalam mono 28px menuntut ±310px sementara
+          kolom seperenam hanya memberi 175px. Uang yang terpotong bukan
+          masalah estetika — ia salah baca.
 
-          Susunan ini memberi H1 satu baris penuh untuk dirinya, lalu tiga
-          angka pendukung berbagi baris kedua dengan lebar 1/3 masing-masing —
-          cukup untuk nominal terpanjang yang mungkin muncul.
+          Empat kolom di 1440px memberi ±330px per kartu, cukup untuk nominal
+          terpanjang yang mungkin muncul, dan gerbang interior memeriksanya
+          tiap jalanan. Di bawah 1024px turun ke dua kolom, di bawah 640px
+          menumpuk — jadi angkanya tidak pernah menyempit melewati ambang itu.
+
+          Yang HILANG dari susunan lama adalah ukuran sebagai penanda peringkat.
+          Yang menggantikannya: kuningan. Kekayaan bersih tetap satu-satunya
+          angka berwarna uang di layar ini, dan warna membedakan tanpa menuntut
+          ruang.
         */
-        className="grid gap-4"
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="Ringkasan bulan ini"
       >
         <Stat
@@ -80,12 +88,10 @@ export default function DasborPage() {
           value={d.netWorth}
           format={formatIdr}
           tone="value"
-          hero
           icon={<Wallet size={16} aria-hidden />}
           hint={`Dihitung dari ${String(d.accounts.length)} dompet`}
         />
 
-        <div className="grid gap-4 sm:grid-cols-3">
         <Stat
           label="Masuk bulan ini"
           value={d.monthIncome}
@@ -118,7 +124,6 @@ export default function DasborPage() {
           icon={<Repeat size={16} aria-hidden />}
           hint={d.monthIncome - d.monthExpense >= 0 ? 'Surplus' : 'Defisit'}
         />
-        </div>
       </motion.section>
 
       <div className="grid gap-4 xl:grid-cols-3">
@@ -205,17 +210,103 @@ export default function DasborPage() {
             </CardBody>
           </Card>
 
+          {d.goals.length > 0 ? (
+            <Card>
+              <CardBody>
+                <CardHeader
+                  title="Tujuan aktif"
+                  action={
+                    <Link href="/tujuan" className="card-action text-xs text-muted hover:text-ink">
+                      Semua tujuan
+                    </Link>
+                  }
+                />
+                {/* SATU tujuan, yang paling dekat selesai. Dasbor menjawab
+                    "bagaimana keadaanku", dan daftar lima tujuan menuntut
+                    pembacanya memilih sendiri mana yang penting — pekerjaan
+                    yang seharusnya sudah dikerjakan halaman ini. */}
+                {(() => {
+                  const tujuan = [...d.goals]
+                    .filter((g) => !g.achieved)
+                    .sort((a, b) => b.savedAmount / b.targetAmount - a.savedAmount / a.targetAmount)[0];
+                  if (!tujuan) return <p className="py-6 text-center text-sm text-dim">Semua tujuan tercapai.</p>;
+
+                  const rasio = Math.min(tujuan.savedAmount / tujuan.targetAmount, 1);
+                  return (
+                    <div className="flex items-center gap-4">
+                      <ProgressRing
+                        ratio={rasio}
+                        label={`${String(Math.round(rasio * 100))}%`}
+                        caption={`${tujuan.name}: ${String(Math.round(rasio * 100))} persen terkumpul`}
+                        tone="positive"
+                        size={84}
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-ink">{tujuan.name}</p>
+                        <p className="numeric mt-0.5 text-sm text-muted">
+                          {formatIdr(tujuan.savedAmount)}
+                          <span className="text-dim"> / {formatIdr(tujuan.targetAmount)}</span>
+                        </p>
+                        {tujuan.targetDate ? (
+                          <p className="mt-0.5 text-xs text-dim">Target {formatDate(tujuan.targetDate)}</p>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </CardBody>
+            </Card>
+          ) : null}
+
           {d.budgets.length > 0 ? (
             <Card>
               <CardBody>
                 <CardHeader
-                  title="Anggaran"
+                  title="Anggaran bulan ini"
                   action={
                     <Link href="/anggaran" className="card-action text-xs text-muted hover:text-ink">
                       Kelola
                     </Link>
                   }
                 />
+
+                {/*
+                  SATU cincin untuk seluruh anggaran, lalu rinciannya di bawah.
+
+                  Empat batang berjejer menjawab empat pertanyaan kecil dan
+                  tidak menjawab yang besar: "secara keseluruhan, aku aman atau
+                  tidak?" Cincin menjawab yang besar lebih dulu; batangnya tetap
+                  ada untuk yang ingin tahu di mana persisnya.
+                */}
+                {(() => {
+                  const jatah = d.budgets.reduce((s, b) => s + b.limit, 0);
+                  const pakai = d.budgets.reduce((s, b) => s + b.spent, 0);
+                  const rasio = jatah > 0 ? pakai / jatah : 0;
+                  const nada = rasio > 1 ? 'negative' : rasio > 0.85 ? 'caution' : 'neutral';
+
+                  return (
+                    <div className="mb-4 flex items-center gap-4">
+                      <ProgressRing
+                        ratio={rasio}
+                        label={`${String(Math.round(rasio * 100))}%`}
+                        caption={`Seluruh anggaran: ${String(Math.round(rasio * 100))} persen terpakai`}
+                        tone={nada}
+                        size={84}
+                      />
+                      <div className="min-w-0">
+                        <p className="numeric text-sm text-ink">
+                          {formatIdr(pakai)}
+                          <span className="text-dim"> / {formatIdr(jatah)}</span>
+                        </p>
+                        <p className="mt-0.5 text-xs text-dim">
+                          {rasio > 1
+                            ? `Lewat ${formatIdr(pakai - jatah)} dari seluruh jatah`
+                            : `Sisa ${formatIdr(jatah - pakai)}`}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
                 <ul className="space-y-3">
                   {d.budgets.slice(0, 4).map((budget) => {
                     const ratio = Math.min(budget.spent / budget.amount, 1);

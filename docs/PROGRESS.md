@@ -90,7 +90,7 @@ Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
 | V1 | todo | — | — | permukaan publik: landing + masuk + daftar + pulihkan |
 | V2 | selesai | b36893b | contrast hijau (2 tema) · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | token hangat + terang jadi bawaan per-permukaan |
 | V2b | selesai | ini | contrast hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | bilah sisi arang lewat `.kanvas-gelap`, nilainya dipinjam dari tema gelap yang sudah diaudit |
-| V3 | todo | — | — | dasbor — **titik henti manusia Y5 #2** |
+| V3 | selesai | ini | contrast hijau · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | empat kartu sebaris, cincin anggaran, kartu tujuan. Pemilih rentang tanggal DITUNDA — lihat catatan |
 | V4a | todo | — | — | transaksi |
 | V4b | todo | — | — | dompet |
 | V4c | todo | — | — | anggaran |
@@ -193,7 +193,19 @@ Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
 
 ## Yang terhalang
 
-Belum ada.
+**V3 · pemilih rentang tanggal di dasbor — DITUNDA, bukan dilupakan.**
+
+Mockup memperlihatkan pemilih "1 – 7 Mei 2025" di kepala dasbor. `GET
+/v1/dashboard` tidak menerima parameter rentang apa pun; seluruh angkanya
+dihitung untuk BULAN BERJALAN, dan itu tertanam di `service.ts`.
+
+Memasang pemilihnya sekarang berarti memasang kontrol yang tidak mengubah satu
+angka pun di bawahnya — kontrol palsu, yang jauh lebih buruk daripada tidak ada
+kontrol. Yang dibutuhkan lebih dulu adalah pekerjaan API: `dashboard(deps,
+userId, range)` beserta seluruh turunannya.
+
+Dijadwalkan sebagai pekerjaan API tersendiri sesudah Langkah 4. Sampai itu ada,
+kepala dasbor mengatakan apa adanya: "Ringkasan keuanganmu bulan ini."
 
 ## Tanda periksa git
 
