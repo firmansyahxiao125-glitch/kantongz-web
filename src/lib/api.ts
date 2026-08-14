@@ -75,6 +75,14 @@ export interface RequestOptions {
    */
   absolute?: boolean;
   signal?: AbortSignal;
+  /**
+   * Badan MENTAH, dikirim apa adanya beserta tipe kontennya sendiri.
+   *
+   * Dipakai satu rute: pemindaian struk, yang menerima byte gambar langsung
+   * dan bukan JSON. Membungkus gambar sebagai base64 di dalam JSON akan
+   * menumbuhkannya sepertiga dan memaksa peladen menguraikannya dua kali.
+   */
+  raw?: { body: BodyInit; contentType: string };
 }
 
 /**
@@ -96,10 +104,11 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 }
 
 async function send<T>(path: string, options: RequestOptions, mayRetry: boolean): Promise<T> {
-  const { method = 'GET', body, auth = true, absolute = false, signal } = options;
+  const { method = 'GET', body, auth = true, absolute = false, signal, raw } = options;
 
   const headers: Record<string, string> = { accept: 'application/json' };
-  if (body !== undefined) headers['content-type'] = 'application/json';
+  if (raw) headers['content-type'] = raw.contentType;
+  else if (body !== undefined) headers['content-type'] = 'application/json';
   if (auth && accessToken) headers.authorization = `Bearer ${accessToken}`;
 
   let response: Response;
@@ -107,7 +116,7 @@ async function send<T>(path: string, options: RequestOptions, mayRetry: boolean)
     response = await fetch(absolute ? path : `${BASE_URL}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: raw ? raw.body : body === undefined ? undefined : JSON.stringify(body),
       signal: signal ?? null,
       credentials: absolute ? 'same-origin' : 'omit',
     });

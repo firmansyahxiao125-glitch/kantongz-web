@@ -359,6 +359,30 @@ export const totp = {
 
 export const totpKeys = { status: ['auth', 'totp'] as const };
 
+/* ── struk ───────────────────────────────────────────────────────────── */
+
+export interface ReceiptDraft {
+  merchant: string | null;
+  /** Rupiah UTUH. `null` bila tidak ditemukan dengan yakin. */
+  total: number | null;
+  occurredAt: number | null;
+  confidence: 'tinggi' | 'sedang' | 'rendah';
+  /** Baris yang menghasilkan totalnya, supaya pengguna dapat memeriksanya. */
+  totalLine: string | null;
+}
+
+/** Batas yang sama dengan peladen — ditolak di sini supaya pengguna tahu
+ *  sebelum menunggu unggahan delapan megabita gagal. */
+export const MAX_RECEIPT_BYTES = 8 * 1024 * 1024;
+
+export const receipt = {
+  scan: (file: File) =>
+    request<ReceiptDraft>('/v1/receipts/scan', {
+      method: 'POST',
+      raw: { body: file, contentType: file.type },
+    }),
+};
+
 /* ── akun ────────────────────────────────────────────────────────────── */
 
 export const account = {

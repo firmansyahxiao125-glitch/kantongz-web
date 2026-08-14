@@ -14,7 +14,14 @@ import { Field } from '@/components/ui/field';
 import { Select } from '@/components/ui/select';
 import { isApiError } from '@/lib/api';
 import { messageFor } from '@/lib/contracts';
-import { keys, ledger, type Category, type Transaction, type WalletAccount } from '@/lib/ledger';
+import {
+  keys,
+  ledger,
+  type Category,
+  type ReceiptDraft,
+  type Transaction,
+  type WalletAccount,
+} from '@/lib/ledger';
 
 /**
  * Formulir catat / ubah transaksi.
@@ -62,20 +69,34 @@ export function TransactionDialog({
   accounts,
   categories,
   existing,
+  draft,
 }: {
   open: boolean;
   onClose: () => void;
   accounts: WalletAccount[];
   categories: Category[];
   existing?: Transaction | null;
+  /**
+   * Hasil pemindaian struk, bila formulir dibuka lewat jalan itu.
+   *
+   * TERPISAH dari `existing` dan bukan sekadar transaksi setengah jadi:
+   * `existing` menentukan formulir ini menyimpan lewat PUT ke sebuah id yang
+   * sudah ada. Rancangan tidak punya id dan tidak boleh punya — ia hanya
+   * mengisi kolom, dan yang menyimpan tetap orangnya.
+   */
+  draft?: ReceiptDraft | null;
 }) {
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      title={existing ? 'Ubah transaksi' : 'Catat transaksi'}
+      title={existing ? 'Ubah transaksi' : draft ? 'Periksa hasil pindai' : 'Catat transaksi'}
       description={
-        existing ? undefined : 'Pemasukan, pengeluaran, atau pemindahan antar dompetmu sendiri.'
+        existing
+          ? undefined
+          : draft
+            ? 'Angka di bawah dibaca dari fotomu. Betulkan yang meleset sebelum menyimpan.'
+            : 'Pemasukan, pengeluaran, atau pemindahan antar dompetmu sendiri.'
       }
     >
       <TransactionForm
@@ -83,21 +104,30 @@ export function TransactionDialog({
         accounts={accounts}
         categories={categories}
         existing={existing ?? null}
+        draft={draft ?? null}
       />
     </Dialog>
   );
 }
+
+const KEYAKINAN: Record<ReceiptDraft['confidence'], string> = {
+  tinggi: 'Terbaca jelas.',
+  sedang: 'Sebagian terbaca samar.',
+  rendah: 'Struknya sulit dibaca.',
+};
 
 function TransactionForm({
   onClose,
   accounts,
   categories,
   existing,
+  draft,
 }: {
   onClose: () => void;
   accounts: WalletAccount[];
   categories: Category[];
   existing: Transaction | null;
+  draft: ReceiptDraft | null;
 }) {
   const client = useQueryClient();
 
@@ -114,9 +144,16 @@ function TransactionForm({
       accountId: existing?.accountId ?? accounts[0]?.id ?? '',
       counterAccountId: existing?.counterAccountId ?? '',
       categoryId: existing?.categoryId ?? '',
-      amount: existing?.amount ?? ('' as unknown as number),
-      occurredAt: existing ? toDateInput(existing.occurredAt) : hariIni,
-      merchant: existing?.merchant ?? '',
+      amount: existing?.amount ?? draft?.total ?? ('' as unknown as number),
+      occurredAt: existing
+        ? toDateInput(existing.occurredAt)
+        : /* Tanggal struk hanya dipakai bila BENAR-BENAR terbaca. Nilai yang
+             tidak ditemukan pembacanya datang sebagai `null`, dan hari ini
+             adalah tebakan yang jauh lebih baik daripada 1 Januari 1970. */
+          draft?.occurredAt
+          ? toDateInput(draft.occurredAt)
+          : hariIni,
+      merchant: existing?.merchant ?? draft?.merchant ?? '',
       note: existing?.note ?? '',
     },
   });
@@ -193,6 +230,31 @@ function TransactionForm({
             : null
         }
       />
+
+      {/*
+        Sumber angkanya diperlihatkan, bukan disembunyikan.
+
+        `totalLine` adalah baris MENTAH yang menghasilkan nominal di bawah.
+        Menampilkannya membuat salah baca dapat dikenali dalam sekejap — "TOTAL
+        Rp 40.500" yang menjadi 405.000 terlihat seketika bila barisnya ada di
+        sebelahnya, dan tidak terlihat sama sekali bila hanya angkanya yang
+        muncul. Keyakinan rendah tidak menolak hasilnya; ia hanya mengatakan
+        seberapa keras kolom-kolomnya perlu diperiksa.
+      */}
+      {draft ? (
+        <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-2)] p-3.5">
+          <p className="text-xs text-muted">
+            {KEYAKINAN[draft.confidence]} Periksa jumlah dan tanggalnya.
+          </p>
+          {draft.totalLine ? (
+            <p className="numeric mt-1.5 text-sm break-words text-ink">“{draft.totalLine}”</p>
+          ) : (
+            <p className="mt-1.5 text-sm text-ink">
+              Baris totalnya tidak ketemu — isi jumlahnya sendiri.
+            </p>
+          )}
+        </div>
+      ) : null}
 
       <Select
         label="Jenis"

@@ -3,9 +3,10 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ArrowDownLeft, ArrowUpRight, Pencil, Plus, Repeat, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import { ReceiptScanButton } from '@/components/ledger/receipt-scan';
 import { TransactionDialog } from '@/components/ledger/transaction-dialog';
 import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import { formatDate, formatIdr } from '@/lib/format';
 import {
   keys,
   ledger,
+  type ReceiptDraft,
   type Transaction,
   type TransactionKind,
   type TransactionPage,
@@ -30,6 +32,7 @@ export default function TransaksiPage() {
   const [kind, setKind] = useState<TransactionKind | ''>('');
   const [accountId, setAccountId] = useState('');
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const [draft, setDraft] = useState<ReceiptDraft | null>(null);
   const [open, setOpen] = useState(false);
 
   const accountsQuery = useQuery({ queryKey: keys.accounts, queryFn: ledger.accounts });
@@ -68,6 +71,15 @@ export default function TransaksiPage() {
     },
   });
 
+  /* Rancangan mengisi formulir yang SAMA, bukan formulir keduanya sendiri.
+     Satu tempat untuk menyimpan transaksi berarti satu tempat untuk aturan
+     jumlah, tanggal, dan kategorinya. */
+  const bukaRancangan = useCallback((hasil: ReceiptDraft) => {
+    setEditing(null);
+    setDraft(hasil);
+    setOpen(true);
+  }, []);
+
   const accounts = accountsQuery.data ?? [];
   const categories = categoriesQuery.data ?? [];
   const items = list.data?.pages.flatMap((page) => page.items) ?? [];
@@ -91,16 +103,24 @@ export default function TransaksiPage() {
         title="Transaksi"
         description="Seluruh catatan masuk, keluar, dan transfer antar dompet."
         actions={
-          <Button
-            icon={<Plus size={16} aria-hidden />}
-            disabled={accounts.length === 0}
-            onClick={() => {
-              setEditing(null);
-              setOpen(true);
-            }}
-          >
-            Catat transaksi
-          </Button>
+          <>
+            {/* Keduanya mati sebelum ada dompet, dan karena alasan yang sama:
+                transaksi selalu tercatat pada sebuah dompet, jadi memindai
+                struk lebih dulu hanya akan berakhir di formulir yang tidak
+                dapat disimpan. */}
+            <ReceiptScanButton disabled={accounts.length === 0} onDraft={bukaRancangan} />
+            <Button
+              icon={<Plus size={16} aria-hidden />}
+              disabled={accounts.length === 0}
+              onClick={() => {
+                setEditing(null);
+                setDraft(null);
+                setOpen(true);
+              }}
+            >
+              Catat transaksi
+            </Button>
+          </>
         }
       >
         {/* Penyaring berada DI BAWAH judul, bukan menggantikannya. Labelnya
@@ -385,10 +405,12 @@ export default function TransaksiPage() {
         onClose={() => {
           setOpen(false);
           setEditing(null);
+          setDraft(null);
         }}
         accounts={accounts}
         categories={categories}
         existing={editing}
+        draft={draft}
       />
     </div>
   );
