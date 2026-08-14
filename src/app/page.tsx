@@ -13,7 +13,7 @@ import { RevealObserver } from '@/components/ui/reveal-observer';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
 import { HeroParallax } from '@/components/three/hero-parallax';
-import { MascotScene } from '@/components/three/mascot-scene';
+import { RoninScene } from '@/components/three/ronin-scene';
 
 export const metadata: Metadata = {
   title: 'KANTONGZ — Uangmu, dengan mesin yang mengawasinya',
@@ -166,13 +166,17 @@ export default function LandingPage() {
           </div>
 
           {/*
-            Maskot. `aria-hidden` di dalam `MascotScene`, dan namanya
-            diperkenalkan lewat teks di bawahnya — pembaca layar bertemu
-            "Bruang" sebagai kata, bukan sebagai kanvas yang tak terbaca.
+            RONIN. ROADMAP §7.1.
+
+            Kanvasnya `aria-hidden` — isinya sudah disampaikan teks di
+            sekelilingnya — tetapi PANGGUNGNYA adalah tombol bernama, satu
+            perhentian Tab, yang menanggapi Enter dan Spasi persis seperti
+            klik. Interaksi yang hanya dapat dicapai tetikus adalah interaksi
+            yang separuh penontonnya tidak punya.
           */}
           <div className="relative lg:col-span-5">
             <HeroParallax>
-              <MascotScene className="mx-auto aspect-square w-full max-w-[30rem]" />
+              <RoninScene className="mx-auto aspect-square w-full max-w-[30rem]" />
             </HeroParallax>
 
             <Rise index={2}>

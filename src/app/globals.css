@@ -93,6 +93,20 @@
    */
   --color-identity-none: #7f7f8b;
 
+  /*
+   * ENERGI RONIN — permukaan publik saja. ROADMAP §7.1.
+   *
+   * Hijau jenuh di atas hampir-hitam, satu-satunya warna yang bersaing di
+   * halaman muka. Ia TIDAK pernah masuk ke permukaan dalam-aplikasi: di sana
+   * hijau berarti "positif" dan memakai zamrud teredam, dan dua hijau dengan
+   * dua arti di satu produk adalah dua arti yang akan tertukar.
+   *
+   * Bukan hijau Tailwind mana pun — dicari supaya tepi yang menyala terbaca
+   * sebagai cahaya, bukan sebagai garis stabilo.
+   */
+  --color-ronin: #35f58c;
+  --color-ronin-bright: #c9ffe4;
+
   /* ── sinyal: semantik, TERPISAH dari aksen (DESIGN §7) ──────────────────
      Tidak pernah berdiri sendiri tanpa bentuk atau label — sepuluh persen
      laki-laki tidak dapat membedakan positif dari negatif lewat warna saja. */
