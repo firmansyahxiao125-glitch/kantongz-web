@@ -175,6 +175,42 @@ export const ledger = {
     request<CashflowPoint[]>(`/v1/analytics/cashflow${query({ ...params })}`),
 };
 
+/* ── impor ───────────────────────────────────────────────────────────── */
+
+export interface ImportRow {
+  accountId: string;
+  counterAccountId?: string;
+  categoryId?: string;
+  kind: TransactionKind;
+  amount: number;
+  occurredAt: number;
+  merchant?: string;
+  note?: string;
+}
+
+export interface ImportOutcome {
+  index: number;
+  status: 'imported' | 'duplicate' | 'error';
+  reason: string | null;
+}
+
+export interface ImportReport {
+  total: number;
+  imported: number;
+  duplicate: number;
+  failed: number;
+  dryRun: boolean;
+  results: ImportOutcome[];
+}
+
+/** Batas yang sama dengan peladen. Ditolak di sini supaya pengguna tahu lebih dulu. */
+export const MAX_IMPORT_ROWS = 500;
+
+export const impor = {
+  jalankan: (rows: ImportRow[], dryRun: boolean) =>
+    request<ImportReport>('/v1/transactions/import', { method: 'POST', body: { dryRun, rows } }),
+};
+
 /* ── aturan berulang ─────────────────────────────────────────────────── */
 
 export type Cadence = 'daily' | 'weekly' | 'monthly';

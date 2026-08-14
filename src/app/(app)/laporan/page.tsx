@@ -5,6 +5,7 @@ import { Download, Printer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import { CsvImportButton } from '@/components/ledger/csv-import';
 import { PageHeader } from '@/components/shell/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
@@ -109,7 +110,12 @@ export default function LaporanPage() {
             />
           </div>
 
-          <div className="ml-auto flex gap-2">
+          {/* Impor berdiri DI SEBELAH ekspor, dan itu bukan kebetulan tata
+              letak: berkas yang keluar dari tombol kanan adalah berkas yang
+              masuk lewat tombol ini. Menaruhnya di halaman lain akan membuat
+              orang mengira keduanya format yang berbeda. */}
+          <div className="ml-auto flex flex-wrap gap-2">
+            <CsvImportButton accounts={accounts.data ?? []} categories={categories.data ?? []} />
             <Button
               variant="secondary"
               icon={<Printer size={16} aria-hidden />}
