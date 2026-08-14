@@ -36,6 +36,19 @@ Turun di bawah angka mana pun di sini adalah regresi.
 | gerbang | interior hijau · alur hijau · security 21/21 · palette 4/4 · contrast hijau |
 | CI | hijau di ubuntu-latest, kedua repositori, termasuk pekerjaan `keamanan` |
 
+> **Flake CI yang ditemukan dan ditutup — 14 Agustus 2026.** Gerbang peramban
+> di CI (`typography`, `render`) gagal dua commit berturut-turut dengan pesan
+> "Chrome tidak pernah membuka target halaman", lalu HIJAU pada commit
+> berikutnya yang hanya mengubah markdown. Kode sama persis, hasil berbeda.
+>
+> Sebabnya bukan gelung polling yang salah — itu sudah benar. Sebabnya
+> ANGGARAN WAKTUNYA: 60 × 250ms = 15 detik, cukup di laptop panas, tidak cukup
+> di runner dingin yang sambil menyalakan peladen Next. Kini 40 detik, sebagai
+> konstanta bernama `MAKS_TARGET` di keenam skrip gerbang sekaligus.
+>
+> Kalau gerbang peramban gagal lagi dengan kalimat itu, periksa dulu apakah
+> runnernya kehabisan waktu — bukan apakah kodenya rusak.
+
 > Catatan verifikasi: `security` sempat gagal pada jalanan pertama sesi ini.
 > Penyebabnya BUKAN kode — sebuah proses API liar di porta 3999, sisa uji CI
 > sebelumnya, berbagi basis data yang sama dengan bahan kunci yang berbeda.
