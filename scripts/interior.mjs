@@ -253,19 +253,27 @@ async function main() {
   const chrome = spawn(findChrome(), [
     '--headless=new', `--remote-debugging-port=${String(PORT)}`, `--user-data-dir=${PROFILE}`,
     '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--hide-scrollbars',
+    /* Sama dengan `typography.mjs` dan `render.mjs`: runner CI berjalan sebagai
+       root di dalam kontainer, dan tanpa ini Chrome menolak start. Gerbang ini
+       belum berjalan di CI, tetapi bendera yang hilang adalah jenis perbedaan
+       yang baru ketahuan saat seseorang memindahkannya ke sana. */
+    '--no-sandbox',
   ], { stdio: 'ignore' });
 
   let gagal = 0;
 
   try {
     let target = null;
+    /* Tidur di SETIAP putaran yang belum menemukan target, bukan hanya saat
+       fetch melempar — Chrome dapat menjawab sebelum target halamannya ada. */
     for (let i = 0; i < 60 && target === null; i += 1) {
       try {
         const list = await (await fetch(`http://127.0.0.1:${String(PORT)}/json/list`)).json();
         target = list.find((t) => t.type === 'page') ?? null;
-      } catch { await sleep(250); }
+      } catch { /* belum menerima sambungan */ }
+      if (target === null) await sleep(250);
     }
-    if (target === null) throw new Error('Chrome tidak pernah membuka port debug.');
+    if (target === null) throw new Error('Chrome tidak pernah membuka target halaman.');
 
     const cdp = await connect(target.webSocketDebuggerUrl);
 

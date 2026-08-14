@@ -376,13 +376,23 @@ async function main() {
   let cdp = null;
   try {
     let target = null;
+    /* Tidur di SETIAP putaran yang belum menemukan target, bukan hanya saat
+       fetch melempar.
+
+       Sebelumnya `sleep` hanya ada di `catch`, jadi ketika Chrome sudah
+       menjawab `/json/list` tetapi BELUM membuat target halaman — jendela yang
+       nyata dan pendek — keenam puluh putaran habis dalam hitungan milidetik.
+       Gerbangnya lalu gagal dengan kalimat yang menyesatkan: portanya justru
+       sudah terbuka. Teramati sebagai kegagalan CI yang lolos hijau pada
+       commit sebelumnya dan berikutnya. */
     for (let i = 0; i < 60 && target === null; i += 1) {
       try {
         const res = await fetch(`http://127.0.0.1:${String(PORT)}/json/list`);
         target = (await res.json()).find((t) => t.type === 'page') ?? null;
-      } catch { await sleep(250); }
+      } catch { /* belum menerima sambungan */ }
+      if (target === null) await sleep(250);
     }
-    if (target === null) throw new Error('Chrome tidak pernah membuka port debug.');
+    if (target === null) throw new Error('Chrome tidak pernah membuka target halaman.');
 
     cdp = await Cdp.connect(target.webSocketDebuggerUrl);
     await cdp.send('Page.enable');

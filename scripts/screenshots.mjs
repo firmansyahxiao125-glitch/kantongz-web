@@ -308,16 +308,19 @@ async function main() {
        Durasi tetap terlalu pendek pada mesin lambat dan terlalu panjang pada
        mesin cepat, dan yang pertama gagal secara acak. */
     let target = null;
+    /* Tidur di SETIAP putaran yang belum menemukan target, bukan hanya saat
+       fetch melempar — Chrome dapat menjawab sebelum target halamannya ada. */
     for (let attempt = 0; attempt < 60 && target === null; attempt += 1) {
       try {
         const response = await fetch(`http://127.0.0.1:${String(PORT)}/json/list`);
         const targets = await response.json();
         target = targets.find((t) => t.type === 'page') ?? null;
       } catch {
-        await sleep(250);
+        /* belum menerima sambungan */
       }
+      if (target === null) await sleep(250);
     }
-    if (target === null) throw new Error('Chrome tidak pernah membuka port debug.');
+    if (target === null) throw new Error('Chrome tidak pernah membuka target halaman.');
 
     const cdp = await Cdp.connect(target.webSocketDebuggerUrl);
     await cdp.send('Page.enable');
