@@ -187,6 +187,20 @@ export function RoninScene({ className }: { className?: string }) {
       onPointerMove={(e) => {
         arahkan(e.clientX, e.clientY);
       }}
+      /*
+        Menekan panggungnya juga menebas — tetapi lewat PENUNJUK saja.
+
+        Ini sengaja tidak dijadikan `role="button"` dan tidak diberi
+        `tabIndex`: kendali papan tiknya sudah ada di bawah, dan menambah
+        perhentian Tab kedua yang melakukan hal yang sama persis hanya
+        memperpanjang perjalanan tanpa menambah kemampuan.
+
+        Klik yang berasal DARI tombolnya diabaikan, kalau tidak satu tekanan
+        akan menebas dua kali dan lapisannya langsung tertutup lagi.
+      */
+      onClick={(e) => {
+        if (!(e.target as HTMLElement).closest('button')) tebas();
+      }}
       onTouchMove={(e) => {
         const t = e.touches[0];
         if (t) arahkan(t.clientX, t.clientY);
@@ -206,12 +220,26 @@ export function RoninScene({ className }: { className?: string }) {
       )}
 
       {/*
-        PANGGUNGNYA SENDIRI ADALAH TOMBOLNYA.
+        TOMBOLNYA TERLIHAT, DAN ITU PERBAIKAN — BUKAN KOMPROMI.
 
-        Satu perhentian Tab, bernama, dengan cincin fokus yang terlihat. Enter
-        dan Spasi melakukan persis yang dilakukan klik. Tanpa ini, tebasan
-        hanya dapat dicapai tetikus — dan gerbang `akses` akan menolaknya,
-        dengan benar.
+        Versi sebelumnya menjadikan SELURUH panggung satu tombol `inset-0`
+        yang tak terlihat. Niatnya benar (tebasan harus dapat dicapai papan
+        tik), tetapi hasilnya salah dua kali.
+
+        Pertama, gerbang `akses` menolaknya, dan alasannya sah: kotak
+        fokusnya setinggi 480 piksel dengan puncak jauh di atas baris CTA,
+        jadi Tab dari "Masuk ke akun" melompat ke atas melewati ambang 240
+        piksel. Pengguna papan tik kehilangan tempatnya di halaman.
+
+        Kedua — dan ini lebih penting daripada gerbangnya — tombol tak
+        terlihat adalah tombol yang tidak diketahui siapa pun. Satu-satunya
+        petunjuk keberadaannya adalah cincin fokus yang baru muncul SESUDAH
+        seseorang menebak untuk menekan Tab ke sana.
+
+        Jadi kendalinya menjadi tombol sungguhan di bawah panggung: terlihat,
+        bernama, dan berada persis di tempat urutan bacanya. Menekan
+        panggungnya sendiri TETAP menebas lewat penunjuk — kesenangan itu
+        tidak hilang, ia hanya berhenti menjadi satu-satunya jalan masuk.
       */}
       <button
         type="button"
@@ -222,8 +250,10 @@ export function RoninScene({ className }: { className?: string }) {
             ? 'Tutup ringkasan keuangan contoh'
             : 'Tebas — perlihatkan ringkasan keuangan contoh'
         }
-        className="absolute inset-0 cursor-pointer rounded-[var(--radius-xl)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ronin)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+        className="absolute inset-x-0 bottom-0 z-20 mx-auto flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface)_78%,transparent)] px-4 py-2 text-xs font-medium text-ink backdrop-blur-md transition-colors outline-none hover:border-[var(--color-ronin)] focus-visible:ring-2 focus-visible:ring-[var(--color-ronin)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
       >
+        <span aria-hidden>{terbuka ? '✕' : '⚔'}</span>
+        {terbuka ? 'Tutup' : 'Tebas'}
         <span className="sr-only">
           {terbuka ? 'Ringkasan terbuka. Tekan Escape untuk menutup.' : 'Tekan untuk menebas.'}
         </span>
@@ -236,7 +266,7 @@ export function RoninScene({ className }: { className?: string }) {
       */}
       <div
         aria-live="polite"
-        className="pointer-events-none absolute inset-x-4 bottom-4 z-10"
+        className="pointer-events-none absolute inset-x-4 bottom-14 z-10"
       >
         {terbuka ? (
           <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface)_82%,transparent)] p-4 backdrop-blur-md">

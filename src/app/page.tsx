@@ -181,8 +181,8 @@ export default function LandingPage() {
 
             <Rise index={2}>
               <p className="text-center text-xs text-dim">
-                <span className="text-muted">Bruang</span> — mengawasi bukumu, dan melambai
-                kalau kamu lama menatapnya
+                <span className="text-muted">Ronin</span> — penjaga bukumu. Tekan Tebas untuk
+                melihat ringkasan contoh
               </p>
             </Rise>
           </div>

@@ -39,7 +39,8 @@ export function RoninDiam({ menebas = false }: { menebas?: boolean }) {
             left: '27%',
             width: '46%',
             height: '13%',
-            background: 'var(--color-titanium-base)',
+            background: 'color-mix(in oklab, var(--color-ronin) 20%, black)',
+            border: '1px solid color-mix(in oklab, var(--color-ronin) 62%, transparent)',
             clipPath: 'polygon(0% 100%, 50% 0%, 100% 100%)',
           }}
         />
@@ -47,7 +48,7 @@ export function RoninDiam({ menebas = false }: { menebas?: boolean }) {
         {/* kepala di bawah bayangan caping */}
         <div
           className="absolute rounded-full"
-          style={{ top: '30%', left: '43%', width: '14%', height: '10%', background: 'var(--color-titanium-deep)' }}
+          style={{ top: '30%', left: '43%', width: '14%', height: '10%', background: 'color-mix(in oklab, var(--color-ronin) 14%, black)', border: '1px solid color-mix(in oklab, var(--color-ronin) 55%, transparent)' }}
         />
         {/* celah mata — satu-satunya bagian yang menyala */}
         <div
@@ -72,7 +73,8 @@ export function RoninDiam({ menebas = false }: { menebas?: boolean }) {
               left: sisi === -1 ? '28%' : '58%',
               width: '14%',
               height: '7%',
-              background: 'var(--color-titanium-raised)',
+              background: 'color-mix(in oklab, var(--color-ronin) 30%, black)',
+              border: '1px solid var(--color-ronin)',
               transform: `rotate(${String(sisi * 14)}deg)`,
             }}
           />
@@ -86,7 +88,8 @@ export function RoninDiam({ menebas = false }: { menebas?: boolean }) {
             left: '39%',
             width: '22%',
             height: '26%',
-            background: 'var(--color-titanium-base)',
+            background: 'color-mix(in oklab, var(--color-ronin) 20%, black)',
+            border: '1px solid color-mix(in oklab, var(--color-ronin) 62%, transparent)',
             clipPath: 'polygon(6% 0%, 94% 0%, 78% 100%, 22% 100%)',
           }}
         />
@@ -101,7 +104,8 @@ export function RoninDiam({ menebas = false }: { menebas?: boolean }) {
               left: sisi === -1 ? '41%' : '54%',
               width: '5%',
               height: '18%',
-              background: 'var(--color-titanium-deep)',
+              background: 'color-mix(in oklab, var(--color-ronin) 14%, black)',
+              border: '1px solid color-mix(in oklab, var(--color-ronin) 55%, transparent)',
               transform: `rotate(${String(sisi * 6)}deg)`,
             }}
           />

@@ -422,12 +422,52 @@ async function alurImpor(cdp) {
 
   await goto(cdp, `${BASE}/laporan`, 7000);
 
+  /*
+   * Tanggalnya dihitung MUNDUR DARI HARI INI, bukan ditulis sebagai tanggal
+   * mutlak — dan itu memperbaiki bom waktu, bukan sekadar merapikan.
+   *
+   * Versi sebelumnya memakai 14–17/08/2026, ditulis pada bulan itu juga.
+   * Tiga dari empat barisnya karena itu bertanggal MASA DEPAN, dan daftar
+   * transaksi tidak menampilkan transaksi yang belum terjadi. Gerbangnya
+   * lulus di hari ia ditulis lalu membusuk diam-diam: hari ini ia melaporkan
+   * tiga kegagalan pada impor yang sebenarnya BEKERJA SEMPURNA — unggahan
+   * kedua menemukan ketiga barisnya sebagai duplikat, jadi datanya jelas
+   * masuk. Yang rusak verifikasinya, bukan fiturnya.
+   *
+   * Tiga hari terakhir selalu ada di masa lalu dan selalu di dalam periode
+   * berjalan kecuali dijalankan pada dua hari pertama bulan — dan pada kasus
+   * itu pun ia tetap tanggal yang sah, hanya jatuh di periode sebelumnya.
+   */
+  const hariLalu = (n) => {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${String(d.getFullYear())}`;
+  };
+
+  /*
+   * Baris pembukti "hari-dulu" butuh tanggal yang HARINYA <= 12.
+   *
+   * Penegasannya membuktikan `12/08` dibaca 12 Agustus, bukan 8 Desember.
+   * Pada tanggal 20, `20/08` tidak mungkin dibaca bulan-dulu sama sekali —
+   * bulan ke-20 tidak ada — jadi penegasannya lulus tanpa membuktikan apa
+   * pun. Yang dicari karena itu tanggal lampau terdekat yang harinya masih
+   * bisa disalahartikan sebagai bulan.
+   */
+  const MASA = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const bidik = new Date();
+  bidik.setDate(bidik.getDate() - 1);
+  while (bidik.getDate() > 12) bidik.setDate(bidik.getDate() - 1);
+  const bidikCsv = `${String(bidik.getDate()).padStart(2, '0')}/${String(bidik.getMonth() + 1).padStart(2, '0')}/${String(bidik.getFullYear())}`;
+  const bidikTampil = `${String(bidik.getDate())} ${MASA[bidik.getMonth()]}`;
+
   const csv = [
     'Tanggal,Jenis,Dompet,Kategori,Merchant,Catatan,Jumlah',
-    `14/08/2026,Pengeluaran,${dompetNyata},,Kopi ${CAP},"Rapat pagi, berdua",25.000`,
-    `15/08/2026,Pengeluaran,${dompetNyata},,Bensin ${CAP},,150.000`,
-    `16/08/2026,Pemasukan,${dompetNyata},,Bonus ${CAP},,2.500.000`,
-    `17/08/2026,Pengeluaran,Dompet Yang Tidak Ada,,Hantu ${CAP},,10.000`,
+    `${bidikCsv},Pengeluaran,${dompetNyata},,Kopi ${CAP},"Rapat pagi, berdua",25.000`,
+    `${hariLalu(1)},Pengeluaran,${dompetNyata},,Bensin ${CAP},,150.000`,
+    `${hariLalu(0)},Pemasukan,${dompetNyata},,Bonus ${CAP},,2.500.000`,
+    `${hariLalu(3)},Pengeluaran,Dompet Yang Tidak Ada,,Hantu ${CAP},,10.000`,
     `kemarin,Pengeluaran,${dompetNyata},,Rusak ${CAP},,10.000`,
   ].join('\r\n');
 
@@ -460,7 +500,7 @@ async function alurImpor(cdp) {
   ok('ketiganya masuk ke buku besar', teks.includes(`Kopi ${CAP}`) && teks.includes(`Bensin ${CAP}`) && teks.includes(`Bonus ${CAP}`));
   ok('yang rusak TIDAK masuk', !teks.includes(`Rusak ${CAP}`) && !teks.includes(`Hantu ${CAP}`));
   ok('titik ribuan dibaca benar', /Rp\s25\.000/.test(teks) && /Rp\s2\.500\.000/.test(teks));
-  ok('tanggal hari-dulu dibaca benar', /14 Agu|14 Agustus/.test(teks));
+  ok('tanggal hari-dulu dibaca benar', teks.includes(bidikTampil), `(${bidikTampil})`);
 
   /* Diunggah lagi: TIDAK menggandakan apa pun. */
   await goto(cdp, `${BASE}/laporan`, 7000);

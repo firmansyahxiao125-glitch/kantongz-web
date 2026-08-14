@@ -2,7 +2,7 @@
 
 import { Bloom, DepthOfField, EffectComposer, Vignette } from '@react-three/postprocessing';
 
-import { Bara, Ronin, type KendaliRonin } from '@/components/three/ronin';
+import { Bara, Lingkungan, Ronin, type KendaliRonin } from '@/components/three/ronin';
 import { Stage } from '@/components/three/stage';
 import { RoninDiam } from '@/components/three/ronin-diam';
 
@@ -16,11 +16,21 @@ import { RoninDiam } from '@/components/three/ronin-diam';
  * yang tingkat grafisnya tidak akan pernah menjalankannya.
  */
 export default function RoninCanvas({ kendali }: { kendali: { current: KendaliRonin } }) {
+  /*
+   * Jaraknya DIRAPATKAN 7,4 -> 5,9.
+   *
+   * Pada 7,4 samurainya hanya mengisi kira-kira seperenam bingkai, dan sisanya
+   * langit kosong. Itu bukan sekadar soal selera: pahatan yang dibayar mahal —
+   * kusazuri, sode berlapis, lengkung bilah — semuanya berada di bawah dua
+   * piksel pada jarak itu, jadi biayanya dibayar tanpa ada yang melihat
+   * hasilnya.
+   */
   return (
-    <Stage className="size-full" distance={7.4} parallax={0.34} fallback={<RoninDiam />}>
+    <Stage className="size-full" distance={5.9} parallax={0.34} fallback={<RoninDiam />}>
       {(tier) => (
         <>
           <Ronin tier={tier} kendali={kendali} />
+          <Lingkungan tier={tier} />
           <Bara tier={tier} />
 
           {tier === 'full' ? (

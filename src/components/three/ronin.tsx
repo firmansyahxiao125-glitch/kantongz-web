@@ -88,12 +88,13 @@ const FRAGMENT = /* glsl */ `
  * pelat bahu, tsuba — dan tetap dijepit di shader supaya ia tidak pernah
  * membanjiri permukaan.
  */
-function useZirah(kuat = 1, pangkat = 5) {
+function useZirah(kuat = 1, pangkat = 5, duaSisi = false) {
   return useMemo(
     () =>
       new THREE.ShaderMaterial({
         vertexShader: VERTEX,
         fragmentShader: FRAGMENT,
+        side: duaSisi ? THREE.DoubleSide : THREE.FrontSide,
         uniforms: {
           uDalam: { value: new THREE.Color(MATERIAL.nearBlack) },
           uTepi: { value: new THREE.Color(TOKEN.ronin) },
@@ -101,7 +102,7 @@ function useZirah(kuat = 1, pangkat = 5) {
           uKuat: { value: kuat },
         },
       }),
-    [kuat, pangkat],
+    [kuat, pangkat, duaSisi],
   );
 }
 
@@ -136,8 +137,65 @@ export function Ronin({ tier, kendali }: RoninProps) {
   const jejak = useRef<THREE.Mesh>(null);
   const nafas = useRef(0);
 
+  /*
+   * EMPAT bahan, bukan satu.
+   *
+   * Zirah sungguhan tidak terbuat dari satu benda. Yang membuat model
+   * prosedural terbaca sebagai baju perang alih-alih sebagai boneka adalah
+   * perbedaan antara pelat yang menangkap cahaya dan kain yang meredamnya —
+   * dan perbedaan itu dibuat oleh KETAJAMAN rim-nya, bukan oleh warnanya.
+   *
+   *   zirahTerang  pita paling lebar dan paling kuat: helm, sode, tsuba.
+   *                Bagian yang mata cari lebih dulu.
+   *   zirah        pelat biasa — dō, kusazuri, tungkai.
+   *   kain         pita paling tipis dan paling lemah: hakama dan jubah.
+   *                Kain memang tidak berkilat, dan pinggirnya yang nyaris
+   *                padam itulah yang membuatnya terbaca sebagai kain.
+   *   saya         sarung pedang: gelap, tetapi pinggirnya tegas. Kayu
+   *                dipernis, bukan logam dan bukan kain.
+   */
   const zirah = useZirah();
   const zirahTerang = useZirah(1.25, 4);
+  const kain = useZirah(0.55, 6.5);
+  const saya = useZirah(0.9, 5.5);
+  /* Jubah adalah permukaan terbuka — punggungnya ikut terlihat, jadi ia harus
+     dirender dua sisi. Tanpa itu ia lenyap begitu sosoknya berputar. */
+  const kainJubah = useZirah(0.34, 7, true);
+
+  /*
+   * Baja bilah: rim PALING sempit di seluruh berkas ini.
+   *
+   * Bilah adalah lempeng tipis, dan lempeng tipis terlihat dari sudut nyaris
+   * menyerempet di hampir seluruh permukaannya. Dengan bahan zirah biasa
+   * seluruh bilah menyala putih dan katananya berubah menjadi tabung neon.
+   * Pangkat 8 membuat hanya punggung dan sisi bilah yang menangkap cahaya;
+   * mukanya tetap baja gelap, dan satu-satunya yang benar-benar memancar
+   * adalah ha-nya.
+   */
+  const baja = useZirah(0.7, 8);
+
+  /*
+   * Lengkung bilah, dihitung sekali.
+   *
+   * Katana melengkung; pedang lurus adalah pedang Eropa, dan mata langsung
+   * tahu bedanya walau tidak bisa menyebutkan alasannya. Lengkungnya disusun
+   * dari beberapa ruas pendek yang masing-masing sedikit lebih miring —
+   * murah, dan pada tebal sekecil ini tak terbedakan dari lengkung sungguhan.
+   */
+  const ruasBilah = useMemo(() => {
+    const ruas: { x: number; y: number; a: number }[] = [];
+    const panjang = 0.3;
+    let x = 0;
+    let y = 0;
+    let a = 0;
+    for (let i = 0; i < 5; i += 1) {
+      ruas.push({ x: x + (Math.cos(a) * panjang) / 2, y: y + (Math.sin(a) * panjang) / 2, a });
+      x += Math.cos(a) * panjang;
+      y += Math.sin(a) * panjang;
+      a += 0.052;
+    }
+    return ruas;
+  }, []);
 
   /* Bilah: hijau nyaris putih, ADITIF, jadi ia benar-benar menyala alih-alih
      sekadar berwarna terang. Ini yang ditangkap bloom. */
@@ -230,47 +288,150 @@ export function Ronin({ tier, kendali }: RoninProps) {
             tertutup itulah yang membuat siluetnya terbaca sebagai samurai
             alih-alih sebagai orang. */}
         <group ref={kepala} position={[0, 1.42, 0]}>
-          <mesh position={[0, 0.06, 0]} material={zirahTerang}>
-            <coneGeometry args={[0.62, 0.3, segmen]} />
+          {/*
+              Capingnya DINAIKKAN, dan itu bukan penyesuaian selera.
+
+              Pada tinggi semula bibirnya berada hanya 0,025 di atas celah
+              mata. Kamera memandang sedikit dari atas, jadi bibir selebar 0,66
+              itu menutupi persis satu-satunya bagian wajah yang ada — dan
+              wajah tanpa mata yang menyala kehilangan satu-satunya titik yang
+              membuat siluetnya terasa MEMANDANG BALIK.
+
+              Dinaikkan 0,09, celahnya kembali terlihat tanpa capingnya
+              kehilangan sifatnya yang rendah dan menutupi.
+          */}
+          <mesh position={[0, 0.16, 0]} material={zirahTerang}>
+            <coneGeometry args={[0.68, 0.32, segmen]} />
           </mesh>
-          <mesh position={[0, -0.08, 0]} material={zirah}>
+          {/* Bibir caping — cincin tipis di pinggir bawahnya. Kerucut polos
+              berakhir pada satu garis; caping sungguhan punya TEBAL, dan
+              tebal setipis ini yang menangkap rim dua kali. */}
+          <mesh position={[0, 0.04, 0]} rotation={[Math.PI / 2, 0, 0]} material={zirahTerang}>
+            <torusGeometry args={[0.66, 0.022, 6, segmen]} />
+          </mesh>
+
+          {/* ── maedate ───────────────────────────────────────────────
+              Lambang bulan sabit di kening. Satu lengkung, dan siluetnya
+              berhenti terbaca sebagai orang bertopi lalu mulai terbaca
+              sebagai orang berperang. */}
+          <mesh
+            position={[0, 0.21, 0.28]}
+            rotation={[0.42, 0, 0]}
+            material={zirahTerang}
+          >
+            <torusGeometry args={[0.2, 0.028, 6, segmen, Math.PI * 1.1]} />
+          </mesh>
+
+          <mesh position={[0, -0.09, 0]} material={zirah}>
             <sphereGeometry args={[0.19, segmen, segmen]} />
           </mesh>
+
+          {/* menpō — pelindung RAHANG, dan hanya rahang. Versi pertamanya
+              dipasang setinggi mata dan menelan celahnya: wajahnya berubah
+              menjadi segitiga gelap tanpa apa pun di dalamnya. Ia diturunkan
+              ke bawah garis mata, tempat pelindung wajah sungguhan berada. */}
+          <mesh position={[0, -0.2, 0.075]} rotation={[0.5, 0, 0]} material={zirah}>
+            <boxGeometry args={[0.19, 0.13, 0.12]} />
+          </mesh>
+
           {/* celah mata — satu-satunya bagian wajah yang ada, dan ia menyala */}
-          <mesh position={[0, -0.06, 0.17]} material={bilahMat}>
-            <boxGeometry args={[0.17, 0.022, 0.02]} />
+          <mesh position={[0, -0.075, 0.185]} material={bilahMat}>
+            <boxGeometry args={[0.2, 0.026, 0.02]} />
           </mesh>
         </group>
 
-        {/* ── bahu zirah ────────────────────────────────────────────────
-            Pelat bersudut, bukan bulat. Sudut yang menangkap rim light itulah
-            yang memberi bahu beratnya. */}
+        {/* ── sode: bahu BERLAPIS ────────────────────────────────────────
+            Tiga pelat bertumpuk, makin ke bawah makin lebar, masing-masing
+            sedikit lebih miring. Satu kotak besar terbaca sebagai bantalan;
+            yang membuatnya terbaca sebagai zirah adalah GARIS di antara
+            lapisannya — dan tiap garis itu satu tepi lagi yang menangkap
+            cahaya. */}
         {[-1, 1].map((sisi) => (
-          <mesh
-            key={sisi}
-            position={[sisi * 0.46, 1.06, 0]}
-            rotation={[0, 0, sisi * 0.34]}
-            material={zirahTerang}
-          >
-            <boxGeometry args={[0.42, 0.16, 0.44]} />
-          </mesh>
+          <group key={sisi} position={[sisi * 0.47, 1.09, 0]}>
+            {[0, 1, 2].map((lapis) => (
+              <mesh
+                key={lapis}
+                position={[sisi * lapis * 0.035, -lapis * 0.115, 0]}
+                rotation={[0, 0, sisi * (0.3 + lapis * 0.06)]}
+                material={zirahTerang}
+              >
+                <boxGeometry args={[0.4 + lapis * 0.03, 0.095, 0.44 - lapis * 0.03]} />
+              </mesh>
+            ))}
+          </group>
         ))}
 
-        {/* ── badan ─────────────────────────────────────────────────────
+        {/* ── dō: badan zirah ───────────────────────────────────────────
             Meruncing ke bawah: bahu lebar, pinggang sempit. Itu proporsi yang
-            membaca sebagai zirah, bukan sebagai tong. */}
-        <mesh position={[0, 0.72, 0]} material={zirah}>
-          <cylinderGeometry args={[0.42, 0.3, 0.72, segmen]} />
-        </mesh>
-        <mesh position={[0, 0.34, 0]} material={zirahTerang}>
-          <cylinderGeometry args={[0.3, 0.34, 0.16, segmen]} />
+            membaca sebagai zirah, bukan sebagai tong. Dua pita mendatar di
+            atasnya adalah baris tali yang menyatukan pelatnya. */}
+        {/*
+            SATU bentuk, tanpa pita dan tanpa pemisahan. Dua percobaan gagal
+            sebelum ini, dan keduanya gagal karena sebab yang sama.
+
+            Yang pertama menempelkan tiga cincin terang melintang di dada
+            sebagai baris tali. Hasilnya tong bergaris: cincin tipis terlihat
+            dari sudut nyaris menyerempet di hampir seluruh permukaannya,
+            fresnel-nya jenuh, dan ketiganya menyala penuh.
+
+            Yang kedua mencoba akal-akalan — dō-nya dipecah menjadi tiga
+            kerucut terpotong supaya garisnya datang dari CELAH yang gelap,
+            bukan dari pita yang terang. Itu justru MENGGANDAKAN masalahnya:
+            tiap kerucut menyumbang rim di tepi atas dan tepi bawahnya, jadi
+            tiga pita berubah menjadi enam.
+
+            Pelajarannya berlaku untuk seluruh berkas ini: pada bahan fresnel,
+            SETIAP tepi geometri adalah garis terang, entah diminta atau
+            tidak. Detail permukaan karena itu tidak boleh dibuat dari
+            potongan. Lapisan zirahnya dibawa oleh sode dan kusazuri — bagian
+            yang memang menonjol keluar dari siluet — sementara dadanya
+            dibiarkan satu permukaan gelap yang tenang, dan ketenangan itulah
+            yang membuat lapisan di sekitarnya terbaca.
+        */}
+        <mesh position={[0, 0.76, 0]} material={zirah}>
+          <cylinderGeometry args={[0.42, 0.31, 0.78, segmen]} />
         </mesh>
 
-        {/* ── kaki, sedikit terbuka: kuda-kuda, bukan berdiri tegak ───── */}
+        {/* obi — sabuk. Titik tersempit seluruh sosok. */}
+        <mesh position={[0, 0.38, 0]} material={zirahTerang}>
+          <cylinderGeometry args={[0.305, 0.325, 0.1, segmen]} />
+        </mesh>
+
+        {/* ── kusazuri: rok pelat yang menggantung ───────────────────────
+            Ini bagian zirah samurai yang paling tidak mungkin tertukar
+            dengan apa pun. Lima pelat mengelilingi pinggang, masing-masing
+            miring keluar, dan celah di antaranya membentuk garis vertikal
+            yang memberi pinggangnya lebar tanpa memberinya massa. */}
+        {Array.from({ length: 5 }, (_, i) => {
+          const sudut = (i / 5) * Math.PI * 2 + Math.PI / 5;
+          return (
+            <mesh
+              key={sudut}
+              position={[Math.sin(sudut) * 0.3, 0.19, Math.cos(sudut) * 0.3]}
+              rotation={[0.2, sudut, 0]}
+              material={zirah}
+            >
+              <boxGeometry args={[0.3, 0.34, 0.035]} />
+            </mesh>
+          );
+        })}
+
+        {/* ── hakama: kaki KAIN, bukan tabung ───────────────────────────
+            Lebar di paha dan menyempit tajam di mata kaki. Celana samurai
+            memang berbentuk begitu, dan kerucut terpotong yang meruncing
+            terbalik itulah satu-satunya isyarat yang dibutuhkan. Kuda-kuda:
+            sedikit terbuka, bukan berdiri tegak. */}
         {[-1, 1].map((sisi) => (
-          <group key={sisi} position={[sisi * 0.19, 0.26, 0]} rotation={[0, 0, sisi * 0.12]}>
-            <mesh position={[0, -0.26, 0]} material={zirah}>
-              <cylinderGeometry args={[0.11, 0.09, 0.56, segmen]} />
+          <group key={sisi} position={[sisi * 0.2, 0.26, 0]} rotation={[0, 0, sisi * 0.11]}>
+            <mesh position={[0, -0.19, 0]} material={kain}>
+              <cylinderGeometry args={[0.19, 0.115, 0.42, segmen]} />
+            </mesh>
+            {/* pelindung tulang kering, dan sepatu yang menahan kuda-kuda */}
+            <mesh position={[0, -0.46, 0.01]} material={zirah}>
+              <cylinderGeometry args={[0.1, 0.085, 0.16, segmen]} />
+            </mesh>
+            <mesh position={[0, -0.56, 0.04]} material={zirah}>
+              <boxGeometry args={[0.15, 0.06, 0.24]} />
             </mesh>
           </group>
         ))}
@@ -279,22 +440,92 @@ export function Ronin({ tier, kendali }: RoninProps) {
             Seluruh ayunan terjadi di grup ini. Bilahnya panjang dan tipis;
             yang membuatnya terbaca sebagai pedang adalah rasio, bukan detail. */}
         <group ref={lengan} position={[0.44, 1.0, 0.06]}>
-          <mesh position={[0.3, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={zirah}>
-            <cylinderGeometry args={[0.085, 0.075, 0.6, segmen]} />
+          {/* lengan atas dan bawah, dengan siku yang benar-benar ada */}
+          <mesh position={[0.16, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={zirah}>
+            <cylinderGeometry args={[0.088, 0.075, 0.34, segmen]} />
+          </mesh>
+          <mesh position={[0.34, 0, 0]} material={zirahTerang}>
+            <sphereGeometry args={[0.082, segmen, segmen]} />
+          </mesh>
+          <mesh position={[0.52, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={zirah}>
+            <cylinderGeometry args={[0.072, 0.062, 0.34, segmen]} />
+          </mesh>
+
+          {/* tsuka — gagang terbungkus. Gelap, dan justru karena gelap ia
+              memisahkan tangan dari bilah yang menyala. */}
+          <mesh position={[0.78, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={saya}>
+            <cylinderGeometry args={[0.045, 0.042, 0.24, segmen]} />
           </mesh>
           {/* tsuba — pembatas tangan dan bilah */}
-          <mesh position={[0.62, 0, 0]} material={zirahTerang}>
-            <cylinderGeometry args={[0.11, 0.11, 0.03, segmen]} />
+          <mesh position={[0.92, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={zirahTerang}>
+            <cylinderGeometry args={[0.105, 0.105, 0.028, segmen]} />
           </mesh>
-          <mesh position={[1.32, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={bilahMat}>
-            <boxGeometry args={[0.028, 1.36, 0.075]} />
-          </mesh>
+
+          {/*
+              ── BILAH ──────────────────────────────────────────────────
+              Sebelumnya ini satu batang putih penuh, dan itu salah dua kali.
+              Katana bukan neon: yang menyala pada pedang adalah MATANYA,
+              satu garis tipis di sepanjang sisi potong, sementara punggung
+              bilahnya baja gelap. Batang penuh juga membanjiri bagian dalam
+              siluet dengan cahaya, persis yang membuat sosoknya kehilangan
+              volume.
+
+              Jadi badannya bahan zirah, dan hanya ha-nya yang emisif.
+          */}
+          <group position={[0.96, 0, 0]}>
+            {ruasBilah.map((r) => (
+              <group key={r.x} position={[r.x, r.y, 0]} rotation={[0, 0, r.a]}>
+                <mesh material={baja}>
+                  <boxGeometry args={[0.302, 0.072, 0.026]} />
+                </mesh>
+                <mesh position={[0, -0.037, 0]} material={bilahMat}>
+                  <boxGeometry args={[0.303, 0.013, 0.027]} />
+                </mesh>
+              </group>
+            ))}
+            {/* kissaki — ujung yang menyudut, bukan terpotong rata */}
+            <mesh position={[1.53, 0.16, 0]} rotation={[0, 0, 0.26 - 0.5]} material={bilahMat}>
+              <boxGeometry args={[0.12, 0.05, 0.026]} />
+            </mesh>
+          </group>
         </group>
 
         {/* lengan kiri, diam — kontras yang membuat lengan kanan terbaca
             sebagai yang bergerak */}
-        <mesh position={[-0.5, 0.86, 0.02]} rotation={[0, 0, 0.28]} material={zirah}>
-          <cylinderGeometry args={[0.085, 0.07, 0.6, segmen]} />
+        <mesh position={[-0.5, 0.9, 0.02]} rotation={[0, 0, 0.3]} material={zirah}>
+          <cylinderGeometry args={[0.088, 0.07, 0.36, segmen]} />
+        </mesh>
+        <mesh position={[-0.6, 0.63, 0.03]} rotation={[0, 0, 0.22]} material={zirah}>
+          <cylinderGeometry args={[0.07, 0.06, 0.3, segmen]} />
+        </mesh>
+
+        {/* ── daishō: pedang KEDUA, tersarung di pinggang ────────────────
+            Satu pedang di tangan membuat sosok bersenjata. Pedang kedua yang
+            tetap tersarung di pinggul membuatnya seorang samurai — daishō
+            adalah pasangannya, dan pasangan itulah tandanya. Ia juga
+            memberi pinggang kiri garis diagonal yang memutus siluet vertikal
+            yang tanpa itu terlalu rapi. */}
+        <group position={[-0.3, 0.36, -0.1]} rotation={[0, 0, -0.42]}>
+          <mesh position={[-0.34, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={saya}>
+            <cylinderGeometry args={[0.038, 0.03, 0.94, segmen]} />
+          </mesh>
+          <mesh position={[0.16, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={zirahTerang}>
+            <cylinderGeometry args={[0.075, 0.075, 0.022, segmen]} />
+          </mesh>
+          <mesh position={[0.29, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={saya}>
+            <cylinderGeometry args={[0.036, 0.033, 0.22, segmen]} />
+          </mesh>
+        </group>
+
+        {/* ── jubah ─────────────────────────────────────────────────────
+            Setengah kerucut terbuka di belakang punggung, melebar ke bawah.
+            Fungsinya bukan hiasan: ia memberi siluetnya MASSA di bawah bahu,
+            dan massa itulah yang membuat sosok setinggi ini tidak terbaca
+            sebagai ranting. */}
+        <mesh position={[0, 0.7, -0.14]} material={kainJubah}>
+          <cylinderGeometry
+            args={[0.4, 0.62, 1.26, segmen, 1, true, Math.PI * 0.72, Math.PI * 0.56]}
+          />
         </mesh>
 
         {/* ── jejak bilah ───────────────────────────────────────────────
@@ -314,6 +545,108 @@ export function Ronin({ tier, kendali }: RoninProps) {
           />
         </mesh>
       </group>
+    </group>
+  );
+}
+
+/**
+ * LINGKUNGAN — lantai, kabut, dan gerbang di kejauhan.
+ *
+ * Sosok yang melayang di ruang hitam terbaca sebagai aset yang ditempel.
+ * Yang mengubahnya menjadi adegan bukan detail lantainya, melainkan
+ * kenyataan bahwa ia BERPIJAK pada sesuatu — dan pada adegan segelap ini
+ * pijakan itu tidak bisa dibuat dari bayangan. Bayangan gelap di atas latar
+ * yang sudah hampir hitam tidak terlihat sama sekali.
+ *
+ * Jadi kontaknya dibuat dari CAHAYA: cincin di lantai tepat di bawah kaki.
+ * Mata membaca "berdiri di sana" dari cincin itu sama yakinnya seperti dari
+ * bayangan, dan cincinnya justru terbaca pada latar gelap.
+ *
+ * Torii-nya jauh, besar, dan nyaris padam — ia hanya perlu memberi kedalaman
+ * dan satu isyarat tempat. Begitu ia cukup terang untuk diperhatikan, ia
+ * berhenti menjadi latar dan mulai bersaing dengan subjeknya.
+ */
+export function Lingkungan({ tier }: { tier: GraphicsTier }) {
+  const kabut = useRef<THREE.Mesh>(null);
+  const segmen = tier === 'full' ? 64 : 24;
+
+  /*
+   * Torii DIREDUPKAN keras, dari 0,5/3,2 menjadi 0,16/7.
+   *
+   * Pada nilai pertamanya ia menjulang seterang samurainya dan langsung
+   * merebut pandangan — persis yang dilarang catatan di atas, ditulis oleh
+   * saya sendiri sebelum melihat hasilnya. Tiang setinggi itu punya luas layar
+   * berkali-kali lipat badan Ronin, jadi kecerahan yang sama sekali-kali tidak
+   * berarti berat yang sama.
+   */
+  const jauh = useZirah(0.16, 7);
+
+  const cincinMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(TOKEN.ronin),
+        transparent: true,
+        opacity: 0.34,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        toneMapped: false,
+        side: THREE.DoubleSide,
+      }),
+    [],
+  );
+
+  useFrame((state) => {
+    /* Cincin luarnya berputar sangat lambat. Cukup untuk menghapus kesan
+       gambar beku, terlalu lambat untuk menarik perhatian ke dirinya
+       sendiri. */
+    if (kabut.current) kabut.current.rotation.z = state.clock.elapsedTime * 0.05;
+  });
+
+  return (
+    <group position={[0, -1.46, 0]}>
+      {/*
+          Cincin kontak — inilah lantainya, dan ia DIRAPATKAN ke kaki.
+
+          Versi pertamanya berjari-jari 1,0 dan 1,65 pada kepekatan 0,5, dan
+          hasilnya bukan lantai melainkan sebuah sasaran tembak: dua lingkaran
+          terang jauh lebih lebar dari sosoknya, memusat pada ruang kosong.
+          Kontak dibaca dari CAHAYA YANG BERTEMU KAKI, jadi cincinnya harus
+          seukuran kuda-kudanya, bukan seukuran panggungnya.
+
+          Yang lebar hanya disimpan satu, sangat tipis dan sangat redup,
+          sebagai isyarat bahwa lantainya menerus di luar cahaya.
+      */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} material={cincinMat}>
+        <ringGeometry args={[0.44, 0.5, segmen]} />
+      </mesh>
+      <mesh ref={kabut} rotation={[-Math.PI / 2, 0, 0]} material={cincinMat} scale={2.1}>
+        <ringGeometry args={[0.47, 0.482, segmen]} />
+      </mesh>
+
+      {/* ── torii ────────────────────────────────────────────────────────
+          Dua tiang dan dua palang. Bentuk itu dikenali seketika, dan tidak
+          ada bentuk lain yang menyebut "Jepang" dengan geometri sesedikit
+          ini. Ia hanya dipasang pada tingkat penuh: pada tingkat rendah ia
+          nyaris tak terlihat, dan yang nyaris tak terlihat tidak layak
+          dibayar dengan gambar tambahan. */}
+      {tier === 'full' ? (
+        <group position={[0, 0, -8.6]} scale={1.9}>
+          {[-1, 1].map((sisi) => (
+            <mesh key={sisi} position={[sisi * 1.06, 1.06, 0]} material={jauh}>
+              <cylinderGeometry args={[0.075, 0.098, 2.12, 10]} />
+            </mesh>
+          ))}
+          <mesh position={[0, 2.24, 0]} material={jauh}>
+            <boxGeometry args={[2.86, 0.13, 0.2]} />
+          </mesh>
+          <mesh position={[0, 1.86, 0]} material={jauh}>
+            <boxGeometry args={[2.4, 0.088, 0.15]} />
+          </mesh>
+          <mesh position={[0, 2.05, 0]} material={jauh}>
+            <boxGeometry args={[0.14, 0.3, 0.14]} />
+          </mesh>
+        </group>
+      ) : null}
     </group>
   );
 }

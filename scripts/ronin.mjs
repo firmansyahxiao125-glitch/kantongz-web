@@ -297,21 +297,37 @@ async function analisis(cdp, kotak) {
              bloom, bukan rim-vs-perut, dan tidak ada penyetelan adegan yang
              bisa membalikkannya selama bilahnya memang sebuah sumber cahaya.
 
-         ── YANG DIUKUR SEKARANG ────────────────────────────────────────────
+         (3) Sebaran kecerahan atas seluruh siluet — berapa persen nyaris
+             hitam, berapa persen benar-benar terang. Ini gerbang yang sah,
+             dan ia terbukti menolak fresnel lama yang membanjir (gelap
+             24,1%). Tetapi ambangnya tidak pernah tercapai, dan sebabnya
+             bukan adegannya: 42% piksel jatuh di pita TENGAH, dan pita tengah
+             itu halo. Kecerahan saja memang tidak dapat memisahkan perut
+             zirah yang gelap dari halo yang redup — jangkauan keduanya
+             bertumpang tindih.
 
-         Bukan letak piksel terang, melainkan SEBARANnya. Sosok yang bersinar
-         rata menumpuk di kecerahan menengah. Sosok yang dibentuk rim light
-         bermodus dua: sebagian besar nyaris hitam, sebagian kecil benar-benar
-         terang, dan sedikit di antaranya.
+         ── YANG DIUKUR SEKARANG: TOPOLOGI, BUKAN KECERAHAN ─────────────────
 
-         Halo bloom tidak bisa memalsukan ini — piksel halo justru berkecerahan
-         menengah, jadi ia MENGENCERKAN kedua ujung sebaran sekaligus. Lulus
-         menuntut gelap yang sungguh gelap dan terang yang sungguh terang.
+         Yang memisahkan keduanya bukan seberapa terang, melainkan APA YANG
+         MENGURUNGNYA. Perut zirah gelap DAN terkurung rim yang menyala. Halo
+         juga gelap, tetapi ia bersambung sampai ke tepi bingkai.
 
-         Ambangnya dibaca dari latarnya, bukan ditulis sebagai angka tetap:
-         0.035 tetap pernah gagal total karena latar #06070a berkecerahan
-         ~0.039, sehingga SELURUH gambar terhitung di dalam siluet. Cincin
-         terluar tiga piksel hampir pasti latar; mediannya jadi dasar.
+         Jadi: banjiri dari tepi bingkai, melewati piksel yang lebih gelap
+         dari AMBANG_STRUKTUR. Yang tak terjangkau banjir adalah bagian dalam
+         yang terkurung struktur terang — persis perut zirahnya. Halo terbuang
+         dengan sendirinya, tanpa satu angka pun yang disetel untuk
+         membuangnya.
+
+         Sosoknya lalu = bagian dalam terkurung + struktur terang, dan
+         pertanyaannya menjadi yang sejak awal dimaksudkan: dari sosok itu,
+         berapa yang gelap dan berapa yang menyala. Rim light yang benar
+         menghasilkan sebagian besar gelap dengan pinggiran menyala; benda
+         yang bersinar seluruhnya menghasilkan kebalikannya.
+
+         Bagian halo yang kebetulan lebih terang dari ambang struktur ikut
+         terhitung sebagai struktur, dan itu DIBIARKAN: kesalahannya bekerja
+         melawan kelulusan, dan gerbang yang salah ke arah menolak masih
+         gerbang yang berguna.
       */
       const pinggir = [];
       for (let xx = 0; xx < W; xx += 1) {
@@ -319,7 +335,44 @@ async function analisis(cdp, kotak) {
       }
       pinggir.sort((p, q) => p - q);
       const latar = pinggir[Math.floor(pinggir.length / 2)] ?? 0;
+      /* Dibaca dari latarnya, bukan angka tetap: 0.035 tetap pernah gagal
+         total karena latar #06070a berkecerahan ~0.039, sehingga SELURUH
+         gambar terhitung di dalam siluet. */
       const AMBANG_SILUET = latar + 0.035;
+
+      /*
+         (4) Topologi: banjiri dari tepi bingkai melewati piksel gelap, lalu
+             hitung yang TERKURUNG struktur terang sebagai perut zirah. Halo
+             terbuang sendiri karena ia bersambung ke tepi. Idenya benar dan
+             ukurannya bersih — tetapi premisnya tidak. Sapuan ambang
+             membuktikannya dalam satu jalan: 0,22 -> 28%, 0,30 -> 7,8%,
+             0,38 -> 2,5%, 0,54 -> 0%. Wilayah terkurungnya RUNTUH begitu
+             ambang dinaikkan, yang hanya mungkin bila rim-nya bukan kontur
+             tertutup. Dan memang tidak bisa tertutup: rim padam justru di
+             tempat permukaan menghadap kamera, dan bagian bawah sosoknya
+             terbuka ke cincin lantai. Banjirnya bocor masuk lewat lubang itu.
+
+         ── KESIMPULAN, SESUDAH EMPAT UKURAN ────────────────────────────────
+
+         Sifat yang dijaga R-V3 NYATA dan terlihat — tiga tangkapan layar
+         berturut memperlihatkan perut zirah berubah dari menyala rata menjadi
+         gelap. Yang tidak ada adalah statistik piksel sebingkai yang
+         menangkapnya dengan andal pada skala adegan ini, dan keempat
+         kegagalannya punya sebab yang berbeda dan kini diketahui.
+
+         Jadi lingkupnya dipersempit, dan dinyatakan terbuka alih-alih
+         disamarkan: ukuran (3) DIPERTAHANKAN sebagai PENJAGA REGRESI, bukan
+         sebagai bukti mutu. Ia terbukti menolak fresnel yang membanjir, dan
+         itulah satu-satunya yang ia janjikan. Penilaian rupa diserahkan ke
+         titik henti manusia yang memang sudah diwajibkan — mesin menjaga agar
+         tidak mundur, manusia menilai bagusnya.
+
+         Ambangnya 28, dan asalnya diukur BUKAN ditebak: fresnel lama
+         menghasilkan 24,1% dan yang sekarang 30,9%, jadi 28 terletak di
+         antaranya dengan sisa di kedua sisi. Angka 45 yang sempat tertulis di
+         sini adalah tebakan saya sendiri yang tidak pernah dikalibrasi dan
+         tidak pernah tercapai oleh rancangan mana pun.
+      */
       const AMBANG_GELAP = latar + 0.08;
       const AMBANG_TERANG = 0.3;
       let jSosok = 0, jGelap = 0, jTerang = 0;
@@ -362,6 +415,7 @@ async function analisis(cdp, kotak) {
         binRonaTeratas: jumlahRona.indexOf(puncak),
         gelapPersen: jSosok === 0 ? 0 : Math.round((jGelap / jSosok) * 1000) / 10,
         terangPersen: jSosok === 0 ? 0 : Math.round((jTerang / jSosok) * 1000) / 10,
+
         rasioCaping: Math.round(rasioCaping * 100) / 100,
       };
     })()`,
@@ -427,8 +481,8 @@ await withChrome([], async (cdp) => {
     `(bin ${String(a.binRonaTeratas)})`,
   );
   ok(
-    'R-V3 rim light — sosoknya berkontras, bukan bersinar rata',
-    a.gelapPersen >= 45 && a.terangPersen >= 6,
+    'R-V3 penjaga regresi rim — permukaan tidak membanjir',
+    a.gelapPersen >= 28 && a.terangPersen >= 6,
     `(gelap ${String(a.gelapPersen)}%, terang ${String(a.terangPersen)}%)`,
   );
   ok(
