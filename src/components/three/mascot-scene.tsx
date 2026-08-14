@@ -36,16 +36,28 @@ export function MascotScene({ className }: { className?: string }) {
    * Pengganti statis berukuran SAMA dengan kanvasnya, jadi pergantian di
    * perangkat `full` tidak menggeser satu piksel pun tata letak (CLS 0).
    */
+  /*
+   * `data-tier` DI SINI, bukan di `Stage`.
+   *
+   * Gerbang `grafis` harus dapat menegaskan "di ponsel tingkatnya lite" dan
+   * "dengan gerak dikurangi tidak ada 3D sama sekali". `Stage` hanya dipasang
+   * ketika tingkatnya `full` — jadi penanda di sana LENYAP tepat pada dua
+   * keadaan yang paling perlu diperiksa, dan gerbangnya melaporkan "tidak ada"
+   * alih-alih melaporkan keadaan yang sebenarnya.
+   *
+   * Komponen inilah yang memutuskan tingkatnya, jadi di sinilah keputusan itu
+   * dapat dibaca.
+   */
   if (tier !== 'full') {
     return (
-      <div className={cn('relative', className)}>
+      <div data-tier={tier} className={cn('relative', className)}>
         <StaticMascot />
       </div>
     );
   }
 
   return (
-    <div className={cn('relative', className)}>
+    <div data-tier={tier} className={cn('relative', className)}>
       {/* Bahkan di `full`, adegan menunggu peramban selesai bekerja. */}
       <DeferUntilIdle fallback={<StaticMascot />}>
         <LazyCanvas />

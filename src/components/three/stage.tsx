@@ -41,12 +41,30 @@ export function Stage({
 }: StageProps) {
   const tier = useGraphicsTier();
 
+  /*
+   * `data-tier` ada untuk DIUKUR, dan itu satu-satunya alasannya.
+   *
+   * Gerbang `grafis` harus dapat menegaskan "di ponsel tingkatnya lite, bukan
+   * full" dan "dengan gerak dikurangi tidak ada kanvas sama sekali". Tanpa
+   * penanda ini ia hanya bisa menebak lewat gejala — ada tidaknya
+   * pascaproses, misalnya — dan gejala berubah setiap kali adegannya diubah.
+   * Penegasan yang bersandar pada gejala akan memerah karena alasan yang
+   * salah, lalu dimatikan orang.
+   *
+   * Atributnya tidak menyentuh gaya, tidak masuk pohon aksesibilitas, dan
+   * tidak berbiaya. Ia hanya membuat keputusan yang sudah diambil menjadi
+   * dapat diperiksa dari luar.
+   */
   if (tier === 'off') {
-    return <div className={cn('relative', className)}>{fallback}</div>;
+    return (
+      <div data-tier="off" className={cn('relative', className)}>
+        {fallback}
+      </div>
+    );
   }
 
   return (
-    <div className={cn('relative', className)}>
+    <div data-tier={tier} className={cn('relative', className)}>
       <Canvas
         /* Layar retina merender empat kali lebih banyak piksel. Batas 1.5
            menahan biaya itu tanpa perbedaan yang terlihat pada adegan yang

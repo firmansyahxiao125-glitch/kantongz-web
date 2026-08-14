@@ -155,7 +155,20 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 | T4 | todo | — | — | mouse · scroll · TEBASAN (tetikus DAN papan tik) — **titik henti Y5 #3** |
 | T5 | todo | — | — | terikat data, bukan dekorasi |
 | T6 | todo | — | — | 3D dalam aplikasi: kecil, dapat dimatikan |
-| T7 | todo | — | — | `npm run grafis` — anggaran fps diukur, bukan diharapkan |
+| T7 | selesai | ini | grafis 13/13 · akses 455/455 · interior hijau · alur hijau · typography 15/0 · render 39/0 · contrast hijau · palette hijau · 63 uji · build 0 | dibangun SEBELUM samurainya, sama seperti E1 sebelum desain ulang |
+
+### Angka garis dasar grafis
+
+| | terukur | ambang |
+|---|---|---|
+| laju bingkai tingkat `full` | 93 fps | ≥ 55 |
+| bobot JavaScript halaman muka | 584 KB | langit 1100 KB + 15% |
+| tingkat di 390px sentuh | `lite` | bukan `full` |
+| gerak dikurangi | `off`, 0 kanvas, 6 bagian tercat | cadangan yang dirancang |
+| WebGL diblokir | `off`, 9408 karakter tetap terbaca | menurun, tidak mengosong |
+
+Perendernya dibaca lebih dulu; kalau perangkat lunak (SwiftShader di CI),
+penegasan fps DILEWATI dengan mengatakannya — bukan diam-diam diluluskan.
 | T8 | todo | — | — | tingkat `off` mendapat komposisi diam yang dirancang |
 | T9 | todo | — | — | 3D tidak boleh merusak UI finansial |
 
