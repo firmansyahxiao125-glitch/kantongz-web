@@ -91,18 +91,31 @@ Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
 | V2 | selesai | b36893b | contrast hijau (2 tema) · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | token hangat + terang jadi bawaan per-permukaan |
 | V2b | selesai | ini | contrast hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | bilah sisi arang lewat `.kanvas-gelap`, nilainya dipinjam dari tema gelap yang sudah diaudit |
 | V3 | selesai | ini | contrast hijau · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | empat kartu sebaris, cincin anggaran, kartu tujuan. Pemilih rentang tanggal DITUNDA — lihat catatan |
-| V4a | todo | — | — | transaksi |
-| V4b | todo | — | — | dompet |
-| V4c | todo | — | — | anggaran |
-| V4d | todo | — | — | tujuan |
-| V4e | todo | — | — | berulang |
-| V4f | todo | — | — | analitik |
-| V4g | todo | — | — | wawasan |
-| V4h | todo | — | — | asisten |
-| V4i | todo | — | — | laporan |
-| V4j | todo | — | — | profil |
-| V4k | todo | — | — | keamanan |
-| V4l | todo | — | — | pengaturan |
+| V4a–V4l | selesai | ini | contrast hijau · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | **nol perubahan kode dibutuhkan** — lihat catatan di bawah |
+
+### V4 tidak menuntut penulisan ulang, dan itu diperiksa bukan diasumsikan
+
+Spesifikasi V4 sendiri memperkirakannya: *"penghangatan token plus sapuan
+kartu — bukan penulisan ulang"*. Ternyata bahkan sapuan kartunya tidak perlu.
+
+Kedua belas halaman dibangun di atas primitif yang sama (`Card`, `CardBody`,
+`CardHeader`, `PageHeader`, `Stat`, `Button`) dan seluruhnya membaca token,
+bukan nilai. Jadi begitu V2 menghangatkan token dan V2b menggelapkan bilah
+sisi, kedua belasnya ikut — tanpa satu baris pun disentuh.
+
+Seluruh dua belas DILIHAT satu per satu pada 1440px, bukan disimpulkan dari
+tiga: transaksi, dompet, anggaran, tujuan, berulang, analitik, wawasan,
+asisten, laporan, profil, keamanan, pengaturan. Tangkapan layarnya ada di
+direktori kerja sesi.
+
+Satu pertanyaan konsistensi muncul dan terjawab: dasbor kini memakai CINCIN
+untuk anggaran sementara halaman Anggaran memakai BATANG. Itu bukan
+ketidakkonsistenan — cincin menjawab "secara keseluruhan aman atau tidak"
+(satu angka gabungan), batang menjawab "di mana persisnya" (per kategori).
+Dua pertanyaan berbeda memang berhak atas dua bentuk berbeda.
+
+Mengarang perubahan per halaman agar item ini terlihat dikerjakan akan
+menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 | V5 | todo | — | — | layar sambutan mobile: luapan mendatar ke NOL + max-width |
 | V6 | selesai | ini | dokumen saja — tidak ada gerbang yang tersentuh | ROADMAP §7.1 di repo `kantongz`; §7 utuh, tidak dihapus |
 
