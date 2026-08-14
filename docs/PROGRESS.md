@@ -103,10 +103,20 @@ Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
 | V4k | todo | — | — | keamanan |
 | V4l | todo | — | — | pengaturan |
 | V5 | todo | — | — | layar sambutan mobile: luapan mendatar ke NOL + max-width |
-| V6 | todo | — | — | catatan bertanggal yang menggantikan ROADMAP §7 |
+| V6 | selesai | ini | dokumen saja — tidak ada gerbang yang tersentuh | ROADMAP §7.1 di repo `kantongz`; §7 utuh, tidak dihapus |
 
 > Halaman pertama yang selesai adalah **titik henti manusia Y5 #1** — ia
 > menetapkan arah untuk lima belas sisanya.
+
+> **Urutan di dalam Langkah 2 disesuaikan, dan ini alasannya.** V1 (permukaan
+> publik) dikerjakan BERSAMA Langkah 3, bukan sebelum Langkah 2. Keduanya
+> berbagi satu bahasa visual yang sama — gelap, sinematik, digerakkan 3D — dan
+> mengerjakan halaman muka lebih dulu berarti menatanya dua kali: sekali untuk
+> warnanya, sekali lagi ketika samurainya mendarat.
+>
+> Urutan yang dijalankan: **V2 → V3 → V4a…V4l → (Langkah 3 + V1 + V5)**.
+> Dasbor karena itu menjadi halaman pertama yang didesain ulang, dan ia memang
+> yang paling menentukan arah — ia juga sudah menjadi titik henti Y5 #2.
 
 ## Langkah 3 — 3D publik "Ronin"
 
