@@ -14,6 +14,7 @@
     "typography": "node scripts/typography.mjs",
     "render": "node scripts/render.mjs",
     "interior": "node scripts/interior.mjs",
+    "alur": "node scripts/alur.mjs",
     "gates": "node scripts/gates.mjs",
     "test": "vitest run"
   },

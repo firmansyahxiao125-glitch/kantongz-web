@@ -148,7 +148,19 @@ export default function LaporanPage() {
               </p>
             </div>
 
-            <dl className="flex gap-6 text-sm">
+            {/*
+              `flex-wrap`, dan jaraknya menyempit di bawah 640px.
+
+              Tiga nominal tujuh angka berjejer kaku memakan ±362px, sementara
+              isi kartu di layar 390px hanya 316px. Yang terjadi bukan
+              pemotongan yang terlihat melainkan GULIR MENDATAR SELURUH HALAMAN
+              sejauh sembilan piksel — cacat yang tidak terasa sebagai cacat,
+              hanya sebagai halaman yang "bergeser sedikit" saat disentuh.
+
+              Di layar lebar tidak ada yang berubah: `flex-wrap` tidak
+              melakukan apa pun selama ruangnya cukup.
+            */}
+            <dl className="flex flex-wrap gap-x-4 gap-y-2 text-sm sm:gap-x-6">
               <div>
                 <dt className="text-xs text-muted">Pemasukan</dt>
                 <dd className="numeric text-[var(--color-positive)]">{formatIdr(income)}</dd>
