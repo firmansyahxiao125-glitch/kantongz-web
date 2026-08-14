@@ -81,6 +81,21 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
+/**
+ * Berapa lama menunggu Chrome membuka target halamannya.
+ *
+ * 160 x 250ms = 40 detik. Nilai sebelumnya 15 detik, dan itu CUKUP di laptop
+ * yang panas — tetapi tidak di runner CI yang dingin sambil menyalakan peladen
+ * Next di proses lain. Gejalanya: gerbang peramban gagal dengan "Chrome tidak
+ * pernah membuka target halaman" pada satu commit lalu hijau pada commit
+ * berikutnya yang tidak mengubah satu baris kode pun.
+ *
+ * Gerbang yang gagal secara acak lebih buruk daripada tidak ada gerbang: orang
+ * belajar menjalankannya ulang alih-alih menyelidikinya, dan sesudah itu
+ * kegagalan yang SUNGGUHAN pun ikut dijalankan ulang.
+ */
+const MAKS_TARGET = 160;
+
 /* ── argumen ─────────────────────────────────────────────────────────── */
 
 function arg(name, fallback) {
@@ -417,7 +432,7 @@ async function main() {
        halamannya ada; dengan `sleep` hanya di `catch`, keenam puluh putaran
        habis dalam hitungan milidetik dan gerbangnya gagal dengan kalimat yang
        menyesatkan — portanya justru sudah terbuka. */
-    for (let percobaan = 0; percobaan < 60 && target === null; percobaan += 1) {
+    for (let percobaan = 0; percobaan < MAKS_TARGET && target === null; percobaan += 1) {
       try {
         const response = await fetch(`http://127.0.0.1:${String(PORT)}/json/list`);
         const targets = await response.json();
