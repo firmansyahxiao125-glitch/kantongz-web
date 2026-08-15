@@ -163,6 +163,41 @@ const TOLERANSI = 1.15;
  */
 const LANGIT_MODEL_KB = 3200;
 
+/**
+ * Langit-langit SELURUH JavaScript klien yang dibangun, dibaca DARI DISK.
+ *
+ * ── MENGAPA ANGGARAN KETIGA ────────────────────────────────────────────
+ *
+ * Menutup celah yang dibuka `bobotJs` ketika batasnya dipersempit ke
+ * `loadEventEnd`: JavaScript adegan 3D — three, R3F, postprocessing — diminta
+ * SESUDAH halaman selesai dimuat, jadi ia tidak terhitung di sana. Tanpa
+ * anggaran ini, satu pustaka 3D lagi dapat masuk tanpa satu pemeriksaan pun
+ * menyentuhnya.
+ *
+ * ── MENGAPA DARI DISK, DAN BUKAN DARI PERAMBAN ─────────────────────────
+ *
+ * Karena ia SEPENUHNYA deterministik. Tidak ada peramban, tidak ada waktu
+ * sampel, tidak ada prefetch — hanya berkas yang benar-benar dihasilkan
+ * `next build`. Itu kebalikan dari angka runtime yang sempat bergoyang
+ * 623/846/1475 KB dan menghabiskan satu sesi untuk diselidiki.
+ *
+ * ── SATUANNYA BERBEDA, DAN ITU HARUS DISEBUT ───────────────────────────
+ *
+ * Angka ini ukuran DI DISK (tanpa kompresi). `bobotJs` mengukur `transferSize`
+ * (sesudah kompresi). Keduanya tidak boleh dibandingkan satu sama lain — 2883
+ * KB di sini dan 155 KB di sana mengukur hal yang berbeda, bukan pertentangan.
+ *
+ * Diukur pada `next build` pertama sesudah H1: 2732 KB dalam 40 potongan;
+ * satu potongan sendirian 883 KB, dan itu tumpukan 3D-nya.
+ *
+ * Angka pertama yang saya tulis di sini 2883 — hasil `du -sk`, yang menghitung
+ * BLOK DISK dan bukan jumlah ukuran berkas. Selisih 151 KB itu akan menjadi
+ * kelonggaran hantu: ruang yang terlihat ada di anggaran padahal tidak pernah
+ * ada. Yang dipakai sekarang jumlah `statSync().size`, sama persis dengan yang
+ * dihitung pemeriksaannya.
+ */
+const LANGIT_TOTAL_JS_KB = 2732;
+
 /** Ambang laju bingkai per tingkat. Di bawah ini adalah kegagalan. */
 const AMBANG = { full: 55, lite: 30 };
 
@@ -527,6 +562,45 @@ await withChrome([], async (cdp) => {
       daftar.length > 0 && kbTotal <= LANGIT_MODEL_KB,
       `(${kbTotal.toFixed(1)} KiB / ${String(LANGIT_MODEL_KB)} KiB · ${daftar.join(', ') || 'tidak ada .glb'})`,
     );
+  }
+
+  /* ── anggaran SELURUH JavaScript terbangun ────────────────────────────
+     Deterministik: dibaca dari disk, tanpa peramban dan tanpa waktu sampel.
+     Inilah yang menjaga JavaScript adegan 3D, yang tidak terhitung di angka
+     runtime karena diminta sesudah `loadEventEnd`. */
+  {
+    const dirChunks = join(
+      dirname(fileURLToPath(import.meta.url)),
+      '..',
+      '.next',
+      'static',
+      'chunks',
+    );
+
+    if (!existsSync(dirChunks)) {
+      /* Tidak menghukum orang yang belum membangun. Gerbang ini sudah menolak
+         peladen dev, jadi ketiadaan `.next` di sini berarti build-nya ada di
+         tempat lain — bukan berarti anggarannya dilanggar. */
+      ok('total JavaScript terbangun terukur', true, '(.next tidak ada — dilewati)');
+    } else {
+      const berkas = [];
+      const kumpul = (dir) => {
+        for (const nama of readdirSync(dir)) {
+          const penuh = join(dir, nama);
+          if (statSync(penuh).isDirectory()) kumpul(penuh);
+          else if (nama.endsWith('.js')) berkas.push(penuh);
+        }
+      };
+      kumpul(dirChunks);
+
+      const kbTotal = berkas.reduce((s2, f) => s2 + statSync(f).size / 1024, 0);
+      const langitTotal = Math.round(LANGIT_TOTAL_JS_KB * TOLERANSI);
+      ok(
+        'total JavaScript terbangun di bawah anggarannya',
+        kbTotal <= langitTotal,
+        `(${kbTotal.toFixed(0)} KB di disk / ${String(langitTotal)} KB · ${String(berkas.length)} potongan)`,
+      );
+    }
   }
 
   ok(
