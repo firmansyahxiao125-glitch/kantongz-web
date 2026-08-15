@@ -79,22 +79,44 @@ Turun di bawah angka mana pun di sini adalah regresi.
    tanpa satu pun yang berkata "isi halamannya mulai di sini". Diperbaiki:
    `<main id="konten">` membungkus isinya, `id` pindah ke tengara sungguhan.
 
-### Hitungan titik henti Tab — garis dasar
+### E2 — hitungan titik henti Tab, per halaman
 
 Halaman yang angkanya berubah kelak adalah halaman yang strukturnya berubah.
+Diukur `scripts/akses.mjs` dengan penekanan Tab SUNGGUHAN lewat CDP, bukan
+dengan menghitung elemen fokusabel di DOM — keduanya sering berbeda, dan yang
+berbeda itulah cacatnya.
 
 | halaman | lebar | ponsel | | halaman | lebar | ponsel |
 |---|---|---|---|---|---|---|
-| muka | 26 | 19 | | analitik | 21 | 8 |
-| masuk | 9 | 9 | | wawasan | 39 | 26 |
+| muka | 27 | 20 | | analitik | 21 | 8 |
+| masuk | 9 | 9 | | wawasan | 58 | 45 |
 | daftar | 11 | 11 | | asisten | 26 | 13 |
 | pulihkan | 6 | 6 | | laporan | 23 | 10 |
-| dasbor | 26 | 13 | | profil | 21 | 8 |
-| transaksi | 73 | 60 | | keamanan | 84 | 71 |
-| dompet | 22 | 9 | | pengaturan | 22 | 9 |
+| dasbor | **35** | **22** | | profil | 21 | 8 |
+| transaksi | 73 | 60 | | keamanan | **≥100** | **≥100** |
+| dompet | 22 | 9 | | pengaturan | 25 | 12 |
 | anggaran | 25 | 12 | | | | |
 | tujuan | 25 | 12 | | | | |
-| berulang | 41 | 28 | | | | |
+| berulang | 86 | 73 | | | | |
+
+**Dua angka menuntut catatan, dan keduanya ditulis apa adanya.**
+
+`keamanan` melaporkan 100 di kedua lebar, dan itu BUKAN hitungan sebenarnya
+melainkan BATAS penjelajahnya (`Math.min(perkiraan + 6, 100)`). Angka
+sesungguhnya ≥100. Menuliskannya sebagai "100" akan menjadikan batas alat ukur
+sebagai fakta tentang halaman — persis jenis kesalahan yang berkas ini ada
+untuk mencegahnya. Halaman itu memang panjang: setiap sesi aktif menyumbang
+tombol "Akhiri sesi" sendiri.
+
+`dasbor` naik 26 -> 35 (lebar) dan 13 -> 22 (ponsel) pada langkah W1–W4: enam
+pintasan aksi cepat ditambah hingga empat tautan peringatan. Kenaikan itu
+DIHARAPKAN dan dicatat di sini supaya kenaikan berikutnya yang TIDAK
+diharapkan langsung terlihat.
+
+Seluruh angka disertai penegasan yang lebih keras daripada hitungannya
+sendiri: setiap titik henti punya nama yang dapat dibacakan, punya penanda
+fokus yang terlihat, tidak ada `tabindex` positif, dan urutannya tidak
+melompat jauh ke atas di dalam satu tengara.
 
 ## Langkah 2 — sistem visual: dua permukaan
 
@@ -596,9 +618,9 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| E2 | todo | — | — | penjelajahan papan tik, hitungan tab-stop per halaman |
-| E3 | todo | — | — | `docs/UX_SCRIPT.md`, tujuh tugas berbatas waktu |
-| E4 | todo | — | — | `docs/A11Y_MANUAL.md` — menunggu manusia, jangan diklaim selesai |
+| E2 | selesai | ini | akses 489/489 | hitungan tercatat di Langkah 1, dengan dua angka yang diberi catatan |
+| E3 | selesai | ini | dokumen saja | `docs/UX_SCRIPT.md` — tujuh tugas, batas waktunya ALARM bukan target |
+| E4 | **terhalang** | ini | — | `docs/A11Y_MANUAL.md` ditulis; MENUNGGU MANUSIA menjalankannya dengan NVDA/VoiceOver. Tidak boleh diklaim selesai oleh siapa pun yang tidak menjalankannya |
 
 ## Langkah 6 — menutup M16–M20
 
