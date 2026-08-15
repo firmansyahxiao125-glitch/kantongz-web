@@ -73,9 +73,9 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
    *   terang helm, sode, obi: dipahat paling kuat dan paling berkilat.
    *   baja   bilah dan sarung: sorot paling sempit dan paling tajam.
    */
-  const zirah = useZirah(1, 5, false, 0.34, 0.6);
-  const zirahTerang = useZirah(1.25, 4, false, 0.54, 1.15);
-  const kain = useZirah(0.55, 6.5, false, 0.17, 0);
+  const zirah = useZirah(1, 5, false, 0.3, 0.6);
+  const zirahTerang = useZirah(1.25, 4, false, 0.47, 1.15);
+  const kain = useZirah(0.55, 6.5, false, 0.12, 0);
   const baja = useZirah(0.7, 8, false, 0.4, 1.7);
   const kulit = useZirah(0.85, 5.5, false, 0.16, 0.08);
 
@@ -103,6 +103,11 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
    * atas latar hitam. Satu bingkai cukup untuk terlihat sebagai kedipan.
    */
   useLayoutEffect(() => {
+    /* Dicari di sini karena rotasinya akan DIUBAH tiap bingkai, dan nilai
+       turunan render tidak boleh dimutasi. Ref menyatakannya terbuka. */
+    simpul.current.kepala = scene.getObjectByName('kepala') ?? null;
+    simpul.current.dada = scene.getObjectByName('dada') ?? null;
+
     scene.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       const nama = (o.material as THREE.Material | undefined)?.name;
@@ -126,6 +131,22 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
    * Pola yang sama sudah dipakai untuk material jejak di `ronin.tsx`.
    */
   const aksi = useRef<typeof actions | null>(null);
+
+  /*
+   * Simpul kepala dan dada dicari SEKALI, bukan tiap bingkai.
+   *
+   * `getObjectByName` menelusuri seluruh pohon; memanggilnya enam puluh kali
+   * sedetik untuk dua simpul yang tidak pernah berpindah adalah pencarian
+   * yang jawabannya sudah diketahui sejak awal.
+   */
+  const simpul = useRef<{ kepala: THREE.Object3D | null; dada: THREE.Object3D | null }>({
+    kepala: null,
+    dada: null,
+  });
+
+  /* Nilai yang diredam antar-bingkai. Disimpan di ref karena ia keadaan
+     animasi, bukan keadaan render. */
+  const halus = useRef({ hover: 0, kepalaX: 0, kepalaY: 0, dadaY: 0 });
 
   /* Diam berjalan terus dan tidak pernah berhenti — sosok yang benar-benar
      membeku di antara tebasan terbaca sebagai adegan yang macet. */
@@ -162,9 +183,22 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
     const stance = stanceGulir.pose(gulir);
     const guncang = goyangKamera(fase, t);
 
+    /*
+     * ── HOVER ────────────────────────────────────────────────────────
+     *
+     * Diredam, tidak pernah dipasang seketika. Sosok yang menyentak naik
+     * begitu kursor menyentuh tepi panggung terbaca sebagai tombol; yang
+     * naik dalam seperlima detik terbaca sebagai makhluk yang menyadari
+     * ada orang datang. Perbedaannya seluruhnya ada di waktu tempuhnya.
+     */
+    const h = halus.current;
+    h.hover = THREE.MathUtils.damp(h.hover, kendali.current.hover ? 1 : 0, 5, delta);
+
     if (akar.current) {
       akar.current.position.z = -stance.mundur + guncang * 2;
-      akar.current.position.y = DASAR_Y + guncang;
+      /* Terangkat sedikit saat diperhatikan — cukup untuk terasa, tidak
+         cukup untuk terlihat melayang. */
+      akar.current.position.y = DASAR_Y + guncang + h.hover * 0.055;
       akar.current.rotation.y = THREE.MathUtils.damp(
         akar.current.rotation.y,
         /*
@@ -174,11 +208,58 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
          * bukan sebagai hidup. Batasnya cukup untuk terasa memperhatikan,
          * tidak cukup untuk terlihat menoleh.
          */
-        stance.putar + THREE.MathUtils.clamp(arah.x * 0.26, -0.26, 0.26),
-        3.6,
+        /* Jangkauan putarnya MELEBAR saat penunjuk hadir: 0,26 -> 0,36.
+           Yang berubah bukan cuma seberapa jauh ia menoleh, melainkan
+           seberapa jelas ia terlihat memperhatikan. */
+        stance.putar +
+          THREE.MathUtils.clamp(arah.x * (0.26 + h.hover * 0.1), -0.36, 0.36),
+        3.6 + h.hover * 1.4,
         delta,
       );
     }
+
+    /*
+     * ── PARALLAX: kepala dan dada, bukan hanya seluruh sosok ─────────
+     *
+     * Memutar akar saja menggerakkan orangnya seperti patung di atas meja
+     * putar — seluruh tubuh berputar sebagai satu keping. Yang membuatnya
+     * terbaca sebagai MEMANDANG adalah kepala yang mendahului badan dan
+     * badan yang menyusul lebih lambat, persis seperti orang menoleh.
+     *
+     * Ditulis SESUDAH mixer memperbarui klipnya pada bingkai yang sama,
+     * jadi ia menimpa — dan itu memang yang diinginkan: klip diam mengurus
+     * napas, penunjuk mengurus arah pandang, dan keduanya tidak pernah
+     * memperebutkan sumbu yang sama.
+     */
+    const targetKepalaY = THREE.MathUtils.clamp(arah.x * 0.3, -0.3, 0.3);
+    const targetKepalaX = THREE.MathUtils.clamp(arah.y * 0.2, -0.2, 0.2);
+    h.kepalaY = THREE.MathUtils.damp(h.kepalaY, targetKepalaY, 5.5, delta);
+    h.kepalaX = THREE.MathUtils.damp(h.kepalaX, targetKepalaX, 5, delta);
+    h.dadaY = THREE.MathUtils.damp(h.dadaY, targetKepalaY * 0.42, 2.6, delta);
+
+    /*
+       Aturan `react-hooks/immutability` dimatikan di sini, sadar dan sempit.
+
+       Aturannya memodelkan nilai turunan hook sebagai tidak boleh diubah, dan
+       itu benar untuk nilai React. Tetapi `scene` bukan nilai React: ia graf
+       adegan three.js, dan MEMUTASINYA TIAP BINGKAI adalah seluruh alasan
+       `useFrame` ada. `useAnimations` milik drei memutasi simpul yang sama
+       persis, pada bingkai yang sama, lewat mixer-nya.
+
+       Yang dimatikan hanya dua baris ini, bukan berkasnya. Kalau suatu saat
+       ada cara idiomatik menggerakkan simpul GLB bernama tanpa menyentuhnya
+       langsung — merender simpulnya lewat `useGraph` dan ref, misalnya —
+       pengecualian ini harus dicabut, bukan diperluas.
+    */
+    /* eslint-disable react-hooks/immutability -- lihat catatan di atas */
+    const kepala = simpul.current.kepala;
+    const dadaSimpul = simpul.current.dada;
+    if (kepala) {
+      kepala.rotation.y = h.kepalaY;
+      kepala.rotation.x += h.kepalaX * 0.5;
+    }
+    if (dadaSimpul) dadaSimpul.rotation.y += h.dadaY;
+    /* eslint-enable react-hooks/immutability */
 
     void state;
     void tier;

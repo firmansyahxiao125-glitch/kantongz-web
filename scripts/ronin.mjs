@@ -541,6 +541,39 @@ await withChrome([], async (cdp) => {
   const kanan = await analisis(cdp, kotak);
   ok('tetikus mengubah bingkai', beda(kiri, kanan) > 0.05, `(delta ${String(Math.round(beda(kiri, kanan) * 100) / 100)})`);
 
+  /*
+     ── HOVER ────────────────────────────────────────────────────────────
+
+     Diuji TERPISAH dari gerakan tetikus, dan itu bukan pengulangan.
+     `pointermove` sudah mengubah adegan lewat arah pandang, jadi kalau
+     hover hanya diuji bersamanya, hover yang tidak tersambung sama sekali
+     tetap akan terlihat lulus — perubahan yang terukur datang dari
+     tetangganya.
+
+     Jadi arahnya dibekukan lebih dulu: `pointerleave` lalu `pointerenter`
+     dikirim TANPA satu pun `pointermove` di antaranya. Yang berubah
+     sesudahnya hanya bisa datang dari hover.
+  */
+  await evaluate(
+    cdp,
+    `(() => { const p = document.querySelector('[data-tier]');
+      p.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false })); return 1; })()`,
+  );
+  await sleep(1200);
+  const lepas = await analisis(cdp, kotak);
+  await evaluate(
+    cdp,
+    `(() => { const p = document.querySelector('[data-tier]');
+      p.dispatchEvent(new PointerEvent('pointerenter', { bubbles: false })); return 1; })()`,
+  );
+  await sleep(1200);
+  const masuk = await analisis(cdp, kotak);
+  ok(
+    'hover mengubah adegan tanpa gerakan tetikus',
+    beda(lepas, masuk) > 0.02,
+    `(delta ${String(Math.round(beda(lepas, masuk) * 100) / 100)})`,
+  );
+
   /* ── klik ──────────────────────────────────────────────────────────── */
   await evaluate(cdp, `document.querySelector('[data-tier] button').click()`);
   await sleep(180);

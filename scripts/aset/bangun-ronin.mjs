@@ -320,9 +320,12 @@ for (const sisi of [-1, 1]) {
   let hx = sisi * KEPALA * 0.3;
   let hy = KEPALA * 0.3;
   let sudut = sisi * 0.75;
-  const ruasTanduk = KEPALA * 0.34;
-  for (let i = 0; i < 5; i += 1) {
-    const jari = KEPALA * (0.07 - i * 0.011);
+  /* Empat ruas, bukan lima, dan lebih tebal. Tanduk yang terlalu panjang dan
+     kurus terbaca sebagai antena serangga; yang membuatnya terbaca sebagai
+     tanduk logam adalah PANGKAL yang tebal lalu meruncing cepat. */
+  const ruasTanduk = KEPALA * 0.3;
+  for (let i = 0; i < 4; i += 1) {
+    const jari = KEPALA * (0.105 - i * 0.019);
     pasang(kepala, new THREE.CylinderGeometry(jari * 0.75, jari, ruasTanduk * 1.06, 7), MAT.zirahTerang, {
       x: hx + Math.sin(sudut) * ruasTanduk * 0.5,
       y: hy + Math.cos(sudut) * ruasTanduk * 0.5,
@@ -333,7 +336,7 @@ for (const sisi of [-1, 1]) {
     hy += Math.cos(sudut) * ruasTanduk;
     /* Melengkung MASUK ke arah tengah sambil naik — tanduk yang lurus
        terbaca sebagai antena. */
-    sudut -= sisi * 0.28;
+    sudut -= sisi * 0.3;
   }
 }
 
@@ -515,26 +518,33 @@ pasang(saya, new THREE.CylinderGeometry(KEPALA * 0.06, KEPALA * 0.055, KEPALA * 
    mantel tertutup akan menelan seluruh pahatan di baliknya. */
 pasang(
   dada,
+  /* Digantung dari BAHU, bukan dari dada, dan lebih lebar di atas.
+
+     Versi pertama mulai sempit setinggi dada lalu melebar — dan bentuk yang
+     sempit di atas lalu melebar ke bawah adalah definisi ROK. Mantel jatuh
+     dari bahu: lebar sejak pundak, sedikit menyempit di pinggang, lalu
+     mengembang lagi. Perbedaan itu yang menentukan apakah ia terbaca sebagai
+     pakaian luar atau sebagai bawahan. */
   new THREE.CylinderGeometry(
-    KEPALA * 0.78,
-    KEPALA * 1.5,
-    KEPALA * 3.4,
+    KEPALA * 1.12,
+    KEPALA * 1.62,
+    KEPALA * 3.9,
     18,
     1,
     true,
-    Math.PI * 0.34,
-    Math.PI * 1.32,
+    Math.PI * 0.3,
+    Math.PI * 1.4,
   ),
   MAT.kain,
-  { y: -KEPALA * 1.5, z: -KEPALA * 0.06 },
+  { y: -KEPALA * 1.62, z: -KEPALA * 0.08 },
 );
 
 /* Dua kelepak depan — sisi mantel yang jatuh di depan bahu. Tanpa keduanya,
    mantel terbuka terbaca sebagai jubah yang hilang bagian depannya. */
 for (const sisi of [-1, 1]) {
-  pasang(dada, new THREE.BoxGeometry(KEPALA * 0.34, KEPALA * 2.2, KEPALA * 0.07), MAT.kain, {
-    x: sisi * KEPALA * 0.5,
-    y: -KEPALA * 0.9,
+  pasang(dada, new THREE.BoxGeometry(KEPALA * 0.42, KEPALA * 2.7, KEPALA * 0.07), MAT.kain, {
+    x: sisi * KEPALA * 0.66,
+    y: -KEPALA * 1.1,
     z: KEPALA * 0.52,
     rz: sisi * 0.1,
     rx: -0.06,
@@ -564,10 +574,10 @@ for (const sisi of [-1, 1]) {
   const n = sisi === -1 ? 'Kiri' : 'Kanan';
   const L = lengan[n];
   L.bahu.rotation.z = -sisi * 0.3;
-  L.atas.rotation.z = -sisi * 0.3;
+  L.atas.rotation.z = -sisi * 0.46;
   L.atas.rotation.x = -0.16;
-  L.bawah.rotation.x = -0.3;
-  L.bawah.rotation.z = -sisi * 0.2;
+  L.bawah.rotation.x = -0.1;
+  L.bawah.rotation.z = -sisi * 0.3;
   L.telapak.rotation.x = 0.2;
 }
 

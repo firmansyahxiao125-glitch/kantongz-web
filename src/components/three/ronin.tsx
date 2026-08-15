@@ -54,11 +54,13 @@ const FRAGMENT = /* glsl */ `
   uniform vec3 uDalam;
   uniform vec3 uTepi;
   uniform vec3 uKunci;
+  uniform vec3 uIsi;
   uniform vec3 uArah;
   uniform float uPangkat;
   uniform float uKuat;
   uniform float uBentuk;
   uniform float uKilau;
+  uniform float uIsiKuat;
 
   varying vec3 vNormalView;
   varying vec3 vViewDir;
@@ -106,6 +108,26 @@ const FRAGMENT = /* glsl */ `
       cahaya. Inilah yang membedakan baja dari kain pada bentuk yang sama,
       dan ia dimatikan (uKilau = 0) untuk bahan yang memang tidak berkilat.
     */
+    /*
+      ── CAHAYA ISI DARI ARAH BERLAWANAN ────────────────────────────────
+
+      Satu sumber cahaya menghasilkan satu warna, dan satu warna di atas
+      hampir-hitam menghasilkan sosok MONOKROM: tiap permukaan hanya berbeda
+      terangnya, tidak pernah berbeda rupanya. Itu yang membuat hasilnya
+      terbaca sebagai patung dicat satu kaleng.
+
+      Cahaya isi datang dari seberang dengan warna LEBIH TERANG dan lebih
+      dingin. Ia lemah — sengaja, karena isi yang sekuat kunci menghapus
+      arah cahayanya dan mengembalikan kerataan yang tadi dihilangkan — tapi
+      cukup untuk membuat sisi bayangan punya warnanya sendiri.
+
+      Hasilnya dua rentang tonal pada permukaan yang sama, dan dua rentang
+      itulah yang dibaca mata sebagai bahan yang berada di dalam ruang, bukan
+      sebagai bentuk yang diberi warna.
+    */
+    float isi = pow(clamp(dot(N, -normalize(uArah)) * 0.5 + 0.5, 0.0, 1.0), 2.2) * uIsiKuat;
+    dasar += uIsi * isi;
+
     vec3 H = normalize(normalize(uArah) + V);
     float spek = pow(max(dot(N, H), 0.0), 42.0) * uKilau;
     dasar += uKunci * spek;
@@ -147,7 +169,7 @@ const ARAH_KUNCI = new THREE.Vector3(-0.55, 0.72, 0.42).normalize();
  * pelat bahu, tsuba — dan tetap dijepit di shader supaya ia tidak pernah
  * membanjiri permukaan.
  */
-export function useZirah(kuat = 1, pangkat = 5, duaSisi = false, bentuk = 0.5, kilau = 0) {
+export function useZirah(kuat = 1, pangkat = 5, duaSisi = false, bentuk = 0.5, kilau = 0, isiKuat = 0.07) {
   return useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -157,15 +179,26 @@ export function useZirah(kuat = 1, pangkat = 5, duaSisi = false, bentuk = 0.5, k
         uniforms: {
           uDalam: { value: new THREE.Color(MATERIAL.nearBlack) },
           uTepi: { value: new THREE.Color(TOKEN.ronin) },
+          /*
+             Kunci JENUH, isi PUCAT — dan urutannya penting.
+
+             Percobaan pertama memasang `roninBright` sebagai kunci. Karena
+             kunci yang mendominasi hampir seluruh permukaan, seisi sosoknya
+             pudar menjadi lavender kelabu dan warna Ronin-nya hilang. Yang
+             pucat harus menjadi yang LEMAH: ia bertugas memberi sisi bayangan
+             rona berbeda, bukan menentukan rona sosoknya.
+          */
           uKunci: { value: new THREE.Color(TOKEN.ronin) },
+          uIsi: { value: new THREE.Color(TOKEN.roninBright) },
           uArah: { value: ARAH_KUNCI },
           uPangkat: { value: pangkat },
           uKuat: { value: kuat },
           uBentuk: { value: bentuk },
           uKilau: { value: kilau },
+          uIsiKuat: { value: isiKuat },
         },
       }),
-    [kuat, pangkat, duaSisi, bentuk, kilau],
+    [kuat, pangkat, duaSisi, bentuk, kilau, isiKuat],
   );
 }
 
@@ -185,6 +218,15 @@ export interface KendaliRonin {
   gulir: number;
   /** Arah penunjuk, −1..1. Berlaku untuk tetikus maupun sentuhan. */
   arah: { x: number; y: number };
+  /**
+   * Apakah penunjuk sedang berada DI ATAS panggung.
+   *
+   * Terpisah dari `arah`, dan itu bukan pengulangan: `arah` tetap menyimpan
+   * posisi terakhir sesudah penunjuk pergi, karena sosok yang menyentak
+   * kembali ke tengah begitu tetikus keluar terbaca sebagai patah, bukan
+   * sebagai tenang. Yang menandai kepergian itu justru bendera ini.
+   */
+  hover: boolean;
 }
 
 export interface RoninProps {
@@ -642,7 +684,7 @@ export function Lingkungan({ tier }: { tier: GraphicsTier }) {
    * berkali-kali lipat badan Ronin, jadi kecerahan yang sama sekali-kali tidak
    * berarti berat yang sama.
    */
-  const jauh = useZirah(0.16, 7, false, 0.05, 0);
+  const jauh = useZirah(0.16, 7, false, 0.05, 0, 0.03);
 
   const cincinMat = useMemo(
     () =>

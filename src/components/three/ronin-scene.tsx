@@ -62,6 +62,7 @@ export function RoninScene({ className }: { className?: string }) {
     t: 0,
     gulir: 0,
     arah: { x: 0, y: 0 },
+    hover: false,
   });
 
   /* Sejak kapan tidak ada masukan. Sesudah ambangnya, ia hanyut kembali ke
@@ -186,6 +187,21 @@ export function RoninScene({ className }: { className?: string }) {
       data-tier={tier}
       onPointerMove={(e) => {
         arahkan(e.clientX, e.clientY);
+      }}
+      /*
+        Hover ditulis ke REF, bukan ke state.
+
+        Menjadikannya state berarti seluruh pohon adegan dirender ulang dua
+        kali setiap kali kursor melewati panggung — dan render ulang React
+        tidak menggambar satu piksel pun yang berbeda di sini, karena yang
+        menggambar adalah `useFrame`. Ref-nya dibaca per bingkai, jadi
+        tanggapannya tetap seketika tanpa satu pun render tambahan.
+      */
+      onPointerEnter={() => {
+        kendali.current.hover = true;
+      }}
+      onPointerLeave={() => {
+        kendali.current.hover = false;
       }}
       /*
         Menekan panggungnya juga menebas — tetapi lewat PENUNJUK saja.

@@ -236,6 +236,59 @@ tadinya gelap tidak hilang, ia hanya tertimbun.
 Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
 `ronin` kembali 27/27.
 
+### R14 — siluet rujukan, hover, dan parallax kepala
+
+| id | status | commit | gerbang | catatan |
+|---|---|---|---|---|
+| R14 | selesai | ini | ronin 28/28 · akses 455 · grafis 14 · palet bersih · 83 uji | kuwagata, dua katana, haori, hover, parallax kepala/dada |
+
+Rujukan kedua memperlihatkan bahwa jaraknya SILUET, bukan detail permukaan.
+Empat pembentuknya ditambahkan: tanduk kuwagata, dua katana menyilang ke
+bawah, haori panjang yang jatuh dari bahu, dan pose simetris menghadap depan.
+
+Tiga kesalahan ditangkap sendiri sepanjang jalan, dan ketiganya jenis yang
+hanya terlihat dari tangkapan layar:
+
+- Tanduk pertama LENYAP — satu torus ber-arc dengan tiga sumbu rotasi tidak
+  dapat diramalkan arahnya. Diganti rantai ruas yang posisinya dihitung.
+- Sudut bilah pertama menumpuk di atas rotasi lengan sehingga bilahnya
+  MENDATAR: sosoknya terbaca bersayap, bukan bersenjata.
+- Cahaya kunci sempat dipasang `roninBright`, dan karena kunci mendominasi
+  hampir seluruh permukaan, seisi sosoknya PUDAR jadi lavender kelabu. Yang
+  pucat harus menjadi yang lemah: kunci jenuh, isi pucat.
+
+Haori versi pertama mulai sempit setinggi dada lalu melebar — dan sempit di
+atas lalu melebar ke bawah adalah definisi ROK. Digantung dari bahu, ia
+terbaca sebagai pakaian luar.
+
+**Anggaran ditutup dengan menghemat.** Model sempat 286,4 KiB terhadap batas
+280 dan gerbang menolaknya. Sebabnya pemborosan nyata: tiap `pasang()`
+membangun geometrinya sendiri, jadi dua katana menyimpan empat belas bentuk
+identik masing-masing. Kembarannya disatukan sebelum ekspor — 49 disatukan,
+286,4 -> 166,4 KiB, dan anggarannya tidak disentuh.
+
+**Cahaya isi juga tertangkap gerbang.** Menambahkannya mendorong
+`terangPersen` ke 39,9% terhadap batas 38. Yang dikecilkan isinya, bukan
+ambangnya: 0,14 -> 0,07, dan mantel — permukaan terluas sekarang —
+digelapkan. Turun ke 33,5%.
+
+**Hover diuji TERPISAH dari gerakan tetikus.** `pointermove` sudah mengubah
+adegan lewat arah pandang, jadi hover yang diuji bersamanya akan terlihat
+lulus meskipun tidak tersambung sama sekali. Arahnya dibekukan lebih dulu;
+yang berubah sesudahnya hanya bisa datang dari hover. Delta 530.
+
+Parallax kini menggerakkan kepala dan dada, bukan hanya memutar akar. Memutar
+akar saja menggerakkan orangnya seperti patung di atas meja putar; yang
+membuatnya terbaca MEMANDANG adalah kepala yang mendahului dan badan yang
+menyusul lebih lambat.
+
+Satu aturan lint dimatikan, sadar dan sempit: `react-hooks/immutability` pada
+tiga baris yang memutar simpul GLB. Aturannya memodelkan nilai turunan hook
+sebagai tak-boleh-diubah — benar untuk nilai React, tetapi `scene` adalah graf
+adegan three.js, dan memutasinya tiap bingkai adalah seluruh alasan `useFrame`
+ada. `useAnimations` milik drei memutasi simpul yang sama pada bingkai yang
+sama.
+
 ### Review visual karakter — status jujur
 
 Struktur TERCAPAI: humanoid penuh, kepala dan leher, dua bahu, dua lengan dan
@@ -243,11 +296,12 @@ telapak, torso dan pinggang, dua kaki terpisah, dua telapak kaki, proporsi
 manusia, berdiri di platform, katana terbaca sebagai pedang, dan kedalaman
 material yang nyata sejak cahaya bentuk masuk.
 
-BELUM tercapai terhadap rujukan: fidelitas sculpt. Kabuto kini punya
-mabizashi, fukigaeshi, dan tehen sehingga berhenti terbaca sebagai tudung,
-tetapi hasilnya tetap gaya low-poly ter-stilisasi — bukan setara sculpt
-high-poly di gambar rujukan. Itu plafon model bangun-sendiri, dan plafon itu
-sudah disampaikan terbuka; pengguna memilih melanjutkan jalur ini dengan sadar.
+BELUM tercapai terhadap rujukan: fidelitas sculpt. Siluetnya kini terbaca —
+samurai bertanduk, mata menyala, dua katana melengkung, mantel panjang,
+lingkaran lantai, torii — tetapi hasilnya tetap gaya low-poly ter-stilisasi,
+bukan setara sculpt high-poly di gambar rujukan. Itu plafon model
+bangun-sendiri, dan plafon itu sudah disampaikan terbuka; pengguna memilih
+melanjutkan jalur ini dengan sadar.
 
 ### Dua hal yang HARUS diketahui sebelum melanjutkan Ronin
 
