@@ -157,6 +157,60 @@ const FRAGMENT = /* glsl */ `
 const ARAH_KUNCI = new THREE.Vector3(-0.55, 0.72, 0.42).normalize();
 
 /**
+ * HALO — cahaya yang meluruh, bukan bidang yang diberi warna.
+ *
+ * Percobaan pertama memakai `MeshBasicMaterial` transparan untuk bulan dan
+ * kabut. Hasilnya memperlihatkan masalah yang selalu sama: bidang datar
+ * berwarna rata TIDAK PUNYA PELURUHAN, jadi yang terlihat bukan cahayanya
+ * melainkan bentuk pembawanya — bulannya menjadi piring kelabu pejal, dan
+ * kabutnya menjadi kotak bertepi keras melintang di bawah adegan.
+ *
+ * Cahaya di alam tidak pernah berakhir pada sebuah tepi. Peluruhan radial
+ * dari pusat ke nol inilah yang membuat sesuatu terbaca sebagai pendar; dan
+ * karena ia mencapai nol sebelum sampai ke pinggir mesh, geometri
+ * pembawanya tidak akan pernah terlihat berapa pun besarnya.
+ */
+const HALO_VERTEX = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const HALO_FRAGMENT = /* glsl */ `
+  uniform vec3 uWarna;
+  uniform float uKuat;
+  uniform float uPusat;
+  varying vec2 vUv;
+  void main() {
+    float d = length(vUv - 0.5) * 2.0;
+    float a = pow(max(0.0, 1.0 - d), uPusat) * uKuat;
+    gl_FragColor = vec4(uWarna, a);
+  }
+`;
+
+function useHalo(warna: string, kuat: number, pusat = 2.2) {
+  return useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader: HALO_VERTEX,
+        fragmentShader: HALO_FRAGMENT,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        uniforms: {
+          uWarna: { value: new THREE.Color(warna) },
+          uKuat: { value: kuat },
+          uPusat: { value: pusat },
+        },
+      }),
+    [warna, kuat, pusat],
+  );
+}
+
+/**
  * Zirah: gelap di perut, menyala HANYA di pinggir.
  *
  * `uPangkat` menentukan setipis apa pitanya. 2,6 menghasilkan gradien lembut
@@ -686,6 +740,20 @@ export function Lingkungan({ tier }: { tier: GraphicsTier }) {
    */
   const jauh = useZirah(0.16, 7, false, 0.05, 0, 0.03);
 
+  /*
+   * Bulan, kabut, dan siluet pagoda — dan ketiganya lingkungan, bukan hiasan.
+   *
+   * Sesudah karakternya berdiri, jarak terbesar terhadap rujukan berpindah:
+   * yang kurang bukan lagi sosoknya melainkan DUNIA di sekelilingnya.
+   * Rujukan menempatkan samurainya di dalam tempat — bulan besar, gerbang,
+   * atap-atap jauh, kabut ungu — dan tempat itu mengerjakan separuh
+   * kesannya. Sosok yang sama di atas hitam polos terbaca sebagai aset yang
+   * ditempel, betapa pun rapi pahatannya.
+   */
+  const bulanMat = useHalo(TOKEN.roninCore, 0.5, 5.5);
+  const bulanPendar = useHalo(TOKEN.ronin, 0.16, 2.4);
+  const halimunMat = useHalo(TOKEN.ronin, 0.13, 2.8);
+
   const cincinMat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
@@ -727,6 +795,71 @@ export function Lingkungan({ tier }: { tier: GraphicsTier }) {
       <mesh ref={kabut} rotation={[-Math.PI / 2, 0, 0]} material={cincinMat} scale={2.1}>
         <ringGeometry args={[0.47, 0.482, segmen]} />
       </mesh>
+
+      {/* ── SIGIL ────────────────────────────────────────────────────────
+          Dua cincin polos memberi pijakan, dan berhenti di situ. Rujukan
+          menaruh lingkaran sihir bersegmen di bawah kakinya, dan segmen itu
+          yang mengubah "berdiri di atas cahaya" menjadi "berdiri di dalam
+          sesuatu". Yang menambah artinya bukan cincin ketiga melainkan
+          RITME — potongan berulang yang mata baca sebagai tanda, bukan
+          sebagai bentuk.
+
+          Hanya di tingkat penuh: dua belas potong kecil di bawah lipatan
+          ponsel bukan detail, melainkan gambar yang dibayar tanpa dilihat. */}
+      {tier === 'full'
+        ? Array.from({ length: 12 }, (_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            return (
+              <mesh
+                key={a}
+                position={[Math.sin(a) * 0.78, 0.002, Math.cos(a) * 0.78]}
+                rotation={[-Math.PI / 2, 0, -a]}
+                material={cincinMat}
+              >
+                <planeGeometry args={[0.035, 0.16]} />
+              </mesh>
+            );
+          })
+        : null}
+
+      {/* Halimun setinggi lutut — bidang lebar yang sangat redup. Ia tidak
+          digambar untuk dilihat melainkan untuk memberi cahaya sesuatu yang
+          dapat disinggahi; tanpanya, cincin lantai mengambang di kehampaan. */}
+      <mesh position={[0, 0.5, -0.6]} material={halimunMat}>
+        <planeGeometry args={[8, 4]} />
+      </mesh>
+
+      {/* ── BULAN ────────────────────────────────────────────────────────
+          Jangkar besar di kiri-atas, persis seperti rujukan. Ia jauh, pucat,
+          dan tidak pernah bergerak — dan justru karena tidak bergerak, ia
+          memberi seluruh adegan skala. Tanpa satu benda yang jelas jauh,
+          tidak ada yang memberi tahu mata seberapa besar samurainya. */}
+      <mesh position={[-4.6, 4.6, -14]} material={bulanPendar}>
+        <planeGeometry args={[11, 11]} />
+      </mesh>
+      <mesh position={[-4.6, 4.6, -13.9]} material={bulanMat}>
+        <planeGeometry args={[4.6, 4.6]} />
+      </mesh>
+
+      {/* ── ATAP JAUH ────────────────────────────────────────────────────
+          Tiga atap bersusun di kejauhan, nyaris padam. Bentuk atap Jepang —
+          lebar, rendah, ujungnya terangkat — dikenali dari siluetnya saja,
+          dan siluet itu yang menyebut "kota" tanpa satu pun bangunan
+          digambar. */}
+      {tier === 'full'
+        ? [-1, 1].map((sisi) =>
+            [0, 1, 2].map((tingkat) => (
+              <mesh
+                key={`${String(sisi)}-${String(tingkat)}`}
+                position={[sisi * (3.4 + tingkat * 0.5), 0.5 + tingkat * 0.62, -10 - tingkat]}
+                rotation={[0, 0, 0]}
+                material={jauh}
+              >
+                <coneGeometry args={[1.5 - tingkat * 0.26, 0.42, 4]} />
+              </mesh>
+            )),
+          )
+        : null}
 
       {/* ── torii ────────────────────────────────────────────────────────
           Dua tiang dan dua palang. Bentuk itu dikenali seketika, dan tidak
