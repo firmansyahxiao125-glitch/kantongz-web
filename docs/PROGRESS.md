@@ -642,7 +642,7 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| G1 | todo | — | — | pengingat jatuh tempo, idempoten |
+| G1 | selesai | `061bb5b` | 522 uji · keamanan 21/21 · pengingat 8/8 | pengingat jatuh tempo, idempoten — kunci `pengingat:{aturan}:{TANGGAL-JATUH-TEMPO}`, bukan tanggal kirim; dijaga indeks unik `outbox_idempotency`, tanpa tabel baru. Gerbang runtime menemukan `.map()` atas `decryptColumn` membungkam SELURUH pemindaian karena 2 dari 9 baris disandikan kunci lain — kini dilewati per baris dan dicatat sebagai peringatan |
 | G2 | todo | — | — | kategori otomatis dari merchant — menyarankan, tidak memutuskan |
 
 ## Langkah 9 — tiga yang berisiko, paling akhir
