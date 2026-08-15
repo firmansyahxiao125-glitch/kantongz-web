@@ -97,3 +97,36 @@ export const MATERIAL = {
  * literal dengan satu arti adalah dua tempat untuk menyimpang.
  */
 export const CATEGORY_DEFAULT = TOKEN.identityNone;
+
+/**
+ * Warna KANVAS — nilai `--bg` tiap tema, sebagai literal TypeScript.
+ *
+ * ── MENGAPA ADA DI SINI, TERPISAH DARI `TOKEN` ─────────────────────────
+ *
+ * Keduanya sudah hidup di `globals.css` sebagai `--bg`, dan itulah sumber
+ * kebenarannya untuk segala yang dirender peramban. Tetapi dua tempat membaca
+ * warna ini SEBELUM satu baris CSS pun dimuat, jadi `var(--bg)` tidak menunjuk
+ * apa pun di keduanya:
+ *
+ *   `layout.tsx`    `<meta name="theme-color">` — dibaca peramban saat parsing
+ *   `manifest.ts`   manifest aplikasi — dibaca sistem operasi saat pemasangan
+ *
+ * Versi pertama `manifest.ts` menuliskan hex-nya sendiri, dan gerbang
+ * `palette` menolaknya — dengan benar. Alasan "harus literal" memang berlaku
+ * untuk variabel CSS, tetapi tidak untuk modul TypeScript: impor di sini
+ * diselesaikan saat kompilasi, jadi tidak ada satu pun ketergantungan runtime
+ * yang ditambahkan.
+ *
+ * TIDAK dimasukkan ke `TOKEN` karena aturan 2 gerbang itu membandingkan
+ * seluruh isi `TOKEN` dengan token `globals.css` satu per satu, dan `--bg`
+ * bukan token dalam pengertian itu — ia latar permukaan, bukan warna sistem
+ * desain.
+ *
+ * Kecocokannya dengan `--bg` tetap dijaga mesin: aturan 3 `palette.mjs`
+ * memeriksa `layout.tsx` terhadap `globals.css`, dan `pwa.mjs` memeriksa
+ * `manifest.webmanifest` terhadap nilai yang sama.
+ */
+export const KANVAS = {
+  gelap: '#06070a',
+  terang: '#faf8f4',
+} as const;

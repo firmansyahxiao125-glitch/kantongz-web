@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id-ID">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#06070a" />
+    <title>Luring · KANTONGZ</title>
+    <!--
+      SATU BERKAS, TANPA SATU PUN SUMBER DAYA LUAR. H1.
+
+      Halaman ini ditampilkan justru ketika jaringan tidak ada. Setiap tautan
+      ke stylesheet, fon, atau gambar di sini adalah permintaan yang PASTI
+      gagal — dan hasilnya halaman luring yang sendirinya tampak rusak.
+
+      Jadi CSS-nya sebaris, fon-nya tumpukan sistem, dan lambangnya SVG yang
+      ditulis langsung di badan dokumen.
+    -->
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #06070a;
+        --teks: #e7e4dd;
+        --redup: #9a958c;
+        --emas: #c89440;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--teks);
+        font-family:
+          ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+          Arial, sans-serif;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        line-height: 1.6;
+      }
+      main {
+        max-width: 34rem;
+        text-align: center;
+      }
+      svg {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 28px;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin: 0 0 12px;
+      }
+      p {
+        margin: 0 0 10px;
+        color: var(--redup);
+      }
+      .tegas {
+        color: var(--teks);
+      }
+      button {
+        margin-top: 24px;
+        padding: 10px 20px;
+        font: inherit;
+        font-weight: 500;
+        color: var(--bg);
+        background: var(--emas);
+        border: 0;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 2px solid var(--emas);
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <svg viewBox="0 0 48 48" fill="none" role="img" aria-label="KANTONGZ">
+        <circle cx="24" cy="24" r="22" stroke="#c89440" stroke-opacity="0.28" stroke-width="2" />
+        <g stroke="#c89440" stroke-opacity="0.5" stroke-width="1.5" stroke-linecap="round">
+          <line x1="24" y1="7" x2="24" y2="14" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(30 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(60 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(90 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(120 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(150 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(180 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(210 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(240 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(270 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(300 24 24)" />
+          <line x1="24" y1="7" x2="24" y2="14" transform="rotate(330 24 24)" />
+        </g>
+        <circle cx="24" cy="24" r="11" stroke="#c89440" stroke-opacity="0.85" stroke-width="1.5" />
+        <circle cx="24" cy="24" r="5" fill="#e8b563" fill-opacity="0.9" />
+      </svg>
+
+      <h1>Kamu sedang luring</h1>
+
+      <!--
+        Yang ditulis di sini SENGAJA menyebutkan apa yang TIDAK ditampilkan.
+
+        Godaan pada halaman luring adalah menghibur — "kami akan segera
+        kembali". Yang benar-benar ingin diketahui orang yang membuka aplikasi
+        keuangannya adalah apakah angka yang ia lihat dapat dipercaya. Jawaban
+        di sini: tidak ada angka sama sekali, dan itu disengaja.
+      -->
+      <p>Perangkatmu tidak terhubung ke jaringan, jadi KANTONGZ tidak dapat mengambil datamu.</p>
+      <p class="tegas">
+        Saldo dan transaksi sengaja TIDAK disimpan di perangkat ini — angka keuangan yang basi
+        lebih berbahaya daripada angka yang tidak muncul.
+      </p>
+      <p>Sambungkan kembali, lalu muat ulang.</p>
+
+      <button type="button" onclick="location.reload()">Coba lagi</button>
+    </main>
+  </body>
+</html>

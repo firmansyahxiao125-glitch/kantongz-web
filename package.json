@@ -20,7 +20,9 @@
     "test": "vitest run",
     "grafis": "node scripts/grafis.mjs",
     "sintaks": "node scripts/sintaks.mjs",
-    "ronin": "node scripts/ronin.mjs"
+    "ronin": "node scripts/ronin.mjs",
+    "pwa": "node scripts/pwa.mjs",
+    "ikon": "node scripts/ikon.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",

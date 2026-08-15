@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
+import { DaftarSW } from '@/components/pwa/daftar-sw';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
@@ -177,6 +178,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           itu urusan skrip pra-paint di atas, dan penyedia ini yang membacanya.
         */}
         <ThemeProvider>{children}</ThemeProvider>
+        {/*
+          Pendaftar service worker, di tata letak AKAR. H1.
+
+          Di sini dan bukan di `AppProviders` karena cangkang yang di-cache
+          melayani kedua permukaan: pengunjung halaman muka yang memasang
+          KANTONGZ ke layar utamanya mendapat halaman luring yang sama dengan
+          pengguna yang sudah masuk.
+
+          Tidak melanggar batas muatan yang dijaga `AppProviders`: komponen ini
+          merender `null`, tidak menarik satu pustaka pun, dan seluruh isinya
+          satu `useEffect` yang berhenti sendiri di luar produksi.
+        */}
+        <DaftarSW />
       </body>
     </html>
   );
