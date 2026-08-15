@@ -328,6 +328,43 @@ async function periksaStatis(cdp, nama, layar) {
       }
 
       return {
+        /* Luapan mendatar, diukur DUA cara sekaligus.
+
+           scrollWidth menangkap halaman yang benar-benar dapat digeser ke
+           samping. Daftar elemennya menangkap yang lebih licik: elemen yang
+           menonjol keluar viewport tetapi dipotong overflow-hidden di
+           leluhurnya, sehingga halamannya tidak bergeser dan cacatnya tetap
+           terlihat sebagai teks terpotong. Salah satu saja meloloskan
+           separuh kasusnya.
+
+           TANPA BACKTICK, dan itu bukan gaya penulisan: potongan ini hidup di
+           dalam template literal, dan satu backtick menutup stringnya. Berkas
+           ini sudah memperingatkannya beberapa baris di bawah, dan penulisnya
+           tetap menabraknya. */
+        gulirLebar: document.documentElement.scrollWidth,
+        lebarLayar: window.innerWidth,
+        meluap: [...document.querySelectorAll('body *')]
+          .filter(terlihat)
+          .filter(el => { const r = el.getBoundingClientRect();
+            return r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1); })
+          /* Yang punya leluhur DAPAT DIGESER tidak dihitung, dan itu koreksi
+             atas versi pertama pemeriksaan ini.
+
+             Tabel laporan lebih lebar dari layar ponsel dengan sengaja: ia
+             duduk di dalam pembungkus overflow-x-auto, jadi isinya tetap dapat
+             dijangkau dengan menggeser. Menandainya sebagai cacat berarti
+             menuntut setiap tabel diperas sampai tak terbaca — obat yang lebih
+             buruk daripada penyakitnya.
+
+             Luapan hanya cacat ketika TIDAK ADA yang dapat menggesernya. */
+          .filter(el => {
+            for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+              const ox = getComputedStyle(a).overflowX;
+              if (ox === 'auto' || ox === 'scroll') return false;
+            }
+            return true;
+          })
+          .slice(0, 4).map(penanda),
         fokusabel: fokusabel.length,
         tanpaNama: fokusabel.filter(el => !accName(el)).map(penanda),
         tabindexPositif: [...document.querySelectorAll('[tabindex]')]
@@ -367,6 +404,13 @@ async function periksaStatis(cdp, nama, layar) {
   const p = `${nama}/${layar}`;
   ok(`${p} · setiap kontrol punya nama`, f.tanpaNama.length === 0, JSON.stringify(f.tanpaNama.slice(0, 4)));
   ok(`${p} · tidak ada tabindex positif`, f.tabindexPositif.length === 0, JSON.stringify(f.tabindexPositif.slice(0, 3)));
+  ok(
+    `${p} · tanpa luapan mendatar`,
+    f.gulirLebar <= f.lebarLayar + 1 && f.meluap.length === 0,
+    f.meluap.length > 0
+      ? JSON.stringify(f.meluap)
+      : `(scrollWidth ${String(f.gulirLebar)} / ${String(f.lebarLayar)})`,
+  );
   ok(`${p} · tepat satu <main>`, f.main === 1, `(${String(f.main)})`);
   ok(`${p} · tepat satu <h1> terlihat`, f.h1 === 1, `(${String(f.h1)})`);
   ok(`${p} · heading tidak melompat tingkat`, f.lompatHeading.length === 0, JSON.stringify(f.lompatHeading.slice(0, 3)));
