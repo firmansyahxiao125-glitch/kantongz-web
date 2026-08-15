@@ -138,7 +138,7 @@ melompat jauh ke atas di dalam satu tengara.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| V1 | selesai | Langkah 3 +  | render 39/0 · ronin 28/0 · pwa 21/0 · typography 15/0 · contrast · palette | permukaan publik: landing + masuk + daftar + pulihkan. Dikerjakan BERSAMA Langkah 3 sesuai catatan urutan di bawah, lalu ditutup dengan judul per halaman — ketiganya sempat memakai judul bawaan yang sama, sehingga pembaca layar tidak pernah mengumumkan perpindahan halaman |
+| V1 | selesai | Langkah 3 + `05a9455` | render 39/0 · ronin 28/0 · pwa 21/0 · typography 15/0 · contrast · palette | permukaan publik: landing + masuk + daftar + pulihkan. Dikerjakan BERSAMA Langkah 3 sesuai catatan urutan di bawah, lalu ditutup dengan judul per halaman — ketiganya sempat memakai judul bawaan yang sama, sehingga pembaca layar tidak pernah mengumumkan perpindahan halaman |
 | V2 | selesai | b36893b | contrast hijau (2 tema) · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | token hangat + terang jadi bawaan per-permukaan |
 | V2b | selesai | ini | contrast hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | bilah sisi arang lewat `.kanvas-gelap`, nilainya dipinjam dari tema gelap yang sudah diaudit |
 | V3 | selesai | ini | contrast hijau · palette hijau · akses 455/455 · interior hijau · alur hijau · 63 uji · build 0 | empat kartu sebaris, cincin anggaran, kartu tujuan. Pemilih rentang tanggal DITUNDA — lihat catatan |
@@ -175,8 +175,8 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 
 > **V1 diverifikasi 16 Agustus 2026, bukan disimpulkan.** Keempat rute publik
 > diperiksa pada peladen standalone produksi: seluruhnya 200, seluruhnya
-> membawa  lewat skrip pra-paint, latar terukur
->  — sama persis dengan token  — dan seluruhnya menyertakan
+> membawa `data-theme="dark"` lewat skrip pra-paint, latar terukur
+> `rgb(6,7,10)` — sama persis dengan token `--bg` — dan seluruhnya menyertakan
 > tautan manifest PWA.
 >
 > Yang TIDAK diklaim di sini: bahwa permukaannya indah. Tidak ada angka untuk
