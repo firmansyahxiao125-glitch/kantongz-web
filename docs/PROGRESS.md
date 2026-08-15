@@ -665,14 +665,33 @@ pada isi buku besar.
 
 ## Yang terhalang
 
-> **Tiga gerbang peramban MERAH sebelum H1, dan bukan karenanya — 16 Agustus 2026.**
+> **Tiga gerbang peramban itu TIDAK pernah rusak — 16 Agustus 2026, `23afe0f`.**
 >
-> Dibuktikan dengan menyimpan seluruh perubahan H1 (`git stash`), membersihkan
-> `.next`, lalu menjalankan ketiganya pada pohon BERSIH. Hasilnya identik. H1
-> tidak menyentuhnya.
+> Ketiganya mengukur `next dev`. Diukur ulang terhadap `next build` + `next start`:
 >
-> | gerbang | keadaan | sebab |
+> | gerbang | terhadap `next dev` | terhadap produksi |
 > |---|---|---|
+> | `grafis` | 1728 KB / langit 1265 | **19 lulus, 0 gagal** |
+> | `render` | 38 lulus, 1 gagal | **39 lulus, 0 gagal** |
+> | `ronin` | 27 lulus, 1 gagal, 3 galat konsol | **28 lulus, 0 gagal, 0 galat** |
+>
+> `next dev` menyajikan 882 KB potongan tanpa minifikasi plus React Refresh
+> yang memanggil `eval()` — dan CSP repositori ini menolak `unsafe-eval`
+> dengan sengaja. Gerbangnya melaporkan kebijakan keamanan yang bekerja
+> benar sebagai kegagalan.
+>
+> `scripts/permukaan.mjs` kini MENOLAK dev di ketiganya. Bobotnya dibatasi
+> `loadEventEnd` dan menjadi deterministik: 155 KB, lima jalanan sama persis
+> (sebelumnya bergoyang 623 / 846 / 1475). Langit-langit dikalibrasi ulang
+> 1100 → 155.
+>
+> **Item terbuka yang lahir dari perbaikan ini.** JavaScript adegan 3D —
+> three, R3F, postprocessing — diminta SESUDAH `loadEventEnd`, jadi kini
+> tidak terhitung anggaran mana pun. GLB-nya punya `LANGIT_MODEL_KB`;
+> JS-nya belum punya. Sebelumnya ia kadang terhitung dan kadang tidak, dan
+> itulah sebagian dari goyangannya.
+
+---|---|---|
 > | `render` | 38 lulus · 1 gagal | 1 galat konsol — `unsafe-eval` |
 > | `ronin` | 27 lulus · 1 gagal · 3 galat konsol | `unsafe-eval` + "cadangannya juga UNGU (bin 11, jenuh 5,8%)" |
 > | `grafis` | 18 lulus · 1 gagal · 1 dilewati | bobot JavaScript 1728 KB terhadap langit-langit 1265 KB |
