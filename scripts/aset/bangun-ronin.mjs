@@ -221,12 +221,12 @@ for (const sisi of [-1, 1]) {
    dan lapisan tengkuknya dirapatkan serta dibatasi HANYA ke belakang. */
 
 /* tengkorak */
-pasang(kepala, new THREE.SphereGeometry(KEPALA * 0.4, 16, 14), MAT.kulit, { y: 0 });
+pasang(kepala, new THREE.SphereGeometry(KEPALA * 0.4, 14, 10), MAT.kulit, { y: 0 });
 
 /* hachi — mangkuk helm */
 pasang(
   kepala,
-  new THREE.SphereGeometry(KEPALA * 0.52, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.56),
+  new THREE.SphereGeometry(KEPALA * 0.52, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.56),
   MAT.zirahTerang,
   { y: KEPALA * 0.08 },
 );
@@ -301,8 +301,44 @@ for (const sisi of [-1, 1]) {
   });
 }
 
+/* ── KUWAGATA: sepasang tanduk ───────────────────────────────────────────
+
+   Penanda siluet paling kuat di seluruh rujukan. Dua lengkung panjang
+   menyapu ke atas-luar dari kening; keduanya menembus garis atas kepala,
+   jadi siluetnya berhenti berupa telur dan mulai berupa sesuatu yang
+   bertanduk. Mata mengenali itu jauh sebelum sempat membaca zirahnya.
+
+   Dibangun dari RUAS EKSPLISIT, bukan dari torus yang diputar.
+
+   Percobaan pertama memakai satu torus ber-arc dengan tiga sumbu rotasi
+   sekaligus, dan hasilnya lenyap — entah tertanam di dalam mangkuk helm atau
+   menghadap ke belakang. Lengkung yang arahnya ditentukan tiga rotasi
+   majemuk memang tidak dapat diramalkan tanpa dicoba, dan bentuk yang harus
+   MENEMBUS siluet tidak boleh bergantung pada tebakan. Rantai ruas menaruh
+   tiap potongnya di tempat yang dihitung, jadi arahnya pasti. */
+for (const sisi of [-1, 1]) {
+  let hx = sisi * KEPALA * 0.3;
+  let hy = KEPALA * 0.3;
+  let sudut = sisi * 0.75;
+  const ruasTanduk = KEPALA * 0.34;
+  for (let i = 0; i < 5; i += 1) {
+    const jari = KEPALA * (0.07 - i * 0.011);
+    pasang(kepala, new THREE.CylinderGeometry(jari * 0.75, jari, ruasTanduk * 1.06, 7), MAT.zirahTerang, {
+      x: hx + Math.sin(sudut) * ruasTanduk * 0.5,
+      y: hy + Math.cos(sudut) * ruasTanduk * 0.5,
+      z: KEPALA * 0.06,
+      rz: -sudut,
+    });
+    hx += Math.sin(sudut) * ruasTanduk;
+    hy += Math.cos(sudut) * ruasTanduk;
+    /* Melengkung MASUK ke arah tengah sambil naik — tanduk yang lurus
+       terbaca sebagai antena. */
+    sudut -= sisi * 0.28;
+  }
+}
+
 /* maedate — bulan sabit di kening, di depan mabizashi */
-pasang(kepala, new THREE.TorusGeometry(KEPALA * 0.34, KEPALA * 0.05, 6, 16, Math.PI * 1.05), MAT.zirahTerang, {
+pasang(kepala, new THREE.TorusGeometry(KEPALA * 0.34, KEPALA * 0.05, 5, 12, Math.PI * 1.05), MAT.zirahTerang, {
   y: KEPALA * 0.34,
   z: KEPALA * 0.26,
   rx: 0.52,
@@ -349,10 +385,10 @@ for (const sisi of [-1, 1]) {
   /* sode — pelat bahu berlapis, menggantung DI LUAR sendi supaya ia ikut
      berayun tanpa menembus lengan */
   for (let i = 0; i < 3; i += 1) {
-    pasang(L.bahu, new THREE.BoxGeometry(KEPALA * (0.86 + i * 0.07), KEPALA * 0.24, KEPALA * 0.86), MAT.zirahTerang, {
-      x: sisi * KEPALA * (0.2 + i * 0.05),
+    pasang(L.bahu, new THREE.BoxGeometry(KEPALA * (0.5 + i * 0.05), KEPALA * 0.2, KEPALA * 0.62), MAT.zirahTerang, {
+      x: sisi * KEPALA * (0.1 + i * 0.04),
       y: -i * KEPALA * 0.2,
-      rz: sisi * (0.24 + i * 0.05),
+      rz: sisi * (0.5 + i * 0.09),
     });
   }
 
@@ -397,27 +433,30 @@ for (const sisi of [-1, 1]) {
   });
 }
 
-/* ── daishō ───────────────────────────────────────────────────────────── */
+/* ── daishō: DUA katana, satu di tiap tangan ────────────────────────────
 
-/**
- * Katana di tangan kanan.
- *
- * Bilahnya melengkung, disusun dari ruas pendek yang makin miring. Badannya
- * baja gelap dan hanya sisi potongnya yang memancar: katana bukan neon, dan
- * batang yang menyala seluruhnya juga membanjiri bagian dalam siluet dengan
- * cahaya — pelajaran yang sudah dibayar sekali di versi prosedural.
- */
-const katana = simpul('katana', 0, -KEPALA * 0.22, KEPALA * 0.06);
-lengan.Kanan.telapak.add(katana);
+   Rujukan memegang sepasang bilah menyilang ke bawah, dan itu bukan sekadar
+   satu pedang tambahan. Dua diagonal yang berlawanan arah membentuk huruf X
+   di sekeliling badan — dan X adalah bentuk yang dibaca mata jauh sebelum ia
+   sempat mengenali zirahnya. Satu pedang hanya memberi satu garis, dan satu
+   garis tenggelam di siluet yang sudah penuh garis vertikal.
 
-pasang(katana, new THREE.CylinderGeometry(KEPALA * 0.055, KEPALA * 0.05, KEPALA * 0.72, 10), MAT.baja, {
-  y: KEPALA * 0.18,
-});
-pasang(katana, new THREE.CylinderGeometry(KEPALA * 0.15, KEPALA * 0.15, KEPALA * 0.04, 14), MAT.zirahTerang, {
-  y: -KEPALA * 0.2,
-});
+   Bilahnya dibuat lewat fungsi supaya keduanya BENAR-BENAR identik. Menyalin
+   blok geometri untuk sisi kedua adalah cara paling pasti membuat dua pedang
+   yang perlahan berbeda tanpa ada yang menyadarinya. */
+function buatKatana(nama, induk) {
+  const k = simpul(nama, 0, -KEPALA * 0.22, KEPALA * 0.06);
+  induk.add(k);
 
-{
+  /* tsuka — gagang terbungkus */
+  pasang(k, new THREE.CylinderGeometry(KEPALA * 0.055, KEPALA * 0.05, KEPALA * 0.72, 10), MAT.baja, {
+    y: KEPALA * 0.18,
+  });
+  /* tsuba — pembatas tangan dan bilah */
+  pasang(k, new THREE.CylinderGeometry(KEPALA * 0.15, KEPALA * 0.15, KEPALA * 0.04, 14), MAT.zirahTerang, {
+    y: -KEPALA * 0.2,
+  });
+
   let x = 0;
   let y = -KEPALA * 0.24;
   let a = 0;
@@ -425,12 +464,12 @@ pasang(katana, new THREE.CylinderGeometry(KEPALA * 0.15, KEPALA * 0.15, KEPALA *
   for (let i = 0; i < 6; i += 1) {
     const cx = x + Math.sin(a) * ruas * 0.5;
     const cy = y - Math.cos(a) * ruas * 0.5;
-    pasang(katana, new THREE.BoxGeometry(KEPALA * 0.055, ruas * 1.02, KEPALA * 0.14), MAT.baja, {
+    pasang(k, new THREE.BoxGeometry(KEPALA * 0.055, ruas * 1.02, KEPALA * 0.14), MAT.baja, {
       x: cx,
       y: cy,
       rz: a,
     });
-    pasang(katana, new THREE.BoxGeometry(KEPALA * 0.058, ruas * 1.02, KEPALA * 0.03), MAT.bilah, {
+    pasang(k, new THREE.BoxGeometry(KEPALA * 0.058, ruas * 1.02, KEPALA * 0.03), MAT.bilah, {
       x: cx + Math.cos(a) * KEPALA * 0.07,
       y: cy + Math.sin(a) * KEPALA * 0.07,
       rz: a,
@@ -439,66 +478,117 @@ pasang(katana, new THREE.CylinderGeometry(KEPALA * 0.15, KEPALA * 0.15, KEPALA *
     y -= Math.cos(a) * ruas;
     a += 0.055;
   }
+  return k;
 }
 
-/**
- * Wakizashi — tetap tersarung di pinggang kiri.
- *
- * Satu pedang membuat sosok bersenjata; PASANGANNYA yang membuatnya samurai.
- * Ia juga memutus siluet pinggang dengan satu garis diagonal, dan siluet
- * tanpa garis itu terlalu rapi untuk terbaca sebagai orang yang bergerak.
- */
-const saya = simpul('saya', -KEPALA * 0.42, -KEPALA * 0.06, -KEPALA * 0.12);
-saya.rotation.z = -0.42;
-saya.rotation.x = -0.18;
-pinggul.add(saya);
-pasang(saya, new THREE.CylinderGeometry(KEPALA * 0.07, KEPALA * 0.055, KEPALA * 1.7, 10), MAT.baja, {
-  y: -KEPALA * 0.5,
+const katana = buatKatana('katana', lengan.Kanan.telapak);
+const katanaKiri = buatKatana('katanaKiri', lengan.Kiri.telapak);
+
+/* Pedang KETIGA, tersarung di punggung — miring melintasi bahu. Rujukan
+   memilikinya, dan ia mengerjakan sesuatu yang tidak dikerjakan dua bilah di
+   tangan: satu diagonal DI BELAKANG badan, yang memberi kedalaman pada siluet
+   yang tanpa itu seluruhnya datar di satu bidang. */
+const saya = simpul('saya', -KEPALA * 0.1, KEPALA * 0.2, -KEPALA * 0.34);
+saya.rotation.z = -0.62;
+saya.rotation.x = 0.16;
+dada.add(saya);
+pasang(saya, new THREE.CylinderGeometry(KEPALA * 0.07, KEPALA * 0.055, KEPALA * 2.0, 10), MAT.baja, {
+  y: -KEPALA * 0.4,
   rz: Math.PI / 2,
-  x: -KEPALA * 0.5,
+  x: -KEPALA * 0.6,
 });
-pasang(saya, new THREE.CylinderGeometry(KEPALA * 0.06, KEPALA * 0.055, KEPALA * 0.5, 10), MAT.zirah, {
-  x: KEPALA * 0.42,
+pasang(saya, new THREE.CylinderGeometry(KEPALA * 0.06, KEPALA * 0.055, KEPALA * 0.55, 10), MAT.zirah, {
+  x: KEPALA * 0.55,
   rz: Math.PI / 2,
 });
 
-/* ── pose istirahat ───────────────────────────────────────────────────────
-   Sosok berdiri tegak sempurna terbaca sebagai manekin. Kuda-kudanya sedikit
-   terbuka, lutut sedikit menekuk, dan lengan kanan terangkat memegang
-   katana — pose itu sendiri sudah bercerita sebelum satu bingkai animasi
-   pun berjalan. */
-/*
-   Lengan kanan MENJAUH dari badan, bukan menyilang di depannya.
+/* ── HAORI: mantel panjang yang mengembang ──────────────────────────────
 
-   Percobaan pertama menekuk bahu ke dalam, dan bilahnya melintas di depan
-   perut lalu keluar di sisi KIRI. Yang terbaca bukan orang memegang pedang
-   melainkan orang yang tertusuk pedangnya sendiri. Pedang harus punya ruang
-   kosong di sekelilingnya supaya terbaca sebagai pedang.
-*/
-lengan.Kanan.bahu.rotation.z = -0.4;
-lengan.Kanan.atas.rotation.x = -0.22;
-lengan.Kanan.atas.rotation.z = -0.5;
-lengan.Kanan.bawah.rotation.x = -0.34;
-lengan.Kanan.bawah.rotation.z = -0.42;
-lengan.Kanan.telapak.rotation.x = 0.16;
+   Bagian tunggal yang paling mengubah siluet, dan sebabnya bukan keindahan.
+   Sosok berzirah tanpa kain panjang berakhir di pinggang, jadi separuh bawah
+   siluetnya cuma dua tungkai — dan dua tungkai tegak adalah bentuk paling
+   netral yang ada. Mantel yang MENGEMBANG memberi bagian bawah itu massa
+   berbentuk baji, dan baji itulah yang membuat sosoknya terbaca berdiri
+   kokoh alih-alih sekadar berdiri.
 
-/* Bilahnya diangkat: ujungnya menyapu ke atas-kanan alih-alih menggantung
-   ke bawah. Diagonal panjang di ruang kosong itulah yang membuat katana
-   terbaca dalam sekejap. */
-katana.rotation.z = -0.62;
-katana.rotation.x = -2.72;
+   Terbuka di depan supaya zirah dada dan kedua tungkai tetap terlihat;
+   mantel tertutup akan menelan seluruh pahatan di baliknya. */
+pasang(
+  dada,
+  new THREE.CylinderGeometry(
+    KEPALA * 0.78,
+    KEPALA * 1.5,
+    KEPALA * 3.4,
+    18,
+    1,
+    true,
+    Math.PI * 0.34,
+    Math.PI * 1.32,
+  ),
+  MAT.kain,
+  { y: -KEPALA * 1.5, z: -KEPALA * 0.06 },
+);
 
-lengan.Kiri.bahu.rotation.z = 0.22;
-lengan.Kiri.atas.rotation.x = -0.2;
-lengan.Kiri.atas.rotation.z = 0.3;
-lengan.Kiri.bawah.rotation.x = -0.5;
+/* Dua kelepak depan — sisi mantel yang jatuh di depan bahu. Tanpa keduanya,
+   mantel terbuka terbaca sebagai jubah yang hilang bagian depannya. */
+for (const sisi of [-1, 1]) {
+  pasang(dada, new THREE.BoxGeometry(KEPALA * 0.34, KEPALA * 2.2, KEPALA * 0.07), MAT.kain, {
+    x: sisi * KEPALA * 0.5,
+    y: -KEPALA * 0.9,
+    z: KEPALA * 0.52,
+    rz: sisi * 0.1,
+    rx: -0.06,
+  });
+}
 
-kaki.Kiri.paha.rotation.z = 0.3;
-kaki.Kanan.paha.rotation.z = -0.3;
-kaki.Kiri.paha.rotation.x = -0.08;
-kaki.Kanan.paha.rotation.x = 0.06;
-kaki.Kiri.lutut.rotation.x = 0.3;
-kaki.Kanan.lutut.rotation.x = 0.26;
+/* Tali dada yang menyilang — satu diagonal di atas dada yang gelap, dan
+   diagonal itu yang membuat dada berhenti terbaca sebagai tong polos. */
+for (const sisi of [-1, 1]) {
+  pasang(dada, new THREE.BoxGeometry(KEPALA * 0.14, KEPALA * 1.5, KEPALA * 0.06), MAT.zirahTerang, {
+    x: sisi * KEPALA * 0.12,
+    y: -KEPALA * 0.24,
+    z: KEPALA * 0.5,
+    rz: sisi * 0.52,
+  });
+}
+
+/* ── pose: SIMETRIS dan terbuka ──────────────────────────────────────────
+
+   Pose sebelumnya memuntir badan dengan satu lengan terangkat. Rujukan
+   melakukan kebalikannya: berdiri menghadap depan, kedua lengan terbuka,
+   kedua bilah menggantung ke bawah-luar. Simetri terbaca sebagai
+   KESIAPAN — sosok yang menunggu, bukan sosok yang sedang menyelesaikan
+   gerakan — dan itu pose yang jauh lebih tepat untuk sesuatu yang berdiri
+   diam di halaman muka sampai seseorang menekannya. */
+for (const sisi of [-1, 1]) {
+  const n = sisi === -1 ? 'Kiri' : 'Kanan';
+  const L = lengan[n];
+  L.bahu.rotation.z = -sisi * 0.3;
+  L.atas.rotation.z = -sisi * 0.3;
+  L.atas.rotation.x = -0.16;
+  L.bawah.rotation.x = -0.3;
+  L.bawah.rotation.z = -sisi * 0.2;
+  L.telapak.rotation.x = 0.2;
+}
+
+/* Kedua bilah menyapu ke bawah-luar, membentuk X di sekeliling tungkai. */
+/* Kedua bilah menggantung ke BAWAH-luar.
+
+   Nilai pertama (z -0,55 / x -0,42) menumpuk di atas rotasi lengan dan
+   hasilnya bilah MENDATAR — sosoknya terbaca bersayap, bukan bersenjata.
+   Sudut serong yang kecil sudah cukup: yang membentuk huruf X adalah kedua
+   diagonal panjangnya, bukan seberapa lebar keduanya dibuka. */
+katana.rotation.z = -0.2;
+katana.rotation.x = 0.12;
+katanaKiri.rotation.z = 0.2;
+katanaKiri.rotation.x = 0.12;
+
+kaki.Kiri.paha.rotation.z = 0.26;
+kaki.Kanan.paha.rotation.z = -0.26;
+kaki.Kiri.paha.rotation.x = 0.0;
+kaki.Kanan.paha.rotation.x = 0.0;
+kaki.Kiri.lutut.rotation.x = 0.14;
+kaki.Kanan.lutut.rotation.x = 0.14;
 
 /* ── animasi ──────────────────────────────────────────────────────────── */
 
@@ -617,6 +707,32 @@ const tebas = new THREE.AnimationClip('tebas', 0.95, [
     [0.1, -0.16, 0],
     [0, 0, 0],
   ]),
+  /* Lengan KIRI ikut, dan sengaja BERLAWANAN arah.
+
+     Dua lengan yang mengayun seirama terbaca sebagai satu gerakan yang
+     digandakan. Yang membuat tebasan dua bilah terbaca sebagai dua bilah
+     adalah kedua busurnya berpapasan — kiri turun ketika kanan naik, dan
+     silangnya jatuh tepat di puncak potongan. */
+  putar('lenganAtasKiri', [0, 0.18, 0.32, 0.55, 0.95], [
+    [0, 0, 0],
+    [0.62, -0.2, 0.3],
+    [-0.85, 0.16, -0.44],
+    [-0.4, 0.08, -0.22],
+    [0, 0, 0],
+  ]),
+  putar('lenganBawahKiri', [0, 0.18, 0.32, 0.58, 0.95], [
+    [0, 0, 0],
+    [0.42, 0, 0],
+    [-0.55, 0, 0],
+    [-0.2, 0, 0],
+    [0, 0, 0],
+  ]),
+  putar('bahuKiri', [0, 0.18, 0.32, 0.95], [
+    [0, 0, 0],
+    [0, -0.14, 0.1],
+    [0, 0.18, -0.16],
+    [0, 0, 0],
+  ]),
   putar('lututKanan', [0, 0.3, 0.6, 0.95], [
     [0, 0, 0],
     [0.2, 0, 0],
@@ -626,6 +742,43 @@ const tebas = new THREE.AnimationClip('tebas', 0.95, [
 ]);
 
 /* ── ekspor ───────────────────────────────────────────────────────────── */
+
+/* ── SATUKAN GEOMETRI KEMBAR SEBELUM EKSPOR ─────────────────────────────
+
+   Tiap `pasang()` membangun geometri barunya sendiri, jadi bentuk yang sama
+   persis tersimpan berkali-kali: dua katana menyimpan empat belas bentuk
+   identik masing-masing, dan setiap bagian kiri-kanan menyimpan kembarannya.
+   glTF menyimpan tiap geometri sebagai buffer terpisah, jadi seluruh
+   pengulangan itu benar-benar dibayar dalam kilobita.
+
+   Menyatukannya di sini, bukan di tempat pemanggilan, adalah keputusan yang
+   disengaja: menulis kode pemasangan supaya berbagi geometri akan membuat
+   setiap baris pahatan bergantung pada tabel bersama, dan tabel bersama itu
+   yang akan membuat perubahan kecil sulit dilakukan. Bentuknya ditulis
+   sebebas mungkin; kembarannya disatukan belakangan.
+
+   Aman karena geometri di sini tidak pernah diubah sesudah dibuat — yang
+   berbeda antar-mesh adalah transform-nya, dan transform tinggal di mesh. */
+function satukanGeometri(akarPohon) {
+  const kamus = new Map();
+  let dibuang = 0;
+  akarPohon.traverse((o) => {
+    if (!o.isMesh) return;
+    const g = o.geometry;
+    const kunci = `${g.type}:${JSON.stringify(g.parameters ?? {})}`;
+    const ada = kamus.get(kunci);
+    if (ada && ada !== g) {
+      o.geometry = ada;
+      g.dispose();
+      dibuang += 1;
+    } else if (!ada) {
+      kamus.set(kunci, g);
+    }
+  });
+  return { unik: kamus.size, dibuang };
+}
+
+const penyatuan = satukanGeometri(akar);
 
 const adegan = new THREE.Scene();
 adegan.add(akar);
@@ -649,5 +802,6 @@ akar.traverse((o) => {
 
 console.log(`  public/ronin.glb  ${(glb.byteLength / 1024).toFixed(1)} KiB`);
 console.log(`  simpul ${String(simpulJumlah)} · segitiga ${String(Math.round(segitiga))}`);
+console.log(`  geometri: ${String(penyatuan.unik)} unik, ${String(penyatuan.dibuang)} kembar disatukan`);
 console.log(`  klip: diam (${String(diam.duration)}s), tebas (${String(tebas.duration)}s)`);
 console.log(`  tinggi ${TINGGI.toFixed(2)} satuan = ${(TINGGI / KEPALA).toFixed(1)} kepala`);
