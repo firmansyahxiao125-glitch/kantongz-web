@@ -13,7 +13,7 @@ import { RevealObserver } from '@/components/ui/reveal-observer';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CoreMark } from '@/components/brand/core-mark';
 import { HeroParallax } from '@/components/three/hero-parallax';
-import { RoninScene } from '@/components/three/ronin-scene';
+import { HeroRonin } from '@/components/three/hero-ronin';
 
 export const metadata: Metadata = {
   title: 'KANTONGZ — Uangmu, dengan mesin yang mengawasinya',
@@ -118,7 +118,7 @@ export default function LandingPage() {
             `Rise` murni CSS: ia berjalan saat halaman dicat, dan ia berjalan
             walaupun potongan skripnya masih dalam perjalanan.
           */}
-          <div className="lg:col-span-7">
+          <div className="kolom-judul lg:col-span-5">
             <Rise>
               <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-[var(--surface)]/60 px-3.5 py-1.5 text-xs text-muted backdrop-blur">
                 <Sparkles className="size-3.5 text-[var(--color-holo)]" aria-hidden />
@@ -127,7 +127,7 @@ export default function LandingPage() {
             </Rise>
 
             <Rise index={1}>
-              <h1 className="text-display mt-7 text-balance">
+              <h1 className="text-display-kolom mt-7 text-balance">
                 Uangmu, dengan <span className="text-gradient">mesin yang mengawasinya</span>
               </h1>
             </Rise>
@@ -166,25 +166,24 @@ export default function LandingPage() {
           </div>
 
           {/*
-            RONIN. ROADMAP §7.1.
+            RONIN + KARTU ANGKA. ROADMAP §7.1.
+
+            Dua kolom terakhir dari tiga: samurainya di tengah, angkanya di
+            kanan. Keduanya dibungkus SATU komponen klien karena kartunya
+            harus tahu kapan tebasan membukanya — dan mengangkat keadaan itu
+            ke halaman ini akan mengubah seluruh halaman muka menjadi
+            komponen klien, termasuk elemen LCP-nya.
 
             Kanvasnya `aria-hidden` — isinya sudah disampaikan teks di
-            sekelilingnya — tetapi PANGGUNGNYA adalah tombol bernama, satu
+            sekelilingnya — tetapi PANGGUNGNYA punya tombol bernama, satu
             perhentian Tab, yang menanggapi Enter dan Spasi persis seperti
             klik. Interaksi yang hanya dapat dicapai tetikus adalah interaksi
             yang separuh penontonnya tidak punya.
           */}
-          <div className="relative lg:col-span-5">
+          <div className="relative lg:col-span-7">
             <HeroParallax>
-              <RoninScene className="mx-auto aspect-square w-full max-w-[30rem]" />
+              <HeroRonin />
             </HeroParallax>
-
-            <Rise index={2}>
-              <p className="text-center text-xs text-dim">
-                <span className="text-muted">Ronin</span> — penjaga bukumu. Tekan Tebas untuk
-                melihat ringkasan contoh
-              </p>
-            </Rise>
           </div>
         </div>
 

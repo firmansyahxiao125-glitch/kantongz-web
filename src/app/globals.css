@@ -524,6 +524,31 @@
      Tracking MENGETAT seiring ukuran naik. Spasi huruf yang optis benar pada
      14px terlihat renggang pada 72px, karena jarak antar huruf yang dibaca
      mata adalah proporsi dari tinggi huruf, bukan nilai tetap. */
+  /*
+    Judul yang ukurannya mengikuti KOLOMNYA, bukan viewport.
+
+    `--text-display` memakai `vw`, dan itu benar selama judulnya menguasai
+    lebar layar. Begitu hero menjadi tiga kolom, judulnya hanya memiliki
+    sepertiga lebar itu — sementara ukurannya tetap dihitung dari keseluruhan.
+    Hasilnya "mengawasinya" tumbuh ke ~550px di dalam kolom selebar ~430px dan
+    MELUAP menimpa kolom sebelahnya.
+
+    Menurunkan `--text-display` akan mengecilkan judul di setiap halaman lain
+    yang tidak punya masalah itu. Yang salah bukan ukurannya melainkan APA YANG
+    DIUKUR, jadi satuannya yang diganti: `cqw` membaca lebar wadahnya sendiri,
+    sehingga judulnya mengecil ketika kolomnya mengecil dan tidak pernah lagi
+    bergantung pada lebar jendela.
+  */
+  .kolom-judul {
+    container-type: inline-size;
+  }
+
+  .text-display-kolom {
+    font-size: clamp(2.5rem, 1rem + 11cqw, 5.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
   .text-display {
     font-size: var(--text-display);
     line-height: 0.98;

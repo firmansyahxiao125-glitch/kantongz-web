@@ -218,9 +218,27 @@ async function tekan(cdp, key) {
 const kotakPanggung = (cdp) =>
   evaluate(
     cdp,
+    /*
+      Dikembalikan dalam koordinat HALAMAN, bukan viewport.
+
+      `getBoundingClientRect` mengukur relatif terhadap viewport, sedangkan
+      klip `Page.captureScreenshot` membaca koordinat halaman. Selama
+      halamannya di scroll 0 keduanya identik — dan justru karena identik,
+      perbedaannya tidak terlihat sampai ada satu pemeriksaan yang menggulir
+      lebih dulu. Begitu itu terjadi, klipnya meleset sejauh gulirannya dan
+      yang terukur adalah bagian halaman yang salah sama sekali.
+
+      Offset gulirnya ditambahkan di sini, sekali, supaya setiap pemanggil
+      mendapat kotak yang benar tanpa perlu mengingat aturannya.
+    */
     `(() => { const el = document.querySelector('[data-tier]'); if (!el) return null;
       const r = el.getBoundingClientRect();
-      return { x: Math.round(r.left), y: Math.round(r.top), width: Math.round(r.width), height: Math.round(r.height) };
+      return {
+        x: Math.round(r.left + window.scrollX),
+        y: Math.round(r.top + window.scrollY),
+        width: Math.round(r.width),
+        height: Math.round(r.height),
+      };
     })()`,
   );
 
@@ -235,6 +253,15 @@ async function analisis(cdp, kotak) {
   const { data } = await cdp.send('Page.captureScreenshot', {
     format: 'png',
     clip: { ...kotak, scale: 1 },
+    /*
+      Melampaui viewport, karena klipnya berkoordinat HALAMAN.
+
+      Tanpa ini Chrome hanya merekam yang ada di layar, jadi klip yang
+      seluruhnya atau sebagian berada di bawah lipatan kembali sebagai
+      wilayah kosong — dan wilayah kosong terbaca sebagai "cadangannya tidak
+      tergambar", persis kebalikan dari yang sebenarnya terjadi.
+    */
+    captureBeyondViewport: true,
   });
 
   return evaluate(

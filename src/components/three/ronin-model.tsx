@@ -51,7 +51,23 @@ export interface RoninModelProps {
 
 export function RoninModel({ tier, kendali }: RoninModelProps) {
   const akar = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF(BERKAS);
+  /*
+   * Draco DAN Meshopt DIMATIKAN, dan itu memperbaiki galat runtime nyata.
+   *
+   * `useGLTF` memasang kedua decoder secara bawaan. Meshopt berbasis
+   * WebAssembly, dan `WebAssembly.instantiate` ditolak Content Security
+   * Policy halaman ini karena `unsafe-eval` tidak diizinkan — gerbang
+   * `render` menangkapnya sebagai `unhandledrejection` di konsol, tepat
+   * sesudah GLB-nya mendarat.
+   *
+   * Menambahkan `unsafe-eval` ke CSP demi decoder yang tidak dipakai adalah
+   * pertukaran yang salah arah: `ronin.glb` dibangun sendiri dan TIDAK
+   * dikompresi Draco maupun Meshopt, jadi kedua decoder itu murni beban —
+   * satu unduhan lebih besar, satu modul WASM lebih banyak, dan satu lubang
+   * di kebijakan keamanan, seluruhnya demi jalur kode yang tidak pernah
+   * dilalui.
+   */
+  const { scene, animations } = useGLTF(BERKAS, false, false);
   const { actions } = useAnimations(animations, akar);
 
   const nafas = useRef(0);
@@ -280,4 +296,4 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
 const DASAR_Y = -1.42;
 const SKALA = 1.02;
 
-useGLTF.preload(BERKAS);
+useGLTF.preload(BERKAS, false, false);

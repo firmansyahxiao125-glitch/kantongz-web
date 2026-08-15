@@ -236,6 +236,54 @@ tadinya gelap tidak hilang, ia hanya tertimbun.
 Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
 `ronin` kembali 27/27.
 
+### R7 + R8 — hero tiga kolom dan kartu angka
+
+| id | status | commit | gerbang | catatan |
+|---|---|---|---|---|
+| R7+R8 | selesai | ini | ronin 28 · akses 455 · render 39 · grafis 14 · contrast · palet · interior · 83 uji | copy kiri · Ronin tengah · kartu kanan |
+
+Keadaan `terbuka` TURUN, bukan naik. Kartunya harus tahu kapan tebasan
+membukanya, dan cara paling langsung — mengangkatnya ke `page.tsx` — tidak
+dapat dipakai: halaman muka adalah komponen peladen, dan satu `useState` di
+sana mengubah SELURUH halaman menjadi klien, termasuk elemen LCP-nya. Jadi
+dibuat satu komponen klien kecil (`hero-ronin.tsx`) yang membungkus panggung
+dan kartunya saja.
+
+Kartunya selalu terlihat, hanya samar sebelum ditebas. Menyembunyikannya
+sampai ditebas akan membuat tebasan terasa berarti — dan membuat pengunjung
+yang tidak pernah menebas melihat kolom kosong lalu menyimpulkan halamannya
+rusak.
+
+### Empat cacat yang ditemukan mengerjakan R7, semuanya di luar dugaan
+
+**1. Judul MELUAP menimpa Ronin.** `--text-display` memakai `vw`, dan itu
+benar selama judulnya menguasai lebar layar. Di hero tiga kolom ia hanya
+memiliki sepertiganya, sementara ukurannya tetap dihitung dari keseluruhan:
+"mengawasinya" tumbuh ke ~550px di dalam kolom ~430px. Yang salah bukan
+ukurannya melainkan APA YANG DIUKUR, jadi satuannya yang diganti — `cqw`
+membaca lebar wadahnya sendiri (`.text-display-kolom`). Token aslinya tidak
+disentuh, sehingga halaman lain tidak ikut mengecil.
+
+**2. Galat CSP dari WebAssembly.** `useGLTF` memasang decoder Draco dan
+Meshopt secara bawaan; Meshopt berbasis WASM, dan `WebAssembly.instantiate`
+ditolak CSP halaman ini. Gerbang `render` menangkapnya sebagai
+`unhandledrejection`. Menambahkan `unsafe-eval` demi decoder yang tidak
+dipakai adalah pertukaran yang salah arah — `ronin.glb` dibangun sendiri dan
+tidak dikompresi keduanya, jadi keduanya dimatikan.
+
+**3. Klip tangkapan layar berkoordinat SALAH.** `getBoundingClientRect`
+mengukur relatif viewport; klip `Page.captureScreenshot` membaca koordinat
+halaman. Selama halamannya di scroll 0 keduanya identik — dan justru karena
+identik, perbedaannya tak terlihat sampai ada pemeriksaan yang menggulir
+lebih dulu.
+
+**4. Cadangan ponsel diukur di wilayah kosong.** Di 390px panggungnya duduk
+di y=779 dengan viewport 844: 78% klipnya di bawah lipatan, jadi rerata yang
+terukur adalah rerata ruang kosong. Ia lulus sebelumnya hanya karena kebetulan
+lebih banyak yang terlihat — pengukuran yang benar/salahnya bergantung pada
+tinggi kolom teks di atasnya bukan pengukuran, melainkan undian.
+`captureBeyondViewport` membuatnya tidak lagi bergantung pada posisi.
+
 ### R14 — siluet rujukan, hover, dan parallax kepala
 
 | id | status | commit | gerbang | catatan |

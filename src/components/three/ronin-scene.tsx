@@ -46,13 +46,28 @@ const LazyCanvas = dynamic(() => import('@/components/three/ronin-canvas'), {
  * layar, bukan disembunyikan di komentar. Angka keuangan yang tampak nyata di
  * halaman pemasaran adalah kebohongan kecil yang tidak perlu.
  */
-const CONTOH = [
+export const CONTOH = [
   { label: 'Kekayaan bersih', nilai: 'Rp 34.748.000' },
   { label: 'Arus kas bulan ini', nilai: '+Rp 17.220.000' },
   { label: 'Dana darurat', nilai: '62% terkumpul' },
 ];
 
-export function RoninScene({ className }: { className?: string }) {
+export interface RoninSceneProps {
+  className?: string;
+  /**
+   * Di mana angkanya DILIHAT — bukan apakah ia diumumkan.
+   *
+   * Wilayah `aria-live`-nya tetap ada di kedua nilai; yang berubah hanya
+   * apakah ia juga tergambar. `sr-only` dipakai ketika kartu angka sudah
+   * berdiri di sebelah panggung, supaya angkanya tidak terbaca dua kali oleh
+   * mata dan tidak terdengar dua kali oleh pembaca layar.
+   */
+  ringkasan?: 'terlihat' | 'sr-only';
+  /** Dipanggil ketika lapisan angka terbuka atau tertutup. */
+  onUbah?: (terbuka: boolean) => void;
+}
+
+export function RoninScene({ className, ringkasan = 'terlihat', onUbah }: RoninSceneProps) {
   const tier = useGraphicsTier();
   const [terbuka, setTerbuka] = useState(false);
   const panggung = useRef<HTMLDivElement>(null);
@@ -87,7 +102,10 @@ export function RoninScene({ className }: { className?: string }) {
       if (maju.fase !== k.fase) {
         k.fase = maju.fase;
         k.t = maju.t;
-        if (maju.fase === 'terbuka') setTerbuka(true);
+        if (maju.fase === 'terbuka') {
+          setTerbuka(true);
+          onUbah?.(true);
+        }
       }
 
       /* Hanyut kembali ke tengah kalau sudah lama tidak disentuh. */
@@ -103,7 +121,7 @@ export function RoninScene({ className }: { className?: string }) {
     return () => {
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [onUbah]);
 
   /* ── gulir ────────────────────────────────────────────────────────── */
 
@@ -150,6 +168,7 @@ export function RoninScene({ className }: { className?: string }) {
       k.fase = 'diam';
       k.t = 0;
       setTerbuka(false);
+      onUbah?.(false);
       return;
     }
     /* Menebas selagi menebas diabaikan. Ayunan yang dimulai ulang di tengah
@@ -158,7 +177,7 @@ export function RoninScene({ className }: { className?: string }) {
 
     k.fase = 'ancang';
     k.t = 0;
-  }, []);
+  }, [onUbah]);
 
   const tutup = useCallback(() => {
     const k = kendali.current;
@@ -166,8 +185,9 @@ export function RoninScene({ className }: { className?: string }) {
     k.fase = 'diam';
     k.t = 0;
     setTerbuka(false);
+    onUbah?.(false);
     sepi.current = 0;
-  }, []);
+  }, [onUbah]);
 
   useEffect(() => {
     if (!terbuka) return;
@@ -282,7 +302,11 @@ export function RoninScene({ className }: { className?: string }) {
       */}
       <div
         aria-live="polite"
-        className="pointer-events-none absolute inset-x-4 bottom-14 z-10"
+        className={
+          ringkasan === 'sr-only'
+            ? 'sr-only'
+            : 'pointer-events-none absolute inset-x-4 bottom-14 z-10'
+        }
       >
         {terbuka ? (
           <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface)_82%,transparent)] p-4 backdrop-blur-md">
