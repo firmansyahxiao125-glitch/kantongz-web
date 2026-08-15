@@ -626,9 +626,9 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| D1 | todo | — | — | definisikan M16–M20 satu per satu |
-| D2 | todo | — | — | `docs/M16-M20_REPORT.md` |
-| D3 | todo | — | — | 18 tangkapan layar difoto ulang |
+| D1 | selesai | ini | dokumen saja | `ARCHITECTURE.md` §7.3 — kelimanya dengan syarat kelulusan berupa ANGKA, bukan kata sifat |
+| D2 | selesai | ini | dokumen saja | termasuk bagian "yang sengaja TIDAK dikerjakan" |
+| D3 | selesai | ini | 18 berkas, 15 Agu 2026 | `kantongz/docs/screenshots/` |
 
 ## Langkah 7 — penutupan celah yang aman
 
