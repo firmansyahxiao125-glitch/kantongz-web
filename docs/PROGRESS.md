@@ -685,11 +685,12 @@ pada isi buku besar.
 > (sebelumnya bergoyang 623 / 846 / 1475). Langit-langit dikalibrasi ulang
 > 1100 → 155.
 >
-> **Item terbuka yang lahir dari perbaikan ini.** JavaScript adegan 3D —
-> three, R3F, postprocessing — diminta SESUDAH `loadEventEnd`, jadi kini
-> tidak terhitung anggaran mana pun. GLB-nya punya `LANGIT_MODEL_KB`;
-> JS-nya belum punya. Sebelumnya ia kadang terhitung dan kadang tidak, dan
-> itulah sebagian dari goyangannya.
+> **Celah yang lahir dari perbaikan itu SUDAH ditutup.** JavaScript adegan
+> 3D diminta sesudah `loadEventEnd` dan berhenti terhitung, jadi
+> `LANGIT_TOTAL_JS_KB` ditambahkan sebagai anggaran ketiga: seluruh
+> JavaScript klien terbangun, dibaca dari disk — tanpa peramban, tanpa waktu
+> sampel, tanpa prefetch. 2732 KB dalam 40 potongan, satu di antaranya 883 KB
+> sendirian. `grafis` kini 20 pemeriksaan.
 
 ---|---|---|
 > | `render` | 38 lulus · 1 gagal | 1 galat konsol — `unsafe-eval` |
