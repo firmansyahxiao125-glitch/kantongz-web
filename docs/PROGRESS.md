@@ -26,15 +26,31 @@ berselisih dengan repositori.
 
 ## Garis dasar
 
-Diverifikasi 14 Agustus 2026, pada `kantongz-api@6970cda` dan `kantongz-web@1a0d584`.
+Diverifikasi **16 Agustus 2026**, pada `kantongz-api@71e3590` dan `kantongz-web@9c1221e`.
 Turun di bawah angka mana pun di sini adalah regresi.
+
+Seluruhnya DIJALANKAN pada tanggal itu, bukan dikutip dari sesi sebelumnya —
+garis dasar yang disalin tanpa dijalankan ulang adalah angka yang perlahan
+menjadi fiksi.
 
 | | |
 |---|---|
-| api | 455 uji · typecheck 0 · lint 0 |
-| web | 63 uji · typecheck 0 · lint 0 · build 0 |
-| gerbang | interior hijau · alur hijau · security 21/21 · palette 4/4 · contrast hijau |
-| CI | hijau di ubuntu-latest, kedua repositori, termasuk pekerjaan `keamanan` |
+| api | **627 uji · 49 berkas** · typecheck 0 · lint 0 |
+| web | **97 uji** · typecheck 0 · lint 0 · build 0 · 15 skrip gerbang sah |
+| gerbang api | **keamanan 39/39** · pengingat 8/8 · templat 3/3 · OpenAPI 10/10 |
+| gerbang web | **grafis 20/0 · render 39/0 · ronin 28/0 · pwa 21/0** · typography 15/0 · palette · contrast |
+| CI | hijau di ubuntu-latest, kedua repositori; lima gerbang peramban kini ikut berjalan |
+
+> **Garis dasar sebelumnya (14 Agustus) menyesatkan, dan itu dicatat.**
+> Ia berbunyi api 455 uji · web 63 uji · security 21/21 — angka yang sudah
+> tertinggal jauh di belakang kenyataan. Garis dasar yang terlalu rendah
+> tidak menangkap regresi apa pun: pembukuan boleh kehilangan seratus uji
+> tanpa satu baris pun terlihat merah.
+>
+> **Gerbang peramban WAJIB dijalankan terhadap build produksi.** Terhadap
+> `next dev` angkanya bukan lebih buruk, melainkan mengukur hal yang
+> berbeda — `scripts/permukaan.mjs` kini menolaknya, dan sebabnya
+> tertulis lengkap di sana.
 
 > **Flake CI yang ditemukan dan ditutup — 14 Agustus 2026.** Gerbang peramban
 > di CI (`typography`, `render`) gagal dua commit berturut-turut dengan pesan
