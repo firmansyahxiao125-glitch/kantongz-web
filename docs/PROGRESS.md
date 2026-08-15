@@ -643,7 +643,7 @@ pada isi buku besar.
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
 | G1 | selesai | `061bb5b` | 522 uji · keamanan 21/21 · pengingat 8/8 | pengingat jatuh tempo, idempoten — kunci `pengingat:{aturan}:{TANGGAL-JATUH-TEMPO}`, bukan tanggal kirim; dijaga indeks unik `outbox_idempotency`, tanpa tabel baru. Gerbang runtime menemukan `.map()` atas `decryptColumn` membungkam SELURUH pemindaian karena 2 dari 9 baris disandikan kunci lain — kini dilewati per baris dan dicatat sebagai peringatan |
-| G2 | todo | — | — | kategori otomatis dari merchant — menyarankan, tidak memutuskan |
+| G2 | selesai | `7d0ee93` | 549 uji · OpenAPI 10/10 | kategori otomatis dari merchant — **menyarankan, tidak memutuskan**: rute GET yang tidak menulis apa pun, dijaga uji yang mengukur jumlah transaksi sebelum/sesudah. Riwayat pengguna mengalahkan kamus; keyakinan dari KONSISTENSI, bukan banyaknya data. Uji mutasi menemukan `includes` mentah membuat "PT INDUSTRI JAYA"→Pulsa, "MOTORS ABC"→Kesehatan |
 
 ## Langkah 9 — tiga yang berisiko, paling akhir
 
