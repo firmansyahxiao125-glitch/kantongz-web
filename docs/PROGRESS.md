@@ -651,7 +651,7 @@ pada isi buku besar.
 |---|---|---|---|---|
 | X1 | selesai | `8e9d8f5` | 8 uji · matriks IDOR 10 rute | uji karakterisasi SEBELUM F3 dan G3 — menemukan 4 kesalahan saya sendiri: `GET /v1/transactions/:id` tidak ada, verba ditebak salah, tabrakan 409 anggaran, dan tiga muatan gagal validasi sehingga kepemilikan tak pernah tercapai |
 | F3 | selesai | `3006b76` | 582 uji · keamanan 21/21 · OpenAPI 10/10 | split transaksi — `category_id` TETAP, mengikuti pecahan terbesar. Agregasi `LEFT JOIN` sadar-pecahan; tak menghitung ganda karena invarian jumlah-harus-sama. **Verifikasi runtime menemukan** migrasi tanpa entri jurnal Drizzle lulus 578 uji lalu tak pernah jalan di produksi — ditutup gerbang `jurnal-migrasi` |
-| F4 | todo | — | — | penghapusan sungguhan — mati secara bawaan |
+| F4 | selesai | `4cd1a23` | 601 uji · keamanan 21/21 · templat 3/3 | penghapusan sungguhan — **mati secara bawaan**. Tiga penghalang: `PURGE_ENABLED`, `dryRun:false`, dan masa tunggu ≥7 hari (dijepit, bukan ditolak). Runtime membuktikan rutenya menolak di SETIAP jalur; tidak pernah dinyalakan pada basis data mana pun |
 | G3 | todo | — | — | dompet bersama — satu penyelesai, gagal-tertutup |
 | X2 | todo | — | — | gerbang keamanan sesudah F3 dan G3, IDOR tak berubah |
 
