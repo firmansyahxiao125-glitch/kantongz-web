@@ -81,14 +81,15 @@ interface NavigatorWithMemory extends Navigator {
  * sifat akun. Orang yang mematikannya di ponsel tua belum tentu ingin
  * mematikannya di desktopnya.
  */
-export type Preferensi3D = 'otomatis' | 'mati';
+export type Preferensi3D = 'mati' | 'otomatis' | 'penuh';
 
 const KUNCI_PREF = 'kantongz.efek3d';
 
 export function baca3D(): Preferensi3D {
   if (typeof window === 'undefined') return 'otomatis';
   try {
-    return window.localStorage.getItem(KUNCI_PREF) === 'mati' ? 'mati' : 'otomatis';
+    const v = window.localStorage.getItem(KUNCI_PREF);
+    return v === 'mati' || v === 'penuh' ? v : 'otomatis';
   } catch {
     /* Mode privat sebagian peramban melempar pada localStorage. Jatuh ke
        bawaan lebih baik daripada halaman yang gagal dirender. */
@@ -191,4 +192,29 @@ export function useGraphicsTier(): GraphicsTier {
  */
 export function usePreferensi3D(): Preferensi3D {
   return useSyncExternalStore(subscribe, baca3D, () => 'otomatis' as const);
+}
+
+/**
+ * Apakah lencana 3D DI DALAM aplikasi boleh dipasang.
+ *
+ * ── MENGAPA IA OPT-IN, DAN BUKAN IKUT `otomatis` ───────────────────────
+ *
+ * Diukur sebelum diputuskan: memasangnya menaikkan JavaScript halaman dasbor
+ * dari 389 KB menjadi 624 KB — naik 235 KB, enam puluh persen, untuk lencana
+ * 88 piksel yang tidak menyampaikan satu informasi pun.
+ *
+ * Di halaman muka biaya seperti itu wajar: permukaan publik memang menjual,
+ * dan pengunjung datang sekali. Dasbor dibuka setiap hari, sering di jaringan
+ * yang mahal, untuk membaca angka uang sendiri. Menaruh biaya itu di sana
+ * secara diam-diam berarti setiap pengguna membayar hiasan yang tidak pernah
+ * ia minta.
+ *
+ * Jadi ia berdiri di belakang pilihan ketiga yang eksplisit. Yang memilih
+ * `otomatis` — bawaannya — tetap mendapat adegan penuh di halaman muka dan
+ * NOL byte three.js di dalam aplikasi.
+ */
+export function useLencana3D(): boolean {
+  const tier = useGraphicsTier();
+  const pref = usePreferensi3D();
+  return tier === 'full' && pref === 'penuh';
 }

@@ -155,7 +155,7 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 | T4 | selesai | 5aac5ec | ronin 27/27 · akses 455/455 | tetikus, gulir, Enter/Spasi/sentuh; Escape menutup |
 | T5 | selesai | 4b48f3d | ronin 27/27 | tebasan membuka angka contoh, diumumkan `aria-live`, DISEBUT contoh |
 | T6a | selesai | ini | grafis 19/19 · akses 489 | saklar "Efek 3D" di Pengaturan — mati berarti NOL kanvas |
-| T6b | todo | — | — | elemen 3D kecil DI DALAM aplikasi (lihat catatan) |
+| T6b | selesai | ini | grafis 22/22 · akses 489 | lencana 88px di dasbor — OPT-IN, bawaannya mati |
 | R1 | selesai | 58d58bd | palet + kontras hijau | token Ronin jadi ungu `#a855ff` |
 | R2–R6 | selesai | 5aac5ec | ronin 27 · akses 455 · grafis 13 · palet bersih | sode berlapis, kusazuri, maedate, menpō, hakama, jubah, daishō, katana melengkung, cincin kontak, torii, kamera 7,4→5,9 |
 | T7 | selesai | ini | grafis 13/13 · akses 455/455 · interior hijau · alur hijau · typography 15/0 · render 39/0 · contrast hijau · palette hijau · 63 uji · build 0 | dibangun SEBELUM samurainya, sama seperti E1 sebelum desain ulang |
@@ -173,7 +173,7 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 Perendernya dibaca lebih dulu; kalau perangkat lunak (SwiftShader di CI),
 penegasan fps DILEWATI dengan mengatakannya — bukan diam-diam diluluskan.
 | T8 | selesai | 5aac5ec | ronin 27/27 · grafis 13/13 | cadangan diam diwarnai ulang ke palet Ronin; kelabu titanium dibuang |
-| T9 | todo | — | — | 3D tidak boleh merusak UI finansial |
+| T9 | selesai | ini | grafis 22/22 | 8 blok finansial dibandingkan, identik dengan 3D nyala vs mati |
 
 ### R13 — karakter pindah ke GLB humanoid berangka
 
@@ -236,6 +236,43 @@ tadinya gelap tidak hilang, ia hanya tertimbun.
 
 Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
 `ronin` kembali 27/27.
+
+### T6b + T9 — lencana dasbor, dan biayanya diukur sebelum diputuskan
+
+Lencana 88 piksel di samping judul Dasbor: ikosahedron kuningan berputar
+lambat, tanpa pascaproses, tanpa partikel. Warnanya KUNINGAN bukan ungu —
+ungu identitas permukaan publik, dan kuningan sudah punya arti tetap di dalam
+aplikasi: uang.
+
+**Ia OPT-IN, dan itu keputusan yang diambil dari angka.** Diukur sebelum dan
+sesudah:
+
+| | JavaScript dasbor | potongan three/fiber/drei |
+|---|---|---|
+| sebelum | 389 KB | 0 |
+| sesudah (lencana hidup) | **624 KB** | 1 |
+| selisih | **+235 KB (+60%)** | |
+
+Di halaman muka biaya seperti itu wajar: permukaan publik memang menjual, dan
+pengunjung datang sekali. Dasbor dibuka setiap hari, sering di jaringan yang
+mahal, untuk membaca angka uang sendiri. Memasangnya secara bawaan berarti
+setiap pengguna membayar hiasan yang tidak pernah ia minta — untuk 88 piksel
+yang tidak menyampaikan satu informasi pun.
+
+Jadi pilihannya menjadi tiga, dengan harganya tertulis di layar:
+**Mati** (gambar diam di mana pun) · **Otomatis** (halaman muka saja —
+bawaan) · **Penuh** (termasuk lencana dasbor, +235 KB).
+
+Cadangannya cakram kuningan bergradien berukuran SAMA PERSIS. Tata letak yang
+bergeser di sebelah angka uang jauh lebih buruk daripada tidak ada lencana.
+
+**T9 membuktikannya, dan tidak dengan tangkapan layar.** Yang dibandingkan
+teks DAN kotak batas setiap blok finansial di dasbor, dengan lencana mati lalu
+hidup: 8 blok, identik. Perbandingan piksel akan gagal karena lencananya
+memang berbeda — dan itu satu-satunya yang boleh berbeda.
+
+Gerbangnya juga memeriksa bahwa bawaannya benar-benar NOL kanvas di dalam
+aplikasi. Opt-in yang diam-diam menyala bukan opt-in.
 
 ### T6a — saklar efek 3D, dan mengapa ia berdiri terpisah dari deteksi
 

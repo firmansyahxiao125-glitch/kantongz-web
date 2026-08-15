@@ -104,15 +104,16 @@ export default function PengaturanPage() {
         <CardBody>
           <CardTitle>Efek 3D</CardTitle>
           <p className="mt-1 text-sm text-muted">
-            Adegan 3D di halaman muka. Mematikannya menghemat baterai dan data;
-            isinya tetap tampil sebagai gambar diam.
+            Mematikannya menghemat baterai dan data; isinya tetap tampil sebagai
+            gambar diam.
           </p>
 
-          <div className="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Efek 3D">
+          <div className="mt-4 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Efek 3D">
             {(
               [
-                { nilai: 'otomatis' as const, label: 'Otomatis', ket: 'Ikuti kemampuan perangkat' },
-                { nilai: 'mati' as const, label: 'Mati', ket: 'Selalu pakai gambar diam' },
+                { nilai: 'mati' as const, label: 'Mati', ket: 'Gambar diam di mana pun' },
+                { nilai: 'otomatis' as const, label: 'Otomatis', ket: 'Halaman muka saja' },
+                { nilai: 'penuh' as const, label: 'Penuh', ket: 'Termasuk lencana dasbor (+235 KB)' },
               ]
             ).map((o) => {
               const aktif = efek3d === o.nilai;

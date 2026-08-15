@@ -62,6 +62,16 @@ function arg(name, fallback = null) {
 const BASE = arg('base', 'http://localhost:3100');
 
 /**
+ * Kredensial UNTUK T9 SAJA — seluruh pemeriksaan lain berjalan tanpa sesi.
+ *
+ * Tanpa keduanya, T9 DILEWATI dengan alasan tertulis, bukan diam-diam
+ * diluluskan. Pemeriksaan yang hilang tanpa suara adalah pemeriksaan yang
+ * lama-lama dianggap tidak pernah ada.
+ */
+const EMAIL = arg('email');
+const PASSWORD = arg('password');
+
+/**
  * Langit-langit bobot JavaScript halaman muka, dalam kilobita terkirim.
  *
  * Angka ini DICATAT, bukan ditebak: ia diukur pada jalanan pertama gerbang ini
@@ -504,6 +514,82 @@ await withChrome([], async (cdp) => {
   await goto(cdp, BASE, 8000);
   const pulih = await evaluate(cdp, `document.querySelector('[data-tier]')?.getAttribute('data-tier')`);
   ok('dikembalikan ke otomatis: penuh lagi', pulih === 'full', `(${String(pulih)})`);
+});
+
+/* ── 2c. T9: 3D TIDAK BOLEH MENGGESER UI FINANSIAL ─────────────────────
+
+   Ini permukaan tempat orang membaca angka uangnya. Hiasan yang menggeser
+   satu angka satu piksel, atau menunda satu angka satu detik, sudah merusak
+   hal yang jauh lebih penting daripada dirinya sendiri.
+
+   Yang dibandingkan bukan tangkapan layar melainkan ISI dan GEOMETRI: teks
+   setiap kartu statistik dan kotak batasnya, dengan lencana mati lalu dengan
+   lencana hidup. Perbandingan piksel akan gagal karena lencananya memang
+   berbeda — dan itu justru satu-satunya yang BOLEH berbeda. */
+
+console.log('\n── T9: UI finansial tidak bergeser ──');
+if (!EMAIL || !PASSWORD) {
+  lewati(
+    'T9 UI finansial tidak bergeser',
+    'butuh --email dan --password; dasbor ada di balik login',
+  );
+}
+if (EMAIL && PASSWORD) await withChrome([], async (cdp) => {
+  await viewport(cdp, 1440, 900, false);
+
+  const masukDulu = async () => {
+    await goto(cdp, `${BASE}/masuk`, 4000);
+    await evaluate(
+      cdp,
+      `(() => {
+        const set = (el, v) => {
+          const s = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+          s.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        set(document.querySelector('input[type=email]'), ${JSON.stringify(EMAIL)});
+        set(document.querySelector('input[type=password]'), ${JSON.stringify(PASSWORD)});
+        document.querySelector('form').requestSubmit();
+        return 1;
+      })()`,
+    );
+    await sleep(6000);
+  };
+
+  /* Angka dan kotaknya, dibaca dari kartu statistik. Lencana sengaja
+     dikecualikan: ia satu-satunya yang memang berubah. */
+  const potretFinansial = `(() => {
+    const bersih = (t) => t.replace(/\s+/g, ' ').trim();
+    return [...document.querySelectorAll('main dl, main [class*=grid] > div')]
+      .filter((el) => /Rp|%/.test(el.textContent || ''))
+      .slice(0, 12)
+      .map((el) => {
+        const r = el.getBoundingClientRect();
+        return bersih(el.textContent || '') + '@' + Math.round(r.x) + ',' + Math.round(r.y)
+          + ',' + Math.round(r.width) + ',' + Math.round(r.height);
+      });
+  })()`;
+
+  await masukDulu();
+
+  await evaluate(cdp, `localStorage.setItem('kantongz.efek3d','otomatis')`);
+  await goto(cdp, `${BASE}/dasbor`, 7000);
+  const mati = await evaluate(cdp, potretFinansial);
+  const kanvasMati = await evaluate(cdp, `document.querySelectorAll('main canvas').length`);
+
+  await evaluate(cdp, `localStorage.setItem('kantongz.efek3d','penuh')`);
+  await goto(cdp, `${BASE}/dasbor`, 8000);
+  const hidup = await evaluate(cdp, potretFinansial);
+  const kanvasHidup = await evaluate(cdp, `document.querySelectorAll('main canvas').length`);
+
+  await evaluate(cdp, `localStorage.removeItem('kantongz.efek3d')`);
+
+  ok('bawaan: NOL kanvas di dalam aplikasi', kanvasMati === 0, `(${String(kanvasMati)})`);
+  ok('opt-in: lencana benar-benar terpasang', kanvasHidup === 1, `(${String(kanvasHidup)})`);
+  ok(
+    'angka finansial tidak bergeser satu piksel pun',
+    mati.length > 0 && JSON.stringify(mati) === JSON.stringify(hidup),
+    `(${String(mati.length)} blok dibandingkan)`,
+  );
 });
 
 /* ── 3. gerak dikurangi: nol kanvas, dan cadangan yang dirancang ──────── */

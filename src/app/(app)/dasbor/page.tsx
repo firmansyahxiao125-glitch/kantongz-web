@@ -9,6 +9,7 @@ import { AreaChart } from '@/components/charts/area-chart';
 import { DonutChart } from '@/components/charts/donut-chart';
 import { ProgressRing } from '@/components/charts/progress-ring';
 import { PageHeader } from '@/components/shell/page-header';
+import { LencanaKartu } from '@/components/three/lencana-kartu';
 import { QuickActions } from '@/components/shell/quick-actions';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
@@ -49,7 +50,18 @@ export default function DasborPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
-      <PageHeader title="Dasbor" description="Ringkasan keuanganmu bulan ini." />
+      {/*
+        Lencana berdiri DI SAMPING judul, bukan di atas angka.
+
+        Menaruhnya di dekat kekayaan bersih akan membuat benda yang berputar
+        bersebelahan dengan angka yang paling ingin dibaca orang — dan gerak
+        di sebelah teks adalah gerak yang menariknya menjauh. Di sisi judul ia
+        menandai halaman tanpa pernah bersaing dengan isinya.
+      */}
+      <div className="flex items-start justify-between gap-4">
+        <PageHeader title="Dasbor" description="Ringkasan keuanganmu bulan ini." />
+        <LencanaKartu className="hidden shrink-0 sm:block" />
+      </div>
       {/*
         HIERARKI, bukan empat kotak sama besar.
 
