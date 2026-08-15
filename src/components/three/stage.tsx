@@ -69,7 +69,7 @@ export function Stage({
         /* Layar retina merender empat kali lebih banyak piksel. Batas 1.5
            menahan biaya itu tanpa perbedaan yang terlihat pada adegan yang
            seluruhnya berupa pendar dan gradien. `lite` dijepit ke 1. */
-        dpr={tier === 'full' ? [1, 1.5] : 1}
+        dpr={tier === 'full' ? [1, 2] : 1}
         camera={{ position: [0, 0, distance], fov: 42 }}
         gl={{
           antialias: tier === 'full',

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bloom, DepthOfField, EffectComposer, Vignette } from '@react-three/postprocessing';
+import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
 
 import { Suspense } from 'react';
 
@@ -74,18 +74,29 @@ export default function RoninCanvas({ kendali }: { kendali: { current: KendaliRo
                 kabut terbaca sebagai lensa kotor — bukan sebagai cahaya.
               */}
               <Bloom
-                luminanceThreshold={0.55}
+                luminanceThreshold={0.72}
                 luminanceSmoothing={0.22}
-                intensity={1.25}
+                intensity={0.85}
                 mipmapBlur
               />
               {/*
-                Kedalaman medan DIPAKAI di sini, berbeda dari adegan maskot
-                sebelumnya. Subjeknya bukan wajah melainkan SILUET, dan bara
-                yang sebagian di luar fokus itulah yang mengubah kumpulan titik
-                menjadi udara.
+                ── KEDALAMAN MEDAN DIBUANG ────────────────────────────────
+
+                Ia dipasang ketika subjeknya siluet prosedural: bara yang
+                sebagian lepas fokus mengubah kumpulan titik menjadi udara,
+                dan siluet datar tidak punya detail yang bisa hilang.
+
+                Aset berpahat membalik perhitungan itu seluruhnya. Yang dibayar
+                mahal justru KETAJAMANNYA — pelat zirah, jahitan mantel, ukiran
+                helm — dan kedalaman medan menghapus persis itu. Dengan
+                `focusDistance` 0,016 pada kamera sejauh 5,2, bidang fokusnya
+                bahkan tidak jatuh di karakternya: yang tajam ruang kosong di
+                depannya, yang kabur samurainya.
+
+                Atmosfernya tidak hilang bersamanya — halimun, bulan berpendar,
+                dan bara masih mengerjakannya, dan ketiganya tidak menyentuh
+                ketajaman subjek.
               */}
-              <DepthOfField focusDistance={0.016} focalLength={0.05} bokehScale={2.4} />
               <Vignette offset={0.26} darkness={0.62} />
             </EffectComposer>
           ) : null}
