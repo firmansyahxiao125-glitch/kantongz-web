@@ -650,9 +650,9 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| F1 | todo | — | — | simpan gambar struk, buang EXIF |
-| F2 | todo | — | — | pulihkan dari ekspor |
-| F5 | todo | — | — | ukur akurasi OCR, ≥40 struk sintetis |
+| F1 | selesai | `78846c6` | 67 uji (F1+F2+F5, diverifikasi ulang 16 Agt) | simpan gambar struk, buang EXIF — JPEG: buang semua APPn kecuali APP0; PNG: daftar tertutup `tEXt/zTXt/iTXt/eXiF/tIME` |
+| F2 | selesai | `9627e80` | 67 uji (F1+F2+F5, diverifikasi ulang 16 Agt) | pulihkan dari ekspor — pratinjau adalah BAWAANNYA; menolak pembukuan yang sudah berisi; seluruh id dipetakan ulang |
+| F5 | selesai | `93c76d5` | 67 uji (F1+F2+F5, diverifikasi ulang 16 Agt) | akurasi pengurai struk — 48 struk sintetis, ambang DIUKUR lebih dulu (total 100%, merchant 93,8% → ambang 0,90) |
 
 ## Langkah 8 — fitur murah bernilai tinggi
 
