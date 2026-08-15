@@ -237,6 +237,53 @@ tadinya gelap tidak hilang, ia hanya tertimbun.
 Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
 `ronin` kembali 27/27.
 
+### W1–W4 — empat tambahan dasbor, nol titik akhir API baru
+
+Setiap sinyal yang dibutuhkan sudah ada di `DashboardSummary`. Menambah
+endpoint untuk menghitung ulang hal yang sudah dikirim berarti dua tempat yang
+harus sepakat, dan dua tempat selalu berselisih pada akhirnya.
+
+Logikanya murni di `src/lib/kesehatan.ts` — tanpa React, tanpa jaringan, tanpa
+jam; waktu disuntikkan sebagai argumen. 14 uji baru, dan bukti merahnya
+dijalankan: merusak arah laju menabung dan menggeser ambang 0,85 -> 0,80
+menjatuhkan 3 uji sekaligus.
+
+**W4 menjaga satu keputusan produk secara eksplisit.** Gamifikasi yang memberi
+poin untuk TRANSAKSI menghadiahi pengeluaran — makin sering belanja, makin
+tinggi angkanya. Pada aplikasi keuangan itu bukan cuma salah, itu berbahaya.
+Keempat komponennya hanya membaik ketika uang penggunanya membaik: anggaran
+dihormati, laju menabung, kemajuan tujuan, arus kas positif. Ada uji yang
+menegaskannya, dan uji itu MERAH kalau arahnya dibalik.
+
+Skornya selalu dirinci. Angka tunggal tidak dapat ditindaklanjuti: orang yang
+melihat "62" tidak tahu apa yang harus diubah.
+
+**W1 menyaring, bukan menumpahkan.** Anggaran ditandai pada 85% — bukan 90%,
+karena pada 90% sebagian besar orang sudah tidak punya ruang mengubah apa pun,
+dan peringatan yang datang terlambat hanya menambah rasa bersalah tanpa
+menambah pilihan. Tujuan hanya disebut kalau TERTINGGAL LAJU; menandai setiap
+tujuan yang belum selesai akan melatih orang mengabaikan seluruh daftarnya.
+
+**W3 menolak foto stok atas tiga alasan.** Lisensi yang harus dijaga selamanya;
+berat yang mengalahkan seluruh anggaran halaman dikalikan jumlah tujuan; dan
+yang paling menentukan — kejujuran. Foto pantai di atas tujuan bernama "Dana
+darurat" menjanjikan sesuatu yang bukan miliknya. Sampulnya dihitung dari `id`
+lewat hash, jadi tujuan yang sama selalu mendapat sampul yang sama.
+
+### `alur` hijau penuh — pencemaran CSV akhirnya tertutup
+
+Penegasan impor membaca `innerText` sekali sesudah impor dan menyimpulkan
+barisnya tidak masuk kalau tidak ketemu. Itu benar hanya selama buku besarnya
+pendek — dan akun uji SELALU terisi, itulah gunanya. Dua puluh lima baris
+pertama berhenti memuat yang baru diimpor, dan gerbangnya melaporkan kegagalan
+pada impor yang berhasil sempurna.
+
+Buktinya bahkan sudah ada di pemeriksaan sesudahnya: unggahan kedua menemukan
+ketiga barisnya sebagai duplikat. Dua penegasan yang berselisih tentang data
+yang sama berarti salah satu mengukur hal yang salah.
+
+Kini "Muat lebih banyak" ditekan sampai penandanya muncul, dengan batas keras.
+
 ### T6b + T9 — lencana dasbor, dan biayanya diukur sebelum diputuskan
 
 Lencana 88 piksel di samping judul Dasbor: ikosahedron kuningan berputar
@@ -540,10 +587,10 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| W1 | todo | — | — | pusat notifikasi |
-| W2 | todo | — | — | kisi aksi cepat |
-| W3 | todo | — | — | sampul tujuan (tanpa foto stok) |
-| W4 | todo | — | — | gamifikasi — XP untuk kesehatan keuangan, bukan belanja |
+| W1 | selesai | ini | 97 uji · akses 489 · interior · kontras | peringatan diturunkan dari data yang sudah ada, nol API baru |
+| W2 | selesai | ini | akses 489 · interior | enam pintasan, semuanya `Link` |
+| W3 | selesai | ini | palet bersih · akses 489 | sampul DIBANGKITKAN dari id, deterministik |
+| W4 | selesai | ini | 97 uji (14 baru, 3 bukti merah) | skor 4 komponen, tidak pernah naik karena belanja |
 
 ## Langkah 5 — validasi manusia
 

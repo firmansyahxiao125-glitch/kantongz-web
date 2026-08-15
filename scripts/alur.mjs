@@ -496,7 +496,39 @@ async function alurImpor(cdp) {
   await sleep(4500);
 
   await goto(cdp, `${BASE}/transaksi`, 4500);
-  const teks = await evaluate(cdp, `document.body.innerText`);
+  /*
+     DIMUAT SAMPAI KETEMU, bukan dibaca sekali dari halaman pertama.
+
+     Versi sebelumnya membaca `innerText` sekali sesudah impor dan
+     menyimpulkan barisnya tidak masuk kalau tidak ketemu. Itu benar hanya
+     selama buku besarnya pendek. Begitu akun ujinya terisi — dan akun uji
+     SELALU terisi, itulah gunanya — dua puluh lima baris pertama tidak lagi
+     memuat yang baru saja diimpor, dan gerbangnya melaporkan kegagalan pada
+     impor yang sebenarnya berhasil sempurna.
+
+     Bukti bahwa impornya berhasil bahkan sudah ada di pemeriksaan
+     sesudahnya: unggahan kedua menemukan ketiga barisnya sebagai duplikat.
+     Dua penegasan yang berselisih tentang data yang sama berarti salah satu
+     mengukur hal yang salah.
+
+     Jadi "Muat lebih banyak" ditekan sampai penandanya muncul, dengan batas
+     keras supaya ia tidak pernah menggantung.
+  */
+  const teks = await (async () => {
+    for (let i = 0; i < 12; i += 1) {
+      const t = await evaluate(cdp, `document.body.innerText`);
+      if (t.includes(`Kopi ${CAP}`) && t.includes(`Bensin ${CAP}`) && t.includes(`Bonus ${CAP}`)) return t;
+      const adaTombol = await evaluate(
+        cdp,
+        `(() => { const b = [...document.querySelectorAll('button')]
+            .find(x => /Muat lebih banyak/i.test(x.textContent || ''));
+          if (!b) return false; b.click(); return true; })()`,
+      );
+      if (!adaTombol) break;
+      await sleep(1200);
+    }
+    return evaluate(cdp, `document.body.innerText`);
+  })();
   ok('ketiganya masuk ke buku besar', teks.includes(`Kopi ${CAP}`) && teks.includes(`Bensin ${CAP}`) && teks.includes(`Bonus ${CAP}`));
   ok('yang rusak TIDAK masuk', !teks.includes(`Rusak ${CAP}`) && !teks.includes(`Hantu ${CAP}`));
   ok('titik ribuan dibaca benar', /Rp\s25\.000/.test(teks) && /Rp\s2\.500\.000/.test(teks));

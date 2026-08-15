@@ -10,6 +10,9 @@ import { DonutChart } from '@/components/charts/donut-chart';
 import { ProgressRing } from '@/components/charts/progress-ring';
 import { PageHeader } from '@/components/shell/page-header';
 import { LencanaKartu } from '@/components/three/lencana-kartu';
+import { AksiCepat } from '@/components/dasbor/aksi-cepat';
+import { KesehatanKartu } from '@/components/dasbor/kesehatan-kartu';
+import { SampulTujuan } from '@/components/dasbor/sampul-tujuan';
 import { QuickActions } from '@/components/shell/quick-actions';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
@@ -222,6 +225,36 @@ export default function DasborPage() {
             </CardBody>
           </Card>
 
+          {/* W1 + W4 — peringatan dan skor, diturunkan dari data yang sudah
+              ada. Nol titik akhir API baru: menambah endpoint untuk menghitung
+              ulang hal yang sudah dikirim berarti dua tempat yang harus
+              sepakat, dan dua tempat selalu berselisih pada akhirnya. */}
+          <KesehatanKartu
+            masukan={{
+              monthIncome: d.monthIncome,
+              monthExpense: d.monthExpense,
+              budgets: d.budgets.map((b) => ({
+                id: b.id,
+                categoryId: b.categoryId,
+                spent: b.spent,
+                effectiveAmount: b.limit,
+              })),
+              goals: d.goals.map((g) => ({
+                id: g.id,
+                name: g.name,
+                targetAmount: g.targetAmount,
+                savedAmount: g.savedAmount,
+                targetDate: g.targetDate,
+                achieved: g.achieved,
+              })),
+              namaKategori: (id) =>
+                d.topCategories.find((c) => c.categoryId === id)?.categoryName ?? 'kategori ini',
+            }}
+          />
+
+          {/* W2 — pintasan yang benar-benar sering dimulai dari dasbor. */}
+          <AksiCepat />
+
           {d.goals.length > 0 ? (
             <Card>
               <CardBody>
@@ -246,6 +279,16 @@ export default function DasborPage() {
                   const rasio = Math.min(tujuan.savedAmount / tujuan.targetAmount, 1);
                   return (
                     <div className="flex items-center gap-4">
+                      {/* W3: sampul DIBANGKITKAN dari id-nya, bukan foto stok.
+                          Foto pantai di atas "Dana darurat" menjanjikan
+                          sesuatu yang bukan miliknya; tujuan keuangan adalah
+                          angka dan waktu, bukan suasana. */}
+                      <SampulTujuan
+                        id={tujuan.id}
+                        nama={tujuan.name}
+                        warna={tujuan.color}
+                        className="size-12 shrink-0 overflow-hidden rounded-xl"
+                      />
                       <ProgressRing
                         ratio={rasio}
                         label={`${String(Math.round(rasio * 100))}%`}
