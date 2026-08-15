@@ -649,7 +649,7 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| X1 | todo | — | — | uji karakterisasi SEBELUM F3 dan G3 |
+| X1 | selesai | `8e9d8f5` | 8 uji · matriks IDOR 10 rute | uji karakterisasi SEBELUM F3 dan G3 — menemukan 4 kesalahan saya sendiri: `GET /v1/transactions/:id` tidak ada, verba ditebak salah, tabrakan 409 anggaran, dan tiga muatan gagal validasi sehingga kepemilikan tak pernah tercapai |
 | F3 | todo | — | — | split transaksi — JANGAN buang `category_id` |
 | F4 | todo | — | — | penghapusan sungguhan — mati secara bawaan |
 | G3 | todo | — | — | dompet bersama — satu penyelesai, gagal-tertutup |
