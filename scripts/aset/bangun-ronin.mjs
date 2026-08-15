@@ -200,55 +200,112 @@ for (const sisi of [-1, 1]) {
 
 /* ── daging dan zirah ─────────────────────────────────────────────────── */
 
-/* kepala: tengkorak, lalu kabuto di atasnya */
-pasang(kepala, new THREE.SphereGeometry(KEPALA * 0.42, 16, 14), MAT.kulit, { y: 0 });
+/* ── KEPALA ──────────────────────────────────────────────────────────────
 
-/* menpō — pelindung rahang, menonjol ke depan */
-pasang(kepala, new THREE.BoxGeometry(KEPALA * 0.52, KEPALA * 0.36, KEPALA * 0.36), MAT.zirah, {
-  y: -KEPALA * 0.2,
-  z: KEPALA * 0.12,
-  rx: 0.34,
-});
+   Bagian ini ditulis ulang karena review visual menyebut helmnya terbaca
+   sebagai TUDUNG, bukan kabuto — dan sebabnya bukan mangkuknya kurang halus.
 
-/* celah mata — satu-satunya yang memancar di wajah */
-pasang(kepala, new THREE.BoxGeometry(KEPALA * 0.58, KEPALA * 0.07, KEPALA * 0.06), MAT.bilah, {
-  y: KEPALA * 0.04,
-  z: KEPALA * 0.38,
-});
+   Yang memisahkan helm dari rambut adalah TEPI KERAS YANG MENJOROK di atas
+   mata. Mangkuk bulat tanpa tepi itu selalu terbaca sebagai kepala berambut,
+   betapa pun banyak lapisan yang ditumpuk di belakangnya. Versi sebelumnya
+   justru menumpuk lapisan tengkuk yang melebar, dan lapisan itulah yang
+   dibaca mata sebagai rambut terurai.
 
-/* kabuto — mangkuk helm, bukan kerucut caping */
+   Jadi tiga bentuk ditambahkan, dan ketiganya penanda kabuto yang tidak
+   dimiliki bentuk kepala lain mana pun:
+
+     mabizashi   tepi depan yang menjorok — penentu utamanya
+     fukigaeshi  dua sayap terlipat di sisi depan
+     tehen       puncak logam kecil di ubun-ubun
+
+   dan lapisan tengkuknya dirapatkan serta dibatasi HANYA ke belakang. */
+
+/* tengkorak */
+pasang(kepala, new THREE.SphereGeometry(KEPALA * 0.4, 16, 14), MAT.kulit, { y: 0 });
+
+/* hachi — mangkuk helm */
 pasang(
   kepala,
-  new THREE.SphereGeometry(KEPALA * 0.56, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.62),
+  new THREE.SphereGeometry(KEPALA * 0.52, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.56),
   MAT.zirahTerang,
-  { y: KEPALA * 0.1 },
+  { y: KEPALA * 0.08 },
 );
 
-/* shikoro — pelindung tengkuk berlapis, melebar ke bawah dan ke belakang.
-   Inilah yang memberi helm siluet Jepangnya. */
-for (let i = 0; i < 2; i += 1) {
+/* tehen — puncak logam di ubun-ubun */
+pasang(kepala, new THREE.CylinderGeometry(KEPALA * 0.07, KEPALA * 0.1, KEPALA * 0.08, 10), MAT.zirahTerang, {
+  y: KEPALA * 0.52,
+});
+
+/* mabizashi — TEPI DEPAN. Inilah yang menjadikannya helm. */
+pasang(kepala, new THREE.BoxGeometry(KEPALA * 0.9, KEPALA * 0.08, KEPALA * 0.36), MAT.zirahTerang, {
+  y: KEPALA * 0.19,
+  z: KEPALA * 0.29,
+  rx: -0.32,
+});
+
+/* fukigaeshi — dua sayap terlipat di sisi depan helm */
+for (const sisi of [-1, 1]) {
+  pasang(kepala, new THREE.BoxGeometry(KEPALA * 0.07, KEPALA * 0.36, KEPALA * 0.32), MAT.zirahTerang, {
+    x: sisi * KEPALA * 0.46,
+    y: KEPALA * 0.14,
+    z: KEPALA * 0.14,
+    rz: sisi * 0.44,
+    ry: -sisi * 0.5,
+  });
+}
+
+/* shikoro — tengkuk, RAPAT dan hanya di belakang. Versi sebelumnya melebar
+   ke samping dan terbaca sebagai rambut jatuh. */
+for (let i = 0; i < 3; i += 1) {
   pasang(
     kepala,
     new THREE.CylinderGeometry(
-      KEPALA * (0.52 + i * 0.07),
-      KEPALA * (0.58 + i * 0.07),
-      KEPALA * 0.13,
-      18,
+      KEPALA * (0.5 + i * 0.055),
+      KEPALA * (0.55 + i * 0.055),
+      KEPALA * 0.1,
+      16,
       1,
       true,
-      Math.PI * 0.28,
-      Math.PI * 1.44,
+      Math.PI * 0.6,
+      Math.PI * 0.8,
     ),
     MAT.zirah,
-    { y: KEPALA * (0.02 - i * 0.12), z: -KEPALA * 0.04 },
+    { y: KEPALA * (0.02 - i * 0.09), z: -KEPALA * 0.05 },
   );
 }
 
-/* maedate — bulan sabit di kening */
-pasang(kepala, new THREE.TorusGeometry(KEPALA * 0.36, KEPALA * 0.05, 6, 16, Math.PI * 1.05), MAT.zirahTerang, {
-  y: KEPALA * 0.4,
-  z: KEPALA * 0.2,
-  rx: 0.5,
+/* menpō — topeng wajah: pipi bersudut lalu dagu meruncing. Bentuk runcing di
+   bawah garis mata itulah yang membuat wajahnya terbaca tertutup topeng
+   logam, bukan sekadar gelap. */
+pasang(kepala, new THREE.BoxGeometry(KEPALA * 0.46, KEPALA * 0.28, KEPALA * 0.32), MAT.zirah, {
+  y: -KEPALA * 0.22,
+  z: KEPALA * 0.11,
+  rx: 0.3,
+});
+pasang(kepala, new THREE.ConeGeometry(KEPALA * 0.21, KEPALA * 0.24, 4), MAT.zirah, {
+  y: -KEPALA * 0.42,
+  z: KEPALA * 0.09,
+  rx: Math.PI,
+  ry: Math.PI / 4,
+});
+
+/* DUA celah mata yang menyala, duduk di bayangan bawah mabizashi. Dua celah
+   terpisah terbaca sebagai mata; satu garis melintang terbaca sebagai visor
+   robot. */
+for (const sisi of [-1, 1]) {
+  pasang(kepala, new THREE.BoxGeometry(KEPALA * 0.18, KEPALA * 0.055, KEPALA * 0.04), MAT.bilah, {
+    x: sisi * KEPALA * 0.15,
+    y: KEPALA * 0.01,
+    z: KEPALA * 0.33,
+    rz: sisi * 0.12,
+  });
+}
+
+/* maedate — bulan sabit di kening, di depan mabizashi */
+pasang(kepala, new THREE.TorusGeometry(KEPALA * 0.34, KEPALA * 0.05, 6, 16, Math.PI * 1.05), MAT.zirahTerang, {
+  y: KEPALA * 0.34,
+  z: KEPALA * 0.26,
+  rx: 0.52,
 });
 
 /* leher benar-benar ada — inilah yang memisahkan kepala dari badan, dan
@@ -275,12 +332,12 @@ pasang(pinggul, new THREE.CylinderGeometry(KEPALA * 0.48, KEPALA * 0.5, KEPALA *
 /* kusazuri — rok pelat yang menggantung dari pinggang */
 for (let i = 0; i < 6; i += 1) {
   const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
-  pasang(pinggul, new THREE.BoxGeometry(KEPALA * 0.44, KEPALA * 0.66, KEPALA * 0.08), MAT.zirah, {
+  pasang(pinggul, new THREE.BoxGeometry(KEPALA * 0.52, KEPALA * 0.88, KEPALA * 0.09), MAT.zirah, {
     x: Math.sin(a) * KEPALA * 0.44,
     z: Math.cos(a) * KEPALA * 0.44,
-    y: -KEPALA * 0.28,
+    y: -KEPALA * 0.42,
     ry: a,
-    rx: 0.16,
+    rx: 0.22,
   });
 }
 
@@ -436,12 +493,12 @@ lengan.Kiri.atas.rotation.x = -0.2;
 lengan.Kiri.atas.rotation.z = 0.3;
 lengan.Kiri.bawah.rotation.x = -0.5;
 
-kaki.Kiri.paha.rotation.z = 0.2;
-kaki.Kanan.paha.rotation.z = -0.2;
+kaki.Kiri.paha.rotation.z = 0.3;
+kaki.Kanan.paha.rotation.z = -0.3;
 kaki.Kiri.paha.rotation.x = -0.08;
 kaki.Kanan.paha.rotation.x = 0.06;
-kaki.Kiri.lutut.rotation.x = 0.16;
-kaki.Kanan.lutut.rotation.x = 0.12;
+kaki.Kiri.lutut.rotation.x = 0.3;
+kaki.Kanan.lutut.rotation.x = 0.26;
 
 /* ── animasi ──────────────────────────────────────────────────────────── */
 

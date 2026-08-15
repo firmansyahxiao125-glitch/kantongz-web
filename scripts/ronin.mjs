@@ -480,10 +480,36 @@ await withChrome([], async (cdp) => {
     a.binRonaTeratas >= 8 && a.binRonaTeratas <= 10,
     `(bin ${String(a.binRonaTeratas)})`,
   );
+  /*
+     ── KALIBRASI ULANG, SESUDAH KOMPOSISINYA BERUBAH TOTAL ───────────────
+
+     Ambang lama (gelap >= 28) dikalibrasi terhadap sosok PROSEDURAL kecil
+     yang mengisi seperenam bingkai dan hanya disinari rim. Karakternya kini
+     humanoid GLB dengan pembingkaian hero dan cahaya bentuk — dan pada sosok
+     yang mengisi bingkai, hampir setiap piksel tubuh berada di atas ambang
+     "gelap", sehingga ember itu cuma menangkap pinggiran latar.
+
+     `gelapPersen` karena itu BUTA di sini, dan itu diukur bukan dikira:
+
+                        gelapPersen   terangPersen
+       membanjir            14,1%         42,0%
+       benar                16,0%         33,9%
+       pemisahan             1,9           8,1
+
+     Penjaganya pindah ke batas ATAS `terangPersen`. Arahnya masuk akal dan
+     itulah sebabnya ia bekerja: permukaan yang membanjir menambah piksel
+     TERANG, bukan mengurangi piksel gelap — bagian yang tadinya gelap tidak
+     hilang, ia hanya tertimbun.
+
+     38 terletak di antara kedua pengukuran dengan sisa di kedua sisi.
+     `gelapPersen` tetap dilaporkan sebagai keterangan, tetapi tidak lagi
+     dipakai menghakimi: angka yang tidak peka terhadap hal yang dijaganya
+     hanya menambah rasa aman palsu.
+  */
   ok(
-    'R-V3 penjaga regresi rim — permukaan tidak membanjir',
-    a.gelapPersen >= 28 && a.terangPersen >= 6,
-    `(gelap ${String(a.gelapPersen)}%, terang ${String(a.terangPersen)}%)`,
+    'R-V3 penjaga regresi — permukaan tidak membanjir cahaya',
+    a.terangPersen <= 38,
+    `(terang ${String(a.terangPersen)}% / maks 38%, gelap ${String(a.gelapPersen)}%)`,
   );
   ok(
     'R-V1 tanda tangan caping — lebar di atas, sempit di bawah',

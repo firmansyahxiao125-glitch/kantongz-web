@@ -178,7 +178,7 @@ penegasan fps DILEWATI dengan mengatakannya — bukan diam-diam diluluskan.
 
 | id | status | commit | gerbang | catatan |
 |---|---|---|---|---|
-| R13 | sebagian | ini | akses 455 · grafis 14 · palet bersih · 83 uji · ronin 26/27 | humanoid GLB + animasi; **R-V3 merah, tidak ditutup** |
+| R13 | selesai | ini | akses 455 · grafis 14 · palet bersih · 83 uji · ronin 27/27 | humanoid GLB + animasi + kabuto berpahat; R-V3 dikalibrasi ulang |
 
 Pipeline GLB DIBUKTIKAN dua arah sebelum satu baris karakter ditulis:
 `GLTFLoader` dan `GLTFExporter` keduanya terpasang (three 0.185), `useGLTF` /
@@ -209,19 +209,45 @@ diukur gerbang mana pun — bundelnya justru mengecil dan 212 KiB masuk tanpa
 satu pemeriksaan pun menyentuhnya. Gerbang yang membaik ketika beban bertambah
 adalah gerbang yang berbohong, jadi kelas asetnya diberi anggarannya sendiri.
 
-**R-V3 MERAH dan sengaja tidak ditutup (16% dari ambang 28).** Ambang 28
-dikalibrasi terhadap komposisi lama: sosok prosedural kecil yang mengisi
-seperenam bingkai, disinari rim saja. Komposisinya kini berubah total —
-humanoid GLB, pembingkaian hero, cahaya bentuk — dan pada sosok yang mengisi
-bingkai hampir setiap piksel tubuh berada di atas ambang "gelap", sehingga
-ember itu hanya menangkap pinggiran latar. Buktinya: menurunkan `uBentuk`
-hampir setengahnya hanya menggeser angkanya 15,5% -> 16%. Metriknya tidak peka
-terhadap hal yang seharusnya ia jaga.
+**R-V3 dikalibrasi ulang: penjaganya pindah statistik, bukan diturunkan.**
 
-Ambangnya TIDAK diturunkan dan gerbangnya TIDAK dihapus. Ia menunggu
-kalibrasi ulang terhadap komposisi baru, dengan bukti merah-sebelum-hijau yang
-sama seperti sebelumnya. Sampai itu selesai, `ronin` berjalan 26/27 dan
-angkanya dilaporkan apa adanya.
+Ambang lama (gelap >= 28) dikalibrasi terhadap komposisi lama — sosok
+prosedural kecil yang mengisi seperenam bingkai, disinari rim saja.
+Komposisinya kini berubah total, dan pada sosok yang mengisi bingkai hampir
+setiap piksel tubuh berada di atas ambang "gelap", sehingga ember itu cuma
+menangkap pinggiran latar.
+
+Yang menentukan bukan dugaan itu melainkan pengukuran keduanya pada komposisi
+BARU:
+
+| | `gelapPersen` | `terangPersen` |
+|---|---|---|
+| membanjir (uBentuk penuh, fresnel tanpa jepitan) | 14,1% | **42,0%** |
+| benar | 16,0% | **33,9%** |
+| pemisahan | 1,9 poin — buta | **8,1 poin — nyata** |
+
+`gelapPersen` terbukti tidak peka terhadap hal yang dijaganya, jadi ia turun
+status menjadi keterangan saja. Penjaganya pindah ke batas ATAS
+`terangPersen` pada 38 — di antara kedua pengukuran dengan sisa di kedua
+sisi. Arahnya masuk akal dan itulah sebabnya ia bekerja: permukaan yang
+membanjir MENAMBAH piksel terang, bukan mengurangi piksel gelap — bagian yang
+tadinya gelap tidak hilang, ia hanya tertimbun.
+
+Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
+`ronin` kembali 27/27.
+
+### Review visual karakter — status jujur
+
+Struktur TERCAPAI: humanoid penuh, kepala dan leher, dua bahu, dua lengan dan
+telapak, torso dan pinggang, dua kaki terpisah, dua telapak kaki, proporsi
+manusia, berdiri di platform, katana terbaca sebagai pedang, dan kedalaman
+material yang nyata sejak cahaya bentuk masuk.
+
+BELUM tercapai terhadap rujukan: fidelitas sculpt. Kabuto kini punya
+mabizashi, fukigaeshi, dan tehen sehingga berhenti terbaca sebagai tudung,
+tetapi hasilnya tetap gaya low-poly ter-stilisasi — bukan setara sculpt
+high-poly di gambar rujukan. Itu plafon model bangun-sendiri, dan plafon itu
+sudah disampaikan terbuka; pengguna memilih melanjutkan jalur ini dengan sadar.
 
 ### Dua hal yang HARUS diketahui sebelum melanjutkan Ronin
 
