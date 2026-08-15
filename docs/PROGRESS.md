@@ -659,11 +659,36 @@ pada isi buku besar.
 
 | id | status | commit | gerbang saat selesai | catatan |
 |---|---|---|---|---|
-| H1 | todo | — | — | PWA atau paritas Expo — TANYAKAN, jangan memilih sendiri |
+| H1 | selesai | `05a3f9a` | **pwa 21/21** · palette · contrast · typography · 97 uji | PWA di web — **DIPILIH PENGGUNA**, bukan oleh saya. Manifest + ikon dibangkitkan dari lambang merek + service worker yang sengaja TIDAK menyimpan satu byte pun jawaban API. Gerbang `pwa` berjalan terhadap build PRODUKSI |
 
 ---
 
 ## Yang terhalang
+
+> **Tiga gerbang peramban MERAH sebelum H1, dan bukan karenanya — 16 Agustus 2026.**
+>
+> Dibuktikan dengan menyimpan seluruh perubahan H1 (`git stash`), membersihkan
+> `.next`, lalu menjalankan ketiganya pada pohon BERSIH. Hasilnya identik. H1
+> tidak menyentuhnya.
+>
+> | gerbang | keadaan | sebab |
+> |---|---|---|
+> | `render` | 38 lulus · 1 gagal | 1 galat konsol — `unsafe-eval` |
+> | `ronin` | 27 lulus · 1 gagal · 3 galat konsol | `unsafe-eval` + "cadangannya juga UNGU (bin 11, jenuh 5,8%)" |
+> | `grafis` | 18 lulus · 1 gagal · 1 dilewati | bobot JavaScript 1728 KB terhadap langit-langit 1265 KB |
+>
+> Galat `unsafe-eval` datang dari React Refresh, yang HANYA ada di mode dev.
+> CSP repositori ini menolak `unsafe-eval` dengan sengaja dan
+> terdokumentasi di `next.config.ts` — jadi gejalanya tidak muncul di
+> produksi. Yang perlu diputuskan: apakah gerbang dev harus mengabaikan
+> galat konsol yang berasal dari React Refresh, atau CSP dev dilonggarkan
+> terpisah dari CSP produksi. **Jangan longgarkan CSP produksi.**
+>
+> Bobot JavaScript 1728 KB terhadap langit 1265 KB adalah temuan tersendiri
+> dan belum diselidiki. Ia BUKAN akibat H1: `sw.js` dan `luring.html`
+> disajikan dari `public/` dan tidak masuk bundel.
+
+
 
 **V3 · pemilih rentang tanggal di dasbor — DITUNDA, bukan dilupakan.**
 
