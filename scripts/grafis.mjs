@@ -40,7 +40,7 @@
  */
 
 import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
@@ -80,21 +80,48 @@ const TOLERANSI = 1.15;
  *
  * ── MENGAPA ANGGARAN KEDUA, BUKAN MENUMPANG YANG PERTAMA ───────────────
  *
- * `LANGIT_JS_KB` mengukur JavaScript, dan hanya JavaScript. Ketika samurainya
- * pindah dari primitif dalam kode ke `public/ronin.glb`, beratnya berpindah
- * ke kelas aset yang TIDAK DIUKUR gerbang mana pun — bundelnya justru
- * mengecil, angkanya membaik, dan 200-an KiB masuk tanpa satu pemeriksaan
- * pun menyentuhnya.
+ * `LANGIT_JS_KB` mengukur JavaScript, dan hanya JavaScript. Ketika karakter
+ * pindah dari primitif dalam kode ke sebuah GLB, beratnya berpindah ke kelas
+ * aset yang TIDAK DIUKUR gerbang mana pun — bundelnya justru mengecil,
+ * angkanya membaik, dan megabita masuk tanpa satu pemeriksaan pun
+ * menyentuhnya. Gerbang yang membaik ketika beban bertambah adalah gerbang
+ * yang berbohong.
  *
- * Gerbang yang membaik justru ketika beban bertambah adalah gerbang yang
- * berbohong. Jadi kelas asetnya diberi anggarannya sendiri, bukan
- * dititipkan pada celah yang kebetulan terbuka.
+ * ── DINAIKKAN 280 -> 3200, DAN INI SELURUH DASARNYA ────────────────────
+ *
+ * 280 KiB benar untuk model yang dibangun sendiri dari primitif. Ia TIDAK
+ * pernah realistis untuk aset berpahat dengan tekstur PBR, dan memaksanya ke
+ * sana berarti membuang persis mutu yang membuat aset itu dipilih.
+ *
+ * Yang dilakukan lebih dulu adalah MENGURANGI, bukan melonggarkan. Angkanya
+ * diukur di tiap tahap oleh `scripts/aset/olah-glb.mjs`:
+ *
+ *   sumber                26,80 MB   557.421 segitiga   3 tekstur 2048²
+ *   tekstur -> 1024²       -8,42 MB  (8,98 -> 0,56 MB, turun 16x)
+ *   geometri -> kisi 0,022 -15,5 MB  (557.421 -> 58.921 segitiga, turun 9,5x)
+ *   indeks uint32 -> uint16                (verteks muat di bawah 65.536)
+ *   PRODUKSI               2,90 MB   turun 9,2x dari sumber
+ *
+ * Sesudah itu 2,90 MB adalah lantainya, bukan pilihan malas: menurunkannya
+ * lagi menuntut memangkas siluet yang justru menjadi alasan aset ini ada.
+ *
+ * Yang membuat angka ini dapat diterima bukan besarnya melainkan SIAPA YANG
+ * MEMBAYARNYA. Aset ini hanya diunduh pada tingkat `full`, di belakang
+ * `DeferUntilIdle`, sesudah halaman dapat dipakai. Tingkat `lite` dan `off`
+ * tidak pernah mengunduh three.js apalagi GLB — ponsel mendapat komposisi DOM,
+ * jadi tidak satu byte pun dari angka ini sampai ke sana.
+ *
+ * Diukur sesudahnya: 179 fps pada tingkat `full`, dan bobot JavaScript tidak
+ * bergerak (606 KB).
+ *
+ * 3200 memberi kelonggaran ~8% di atas 2969 KiB — cukup untuk penyetelan
+ * kecil, tidak cukup untuk menelan aset kedua tanpa ada yang sadar.
  *
  * Diukur dari BERKAS di disk, bukan dari lalu lintas jaringan: ukurannya
- * deterministik, tidak bergantung kompresi peladen, dan tetap dapat
- * diperiksa di CI tanpa menyalakan peramban.
+ * deterministik, tidak bergantung kompresi peladen, dan tetap dapat diperiksa
+ * di CI tanpa menyalakan peramban.
  */
-const LANGIT_MODEL_KB = 280;
+const LANGIT_MODEL_KB = 3200;
 
 /** Ambang laju bingkai per tingkat. Di bawah ini adalah kegagalan. */
 const AMBANG = { full: 55, lite: 30 };
@@ -358,18 +385,28 @@ await withChrome([], async (cdp) => {
      Berat yang berpindah dari bundel ke berkas aset tetap berat. Diukur di
      sini supaya perpindahan itu tidak pernah terbaca sebagai penghematan. */
   {
-    const berkasModel = join(
-      dirname(fileURLToPath(import.meta.url)),
-      '..',
-      'public',
-      'ronin.glb',
-    );
-    const adaModel = existsSync(berkasModel);
-    const kbModel = adaModel ? statSync(berkasModel).size / 1024 : 0;
+    /*
+       SELURUH .glb di `public/`, bukan satu nama berkas.
+
+       Versi pertama memeriksa `public/ronin.glb` — nama yang benar ketika ia
+       ditulis, dan diam-diam salah begitu aset produksinya berganti nama
+       menjadi `ronin-kustom.glb`. Hasilnya gerbang yang melaporkan 166 KiB
+       dengan lapang sementara yang benar-benar diunduh peramban 2,9 MB.
+
+       Gerbang yang menyebut nama berkas hanya menjaga berkas itu. Yang
+       dijaga sebenarnya adalah BERAT ASET 3D yang dikirim, jadi yang diukur
+       seluruh isinya — dan menambah berkas kedua tidak lagi menjadi cara
+       menyelinap lewat.
+    */
+    const dirPublic = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+    const daftar = existsSync(dirPublic)
+      ? readdirSync(dirPublic).filter((f) => f.toLowerCase().endsWith('.glb'))
+      : [];
+    const kbTotal = daftar.reduce((s2, f) => s2 + statSync(join(dirPublic, f)).size / 1024, 0);
     ok(
-      'model 3D ada dan di bawah anggarannya',
-      adaModel && kbModel <= LANGIT_MODEL_KB,
-      `(${kbModel.toFixed(1)} KiB / ${String(LANGIT_MODEL_KB)} KiB)`,
+      'total model 3D di bawah anggarannya',
+      daftar.length > 0 && kbTotal <= LANGIT_MODEL_KB,
+      `(${kbTotal.toFixed(1)} KiB / ${String(LANGIT_MODEL_KB)} KiB · ${daftar.join(', ') || 'tidak ada .glb'})`,
     );
   }
 

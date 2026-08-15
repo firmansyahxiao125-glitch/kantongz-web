@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { useZirah, type KendaliRonin } from '@/components/three/ronin';
 import type { GraphicsTier } from '@/lib/gpu';
 import { TOKEN } from '@/lib/palette';
-import { goyangKamera, stanceGulir } from '@/lib/ronin';
+import { goyangKamera, poseTebasan, stanceGulir } from '@/lib/ronin';
 
 /**
  * RONIN sebagai MODEL — humanoid berangka dari `public/ronin.glb`.
@@ -42,7 +42,18 @@ import { goyangKamera, stanceGulir } from '@/lib/ronin';
  * menegakkan apa pun terhadap berkas biner.
  */
 
-const BERKAS = '/ronin.glb';
+/*
+ * Aset produksi, bukan aset sumber.
+ *
+ * Yang di-commit di `aset-sumber/` adalah GLB mentah 26,8 MB — sumber
+ * kebenaran yang tidak pernah dikirim ke peramban. Berkas di bawah ini
+ * hasil `scripts/aset/olah-glb.mjs`: geometrinya dipangkas dan teksturnya
+ * dikecilkan, dengan angka sebelum-sesudah tercatat di PROGRESS.
+ */
+const BERKAS = '/ronin-kustom.glb';
+
+/** Tinggi sasaran di ruang adegan. Aset apa pun diskalakan ke angka ini. */
+const TINGGI_SASARAN = 2.4;
 
 export interface RoninModelProps {
   tier: GraphicsTier;
@@ -126,12 +137,45 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
 
     scene.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
+      /*
+        Material DITUKAR HANYA kalau namanya dikenal.
+
+        Model bawaan repositori memberi nama materialnya justru supaya
+        ditukar di sini — warnanya harus datang dari token, bukan dipanggang
+        ke dalam biner. Aset dari luar TIDAK punya nama itu, dan materialnya
+        dibiarkan utuh dengan sengaja: tekstur PBR-nya adalah seluruh alasan
+        aset itu dipilih, dan menimpanya dengan shader fresnel berarti
+        membuang persis mutu yang dibayar.
+      */
       const nama = (o.material as THREE.Material | undefined)?.name;
       const ganti = nama ? peta[nama] : undefined;
       if (ganti) o.material = ganti;
       o.castShadow = false;
       o.receiveShadow = false;
     });
+
+    /*
+      ── PENYESUAIAN OTOMATIS ────────────────────────────────────────────
+
+      Aset dari luar datang dengan skala dan titik asal sesukanya: yang ini
+      setinggi 2,00 satuan dengan dasar di y = -1,0. Menuliskan angka
+      penyesuaian sebagai tetapan berarti setiap penggantian aset menuntut
+      penyuntingan kode — dan penyesuaian yang harus diingat manusia adalah
+      penyesuaian yang suatu saat terlupa.
+
+      Kotak batasnya diukur, lalu sosoknya diskalakan ke tinggi sasaran dan
+      digeser sampai TELAPAK KAKINYA menyentuh nol. Aset apa pun sesudah ini
+      mendarat di tempat yang benar tanpa satu angka pun disentuh.
+    */
+    const kotak = new THREE.Box3().setFromObject(scene);
+    const ukuran = kotak.getSize(new THREE.Vector3());
+    const skala = ukuran.y > 0.001 ? TINGGI_SASARAN / ukuran.y : 1;
+    scene.scale.setScalar(skala);
+    scene.position.set(
+      -((kotak.min.x + kotak.max.x) / 2) * skala,
+      -kotak.min.y * skala,
+      -((kotak.min.z + kotak.max.z) / 2) * skala,
+    );
   }, [scene, peta]);
 
   /*
@@ -210,11 +254,39 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
     const h = halus.current;
     h.hover = THREE.MathUtils.damp(h.hover, kendali.current.hover ? 1 : 0, 5, delta);
 
+    /*
+     * ── DUA JALUR GERAK, DIPILIH DARI ASETNYA ────────────────────────
+     *
+     * Model berangka menggerakkan dirinya lewat klip glTF. Aset dari luar
+     * yang statis — tanpa skin, tanpa klip — tidak bisa, dan berpura-pura
+     * ia bisa adalah kebohongan yang langsung terlihat: sosok yang membeku
+     * sementara antarmuka mengatakan ia menebas.
+     *
+     * Jadi ketika klipnya tidak ada, mesin keadaan yang SAMA menggerakkan
+     * seluruh objeknya: badan memuntir, condong, dan tersentak pada
+     * tebasan. Itu bukan animasi kerangka dan tidak akan disebut begitu —
+     * tetapi ia digerakkan oleh sumber kebenaran yang sama, jadi setiap
+     * interaksi yang sudah terbukti tetap bekerja apa adanya.
+     */
+    const berangka = aksi.current?.diam !== undefined;
+    const pose = berangka ? null : poseTebasan(fase, t);
+
     if (akar.current) {
       akar.current.position.z = -stance.mundur + guncang * 2;
       /* Terangkat sedikit saat diperhatikan — cukup untuk terasa, tidak
          cukup untuk terlihat melayang. */
       akar.current.position.y = DASAR_Y + guncang + h.hover * 0.055;
+      if (pose) {
+        /* Napas: naik-turun halus, dan condong pada ayunan. */
+        akar.current.position.y += Math.sin(nafas.current * 0.9) * 0.018;
+        akar.current.rotation.z = THREE.MathUtils.damp(
+          akar.current.rotation.z,
+          pose.badan * 0.5,
+          7,
+          delta,
+        );
+      }
+
       akar.current.rotation.y = THREE.MathUtils.damp(
         akar.current.rotation.y,
         /*
@@ -228,6 +300,7 @@ export function RoninModel({ tier, kendali }: RoninModelProps) {
            Yang berubah bukan cuma seberapa jauh ia menoleh, melainkan
            seberapa jelas ia terlihat memperhatikan. */
         stance.putar +
+          (pose ? pose.badan * 1.15 : 0) +
           THREE.MathUtils.clamp(arah.x * (0.26 + h.hover * 0.1), -0.36, 0.36),
         3.6 + h.hover * 1.4,
         delta,

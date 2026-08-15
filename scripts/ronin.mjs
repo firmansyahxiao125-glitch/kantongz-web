@@ -413,23 +413,58 @@ async function analisis(cdp, kotak) {
         }
       }
 
-      /* ── R-V1: tanda tangan caping ─────────────────────────────────────
-         Topi lebar di atas kepala sempit. Diukur sebagai lebar baris yang
-         menyala: ada baris di sepertiga atas yang jauh lebih lebar daripada
-         baris tepat di bawahnya. */
+      /* ── R-V1: SOSOK HUMANOID — bahu lebih lebar dari kepala ───────────
+
+         Versi sebelumnya mengukur "tanda tangan caping": baris lebar di atas,
+         sempit tepat di bawahnya. Ia benar untuk desain yang punya topi
+         kerucut lebar, dan berhenti benar dua kali — capingnya diganti kabuto
+         bertanduk, lalu karakternya diganti seluruhnya oleh aset berpahat.
+         Pemeriksaan yang menjaga elemen desain yang sudah tidak ada hanya
+         menjaga masa lalu.
+
+         Yang dijaga sekarang adalah sifat yang berlaku untuk SETIAP sosok
+         manusia dan tidak berlaku untuk gumpalan: kepala lebih sempit
+         daripada bahu. Bola, kotak, atau kanvas yang gagal memuat seluruhnya
+         memberi rasio di sekitar 1; sosok berbahu memberi jauh di atasnya.
+
+         Diukur pada piksel TERANG saja (> 0,3) di pita tengah 60% lebar.
+         Keduanya membuang lingkungan: torii dan atap sengaja diredupkan jauh
+         di bawah ambang itu, dan bulan berada di luar pita tengah. Tanpa
+         kedua batas itu yang terukur adalah lebar adegan, bukan lebar sosok.
+      */
+      const x0 = Math.floor(W * 0.2);
+      const x1 = Math.ceil(W * 0.8);
       const lebarBaris = [];
       for (let y = 0; y < H; y += 1) {
         let kiri = -1, kanan = -1;
-        for (let xx = 0; xx < W; xx += 1) {
-          if (terang[y * W + xx] > 0.16) { if (kiri < 0) kiri = xx; kanan = xx; }
+        for (let xx = x0; xx < x1; xx += 1) {
+          if (terang[y * W + xx] > 0.3) { if (kiri < 0) kiri = xx; kanan = xx; }
         }
         lebarBaris.push(kiri < 0 ? 0 : kanan - kiri);
       }
-      let rasioCaping = 0;
-      const jarak = Math.max(4, Math.round(H * 0.06));
-      for (let y = Math.round(H * 0.05); y < Math.round(H * 0.5) - jarak; y += 1) {
-        const atas = lebarBaris[y], bawah = lebarBaris[y + jarak];
-        if (atas > W * 0.08 && bawah > 0) rasioCaping = Math.max(rasioCaping, atas / bawah);
+
+      const barisIsi = lebarBaris.map((l, i) => [l, i]).filter(([l]) => l > 2);
+      let rasioBahu = 0;
+      let yKepala = 0;
+      let yBahu = 0;
+      if (barisIsi.length > 8) {
+        const atas = barisIsi[0][1];
+        const bawah = barisIsi[barisIsi.length - 1][1];
+        const tinggi = bawah - atas;
+        /* Kepala: pita 4-14% dari puncak sosok. Bahu: 18-38%. Keduanya
+           diambil sebagai MEDIAN, bukan satu baris — satu baris tunggal
+           mudah tergelincir oleh satu bara yang kebetulan lewat. */
+        const ambil = (a, b) => {
+          const v = [];
+          for (let y = atas + Math.round(tinggi * a); y <= atas + Math.round(tinggi * b); y += 1) {
+            if (lebarBaris[y] > 0) v.push(lebarBaris[y]);
+          }
+          v.sort((p, q) => p - q);
+          return v.length === 0 ? 0 : v[Math.floor(v.length / 2)];
+        };
+        yKepala = ambil(0.04, 0.14);
+        yBahu = ambil(0.18, 0.38);
+        if (yKepala > 0) rasioBahu = yBahu / yKepala;
       }
 
       const total = W * H;
@@ -443,7 +478,9 @@ async function analisis(cdp, kotak) {
         gelapPersen: jSosok === 0 ? 0 : Math.round((jGelap / jSosok) * 1000) / 10,
         terangPersen: jSosok === 0 ? 0 : Math.round((jTerang / jSosok) * 1000) / 10,
 
-        rasioCaping: Math.round(rasioCaping * 100) / 100,
+        rasioBahu: Math.round(rasioBahu * 100) / 100,
+        lebarKepala: yKepala,
+        lebarBahu: yBahu,
       };
     })()`,
   );
@@ -454,7 +491,7 @@ const beda = (a, b) =>
   a && b
     ? Math.abs(a.nyalaPersen - b.nyalaPersen) +
       Math.abs(a.gelapPersen - b.gelapPersen) +
-      Math.abs(a.rasioCaping - b.rasioCaping) * 10
+      Math.abs(a.rasioBahu - b.rasioBahu) * 10
     : 0;
 
 const panggungInfo = (cdp) =>
@@ -539,9 +576,9 @@ await withChrome([], async (cdp) => {
     `(terang ${String(a.terangPersen)}% / maks 38%, gelap ${String(a.gelapPersen)}%)`,
   );
   ok(
-    'R-V1 tanda tangan caping — lebar di atas, sempit di bawah',
-    a.rasioCaping >= 1.6,
-    `(rasio ${String(a.rasioCaping)}×)`,
+    'R-V1 sosok humanoid — bahu lebih lebar dari kepala',
+    a.rasioBahu >= 1.5,
+    `(bahu ${String(a.lebarBahu)}px / kepala ${String(a.lebarKepala)}px = ${String(a.rasioBahu)}×)`,
   );
 
   /* ── gerak ambien ──────────────────────────────────────────────────── */

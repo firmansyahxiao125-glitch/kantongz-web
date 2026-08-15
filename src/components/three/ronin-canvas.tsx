@@ -5,6 +5,7 @@ import { Bloom, DepthOfField, EffectComposer, Vignette } from '@react-three/post
 import { Suspense } from 'react';
 
 import { Bara, Lingkungan, type KendaliRonin } from '@/components/three/ronin';
+import { TOKEN } from '@/lib/palette';
 import { RoninModel } from '@/components/three/ronin-model';
 import { Stage } from '@/components/three/stage';
 import { RoninDiam } from '@/components/three/ronin-diam';
@@ -41,6 +42,24 @@ export default function RoninCanvas({ kendali }: { kendali: { current: KendaliRo
             dalam, yang kosong hanya samurainya, dan panggungnya tetap hidup
             sejak bingkai pertama.
           */}
+          {/*
+            ── CAHAYA, DAN MENGAPA IA BARU ADA SEKARANG ──────────────────
+
+            Adegan ini berjalan tanpa satu pun lampu sejak awal, dan itu
+            benar selama seluruh isinya memakai shader fresnel yang
+            menghitung rupanya sendiri. Aset dari luar tidak: materialnya PBR
+            sungguhan, dan PBR tanpa sumber cahaya merender HITAM PEKAT —
+            bukan gelap, melainkan tidak tergambar sama sekali.
+
+            Tiga sumber, arah kuncinya sama dengan yang dipakai shader
+            fresnel supaya kedua jenis bahan disinari dari tempat yang sama.
+            Sosok yang separuhnya disinari dari kiri dan separuhnya dari
+            kanan terbaca sebagai dua benda yang kebetulan berdekatan.
+          */}
+          <ambientLight intensity={0.55} color={TOKEN.ronin} />
+          <directionalLight position={[-2.2, 2.9, 1.7]} intensity={1.5} color={TOKEN.roninBright} />
+          <directionalLight position={[2.6, 1.2, -1.8]} intensity={0.9} color={TOKEN.ronin} />
+
           <Suspense fallback={null}>
             <RoninModel tier={tier} kendali={kendali} />
           </Suspense>

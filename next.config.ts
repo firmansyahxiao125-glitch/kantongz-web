@@ -53,13 +53,46 @@ const nextConfig: NextConfig = {
       /* Framer Motion menulis gaya sebaris pada setiap frame animasi, dan
          Tailwind menyuntikkan gaya kritis. Keduanya menuntut ini. */
       "style-src 'self' 'unsafe-inline'",
-      /* `data:` untuk tekstur bintik SVG di `globals.css`. Tidak ada gambar
-         dari host luar di mana pun. */
-      "img-src 'self' data:",
+      /*
+         `data:` untuk tekstur bintik SVG di `globals.css`.
+
+         `blob:` DITAMBAHKAN untuk tekstur GLB, dan lingkupnya sengaja
+         diperiksa sebelum ditambahkan. `GLTFLoader` mengurai gambar yang
+         TERTANAM di dalam berkas model, lalu menyerahkannya ke peramban
+         sebagai URL blob; tanpa izin ini ia gagal dengan "Couldn't load
+         texture" dan modelnya tergambar polos tanpa tekstur.
+
+         Yang diizinkan bukan sumber baru: URL blob hanya dapat DIBUAT oleh
+         skrip di origin ini, dari byte yang sudah ada di origin ini. Ia tidak
+         dapat menunjuk ke host mana pun di luar, jadi permukaan serangnya
+         tidak bertambah — berbeda jauh dari `unsafe-eval`, yang sebelumnya
+         DITOLAK di berkas ini demi decoder WASM yang tidak dipakai.
+
+         Tidak ada gambar dari host luar di mana pun.
+      */
+      "img-src 'self' data: blob:",
       /* `next/font` mengunduh saat BUILD dan menyajikannya dari domain
          sendiri, jadi tidak ada host font eksternal yang perlu diizinkan. */
       "font-src 'self'",
-      `connect-src 'self' ${api}`,
+      /*
+         `blob:` di SINI, bukan hanya di `img-src`, dan sebabnya halus.
+
+         `GLTFLoader` memuat tekstur lewat `ImageBitmapLoader`, dan
+         `ImageBitmapLoader` mengambil URL blob-nya dengan `fetch()` — bukan
+         dengan `<img>`. `fetch` diatur `connect-src`, jadi mengizinkan
+         `blob:` pada `img-src` saja membuat gambarnya dapat dipasang di
+         `<img>` tetapi tetap tidak dapat DIAMBIL oleh pemuatnya.
+
+         Jejaknya menyesatkan: pesan galatnya berbunyi "Couldn't load
+         texture" dan menunjuk URL blob, padahal blob itu terbukti dapat
+         diurai — `createImageBitmap` atasnya mengembalikan 1024x1024 pada
+         detik yang sama. Yang gagal pengambilannya, bukan penguraiannya.
+
+         Lingkupnya tetap sama sempitnya: URL blob hanya dapat dibuat skrip
+         origin ini dari byte yang sudah ada di origin ini, dan tidak dapat
+         menunjuk host mana pun di luar.
+      */
+      `connect-src 'self' blob: ${api}`,
       "worker-src 'self' blob:",
       "object-src 'none'",
       "base-uri 'none'",

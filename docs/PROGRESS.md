@@ -236,6 +236,92 @@ tadinya gelap tidak hilang, ia hanya tertimbun.
 Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
 `ronin` kembali 27/27.
 
+### R15 — sumber model diganti aset berpahat, dengan pipeline produksi
+
+| id | status | commit | gerbang | catatan |
+|---|---|---|---|---|
+| R15 | selesai | ini | ronin 28 · akses 455 · render 39 · grafis 14 · contrast · palet · interior · typography · 83 uji | aset pengguna, 26,8 MB -> 2,90 MB |
+
+**Sumber tetap aman.** `aset-sumber/ronin-sumber.glb` menyimpan GLB mentah apa
+adanya dan TIDAK pernah dikirim ke peramban. Yang disajikan hasil
+`scripts/aset/olah-glb.mjs`.
+
+**Audit sumber (`scripts/aset/periksa-glb.mjs`):** 26,80 MB · 557.421 segitiga
+· 0 skin · 0 klip animasi · 1 material PBR (baseColor + normal + metalRough,
+3 tekstur 2048²).
+
+**Pengurangan terukur, per tahap:**
+
+| tahap | sebelum | sesudah | faktor |
+|---|---|---|---|
+| tekstur 2048² -> 1024² | 8,98 MB | 0,56 MB | 16× |
+| geometri (gugus kisi 0,022) | 557.421 tri | 58.921 tri | 9,5× |
+| indeks uint32 -> uint16 | 4 B | 2 B | 2× |
+| **total** | **26,80 MB** | **2,90 MB** | **9,2×** |
+
+Sapuan kisi diukur, bukan ditebak: 0,010 -> 180k tri / 7,03 MB · 0,016 -> 92k /
+4,25 MB · **0,022 -> 59k / 2,83 MB** · 0,030 -> 39k / 2,27 MB.
+
+**LOD mobile TIDAK dibuat, dan itu keputusan bukan kelalaian.** Arsitektur tier
+yang sudah ada tidak pernah mengunduh three.js maupun GLB pada `lite`/`off` —
+ponsel mendapat komposisi DOM. Menambah LOD kedua berarti aset yang tidak
+pernah diminta siapa pun.
+
+**Anggaran dinaikkan 280 -> 3200 KiB, dengan dasar tertulis.** 280 benar untuk
+model yang dibangun dari primitif dan tidak pernah realistis untuk aset
+berpahat bertekstur. Yang dikerjakan lebih dulu MENGURANGI (9,2×), bukan
+melonggarkan. Yang membuatnya dapat diterima bukan besarnya melainkan siapa
+yang membayarnya: hanya tingkat `full`, di belakang `DeferUntilIdle`, sesudah
+halaman dapat dipakai. Terukur sesudahnya: 179 fps, bobot JS tidak bergerak.
+
+**Gerbangnya sendiri diperbaiki lebih dulu.** Ia memeriksa `public/ronin.glb`
+— nama yang benar ketika ditulis, dan diam-diam salah begitu aset produksinya
+berganti nama. Ia melaporkan 166 KiB dengan lapang sementara yang diunduh 2,9
+MB. Kini ia mengukur SELURUH `.glb` di `public/`.
+
+### Animasi: pilihan A, dan alasannya
+
+Aset ini **tidak punya skeleton dan tidak punya klip animasi**. Itu tidak
+diklaim sebaliknya di mana pun.
+
+Pilihan **A** diambil: karakter statis, digerakkan pada tingkat OBJEK oleh
+mesin keadaan yang sudah ada (`lib/ronin.ts`) — badan memuntir, condong,
+tersentak pada tebasan, ditambah hover, parallax penunjuk, gulir, dan guncangan
+kamera. Seluruh interaksi yang sudah terbukti tetap bekerja karena sumber
+kebenarannya tidak berubah.
+
+**B (merig ulang) tidak dikerjakan** karena tidak dapat dilakukan dengan
+perkakas yang ada: auto-rigger menuntut unggahan ke layanan luar dan akun, dan
+merig manual 557k segitiga adalah pekerjaan Blender, bukan pekerjaan repositori
+ini. Pipeline-nya sudah menerima GLB berangka — kalau kelak dikirim versi yang
+sudah dirig, adaptor di `ronin-model.tsx` memakai klipnya secara otomatis dan
+jalur objek dimatikan sendiri.
+
+### Dua galat CSP, dan mengapa keduanya berbeda
+
+**Ditolak:** `unsafe-eval` untuk decoder Meshopt berbasis WASM. Decoder itu
+tidak dipakai sama sekali — asetnya tidak dikompresi Draco maupun Meshopt —
+jadi melubangi kebijakan demi jalur kode mati adalah pertukaran salah arah.
+Yang dimatikan decodernya.
+
+**Diterima:** `blob:` pada `img-src` DAN `connect-src`. `GLTFLoader` menyerahkan
+tekstur tertanam sebagai URL blob, dan `ImageBitmapLoader` MENGAMBILNYA dengan
+`fetch` — yang diatur `connect-src`, bukan `img-src`. Mengizinkan satu saja
+membuat gambarnya dapat dipasang tetapi tetap tidak dapat diambil. Jejaknya
+menyesatkan: pesannya "Couldn't load texture" menunjuk URL blob yang pada detik
+yang sama terbukti dapat diurai — `createImageBitmap` atasnya mengembalikan
+1024x1024. Yang gagal pengambilannya, bukan penguraiannya. Lingkupnya sempit:
+URL blob hanya dapat dibuat skrip origin ini dari byte yang sudah ada di origin
+ini, dan tidak dapat menunjuk host mana pun di luar.
+
+### R-V1 ditulis ulang terhadap karakter final
+
+"Tanda tangan caping" menjaga elemen desain yang sudah dua kali diganti.
+Sekarang: **bahu lebih lebar dari kepala** — sifat yang berlaku untuk setiap
+sosok manusia dan tidak untuk gumpalan. Diukur pada piksel terang di pita
+tengah supaya lingkungan tidak ikut terhitung. Terukur 151px / 26px = 5,81×
+terhadap ambang 1,5.
+
 ### R7 + R8 — hero tiga kolom dan kartu angka
 
 | id | status | commit | gerbang | catatan |
