@@ -44,3 +44,23 @@ next-env.d.ts
 # Skill yang terpasang lokal ikut ter-commit lewat `git add -A` dan menambah
 # tiga puluh satu berkas yang tidak ada hubungannya dengan KANTONGZ.
 .claude/
+
+# Aset SUMBER model 3D — source-of-truth, disimpan LOKAL saja.
+#
+# `aset-sumber/ronin-sumber.glb` berukuran 26,8 MB. Ia sempat ter-commit dan
+# dikeluarkan lagi dari riwayat sebelum push pertama, dengan dua alasan yang
+# masing-masing berdiri sendiri:
+#
+#   Riwayat git tidak dapat melupakan. Sekali masuk, setiap clone di masa
+#   depan mengunduhnya selamanya — termasuk clone CI yang tidak pernah
+#   membutuhkannya.
+#
+#   Repositori ini PUBLIK. Mem-push aset generatif berarti mendistribusikannya
+#   ulang secara publik, dan itu keputusan lisensi, bukan keputusan teknis.
+#
+# Yang BENAR-BENAR dipakai aplikasi adalah `public/ronin-kustom.glb` (2,90 MB),
+# hasil `npm run aset` dari berkas sumber ini. Itu tetap ter-commit.
+#
+# Menjalankan ulang pipeline-nya menuntut berkas sumber ada di sini. Kalau
+# hilang, ia tidak dapat dipulihkan dari repositori — simpan cadangannya.
+aset-sumber/
