@@ -37,6 +37,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
+import { wajibProduksi } from './permukaan.mjs';
+
 /** Lihat catatan yang sama di skrip gerbang lain: 40 detik, bukan 15. */
 const MAKS_TARGET = 160;
 
@@ -46,6 +48,12 @@ function arg(name, fallback = null) {
 }
 
 const BASE = arg('base', 'http://localhost:3100');
+
+/* Menolak `next dev` sebelum satu proses peramban pun dinyalakan.
+   Sebabnya panjang dan ada di `permukaan.mjs`; ringkasnya: dev
+   menyajikan 882 KB yang tidak pernah diunduh pengguna, dan galat
+   `eval()` dari React Refresh adalah CSP yang bekerja benar. */
+await wajibProduksi(BASE, 'ronin');
 
 let lulus = 0;
 let gagal = 0;

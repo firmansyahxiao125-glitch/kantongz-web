@@ -46,6 +46,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
+import { wajibProduksi } from './permukaan.mjs';
+
 /**
  * Berapa lama menunggu Chrome membuka target halamannya.
  *
@@ -69,6 +71,12 @@ function arg(name, fallback) {
 }
 
 const BASE = arg('base', 'http://localhost:3100');
+
+/* Menolak `next dev` sebelum satu proses peramban pun dinyalakan.
+   Sebabnya panjang dan ada di `permukaan.mjs`; ringkasnya: dev
+   menyajikan 882 KB yang tidak pernah diunduh pengguna, dan galat
+   `eval()` dari React Refresh adalah CSP yang bekerja benar. */
+await wajibProduksi(BASE, 'render');
 const PORT = 9335; // berbeda dari screenshots.mjs (9333) dan typography.mjs (9334)
 const PROFILE = join(tmpdir(), `kantongz-render-${String(process.pid)}`);
 

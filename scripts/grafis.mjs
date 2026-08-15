@@ -46,6 +46,8 @@ import { dirname, join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 
+import { wajibProduksi } from './permukaan.mjs';
+
 /**
  * Berapa lama menunggu Chrome membuka target halamannya.
  *
@@ -60,6 +62,12 @@ function arg(name, fallback = null) {
 }
 
 const BASE = arg('base', 'http://localhost:3100');
+
+/* Menolak `next dev` sebelum satu proses peramban pun dinyalakan.
+   Sebabnya panjang dan ada di `permukaan.mjs`; ringkasnya: dev
+   menyajikan 882 KB yang tidak pernah diunduh pengguna, dan galat
+   `eval()` dari React Refresh adalah CSP yang bekerja benar. */
+await wajibProduksi(BASE, 'grafis');
 
 /**
  * Kredensial UNTUK T9 SAJA — seluruh pemeriksaan lain berjalan tanpa sesi.
@@ -82,7 +90,29 @@ const PASSWORD = arg('password');
  * ditambahkan dan mengapa itu layak. Menaikkannya diam-diam mengubah gerbang
  * ini menjadi stempel.
  */
-const LANGIT_JS_KB = 1100;
+/*
+ * DIKALIBRASI ULANG 1100 -> 155, dan angkanya turun karena ALAT UKURNYA
+ * diperbaiki — bukan karena aplikasinya mengecil.
+ *
+ * Tiga hal berubah sekaligus, dan ketiganya tercatat:
+ *
+ *   1. Gerbang ini dulu mengukur `next dev`. Potongan tanpa minifikasi
+ *      ditambah React Refresh membuatnya 1728 KB. Kini ia MENOLAK dev —
+ *      lihat `permukaan.mjs`.
+ *
+ *   2. Sampelnya dulu menjumlahkan seluruh isi penyangga performa, termasuk
+ *      prefetch rute lain yang dilakukan Next saat menganggur. Angkanya
+ *      bergoyang 623 / 846 / 1475 KB tanpa satu baris kode berubah.
+ *
+ *   3. Kini batasnya `loadEventEnd`: apa yang harus diunduh pengunjung
+ *      pertama untuk MELIHAT halaman muka. Diukur lima kali berturut-turut:
+ *      155 KB, kelimanya sama persis.
+ *
+ * Toleransi 15% memberi langit-langit 178 KB. Ketat, dan memang seharusnya:
+ * anggaran 1265 KB terhadap kenyataan 155 KB membiarkan aplikasinya tumbuh
+ * delapan kali lipat tanpa satu pun peringatan.
+ */
+const LANGIT_JS_KB = 155;
 const TOLERANSI = 1.15;
 
 /**
@@ -329,16 +359,95 @@ async function ukurFps(cdp, detik = 10) {
 }
 
 /** Kilobita JavaScript yang benar-benar TERKIRIM, bukan yang diminta. */
-const bobotJs = (cdp) =>
-  evaluate(
+/**
+ * Bobot JavaScript yang dibutuhkan untuk MEMUAT halaman muka.
+ *
+ * ══════════════════════════════════════════════════════════════════════
+ *  MENGAPA BATASNYA `loadEventEnd`, DAN BUKAN "SEMUA YANG PERNAH DIMINTA"
+ * ══════════════════════════════════════════════════════════════════════
+ *
+ * Versi pertama menjumlahkan SELURUH sumber daya skrip yang ada di penyangga
+ * performa saat disampel. Angkanya bergoyang liar — perintah yang sama persis,
+ * empat kali berturut-turut, terhadap build produksi yang sama:
+ *
+ *     623 KB · 623 KB · 623 KB · 846 KB
+ *
+ * Percobaan berikutnya menunggu sampai tidak ada sumber daya baru, dengan
+ * harapan itu memantapkannya. Hasilnya justru lebih buruk:
+ *
+ *     1475 KB · 623 KB · 623 KB · 846 KB
+ *
+ * dan angka pertama itu MELAMPAUI langit-langitnya. Menunggu lebih lama
+ * membuatnya lebih besar, dan itu petunjuk yang menjelaskan segalanya.
+ *
+ * ── SEBABNYA: PREFETCH ─────────────────────────────────────────────────
+ *
+ * Next mengambil-dahulu rute yang tertaut ketika peramban menganggur. Jadi
+ * penyangga performa terus bertambah SESUDAH halaman selesai dimuat, dan
+ * jumlahnya bergantung pada berapa lama alat ukurnya kebetulan menunggu —
+ * bukan pada apa pun tentang aplikasinya.
+ *
+ * Yang benar-benar ingin diketahui anggaran ini adalah: berapa JavaScript yang
+ * harus diunduh pengunjung PERTAMA untuk melihat halaman muka. Prefetch rute
+ * lain bukan bagian dari itu; ia justru bukti bahwa halamannya sudah selesai
+ * dan peramban sedang menganggur.
+ *
+ * `loadEventEnd` memberi batas yang tegas dan tidak bergantung pada waktu
+ * sampel: sumber daya yang MULAI sesudah halaman selesai dimuat tidak
+ * dihitung. Sampel boleh diambil kapan saja sesudah itu dan hasilnya sama.
+ *
+ * ── CELAH YANG DIBUKA BATAS INI, DAN TIDAK BOLEH DISEMBUNYIKAN ─────────
+ *
+ * JavaScript adegan 3D — three, React Three Fiber, postprocessing — diminta
+ * SESUDAH tingkat grafis diputuskan, dan keputusan itu jatuh sesudah
+ * `loadEventEnd`. Jadi ia kini TIDAK terhitung di angka ini.
+ *
+ * Sebelumnya ia kadang terhitung dan kadang tidak; itulah sebagian dari
+ * goyangan 623/846/1475 di atas. Menukar "kadang terhitung" dengan "tidak
+ * pernah terhitung" membuat angkanya jujur tentang apa yang diukurnya,
+ * tetapi meninggalkan satu kelas berat tanpa anggaran:
+ *
+ *   GLB model 3D   ada anggarannya — `LANGIT_MODEL_KB`
+ *   JS adegan 3D   BELUM ADA anggarannya  ← celah
+ *
+ * Ditulis di sini alih-alih dibiarkan tersirat, karena gerbang yang angkanya
+ * membaik sesudah alat ukurnya dipersempit adalah persis bentuk kebohongan
+ * yang berkas ini ada untuk mencegahnya. Tercatat juga di PROGRESS.md sebagai
+ * item terbuka.
+ */
+async function bobotJs(cdp) {
+  /* Halaman harus benar-benar selesai dimuat dulu. Menyampel sebelum
+     `loadEventEnd` terisi menghasilkan batas nol, dan batas nol membuang
+     SEMUANYA. */
+  await evaluate(
+    cdp,
+    `(async () => {
+       for (let i = 0; i < 40; i += 1) {
+         const nav = performance.getEntriesByType('navigation')[0];
+         if (nav && nav.loadEventEnd > 0) return true;
+         await new Promise((r) => setTimeout(r, 250));
+       }
+       return false;
+     })()`,
+  );
+
+  return evaluate(
     cdp,
     `(() => {
+      const nav = performance.getEntriesByType('navigation')[0];
+      const batas = nav ? nav.loadEventEnd : Infinity;
+
       const r = performance.getEntriesByType('resource')
-        .filter(e => e.initiatorType === 'script' || /\\.js(\\?|$)/.test(e.name));
+        .filter(e => e.initiatorType === 'script' || /\\.js(\\?|$)/.test(e.name))
+        /* Yang MULAI sesudah halaman selesai dimuat adalah prefetch rute lain,
+           bukan biaya memuat halaman ini. */
+        .filter(e => e.startTime <= batas);
+
       const total = r.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
       return Math.round(total / 1024);
     })()`,
   );
+}
 
 /* ── jalan ────────────────────────────────────────────────────────────── */
 
