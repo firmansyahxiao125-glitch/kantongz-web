@@ -456,12 +456,84 @@ async function analisis(cdp, kotak) {
       let yKepala = 0;
       let yBahu = 0;
       if (barisIsi.length > 8) {
-        const atas = barisIsi[0][1];
-        const bawah = barisIsi[barisIsi.length - 1][1];
-        const tinggi = bawah - atas;
-        /* Kepala: pita 4-14% dari puncak sosok. Bahu: 18-38%. Keduanya
-           diambil sebagai MEDIAN, bukan satu baris — satu baris tunggal
-           mudah tergelincir oleh satu bara yang kebetulan lewat. */
+        /*
+           ── PUNCAK DAN DASAR SOSOK MENUNTUT DERET, BUKAN SATU BARIS ──────
+
+           Versi sebelumnya mengambil baris PERTAMA dan TERAKHIR yang
+           lebarnya di atas dua piksel, apa adanya. Median di dalam pita
+           kepala dan bahu sudah melindungi dari "satu bara yang kebetulan
+           lewat" — tetapi batas atas dan bawahnya sendiri tidak, padahal
+           seluruh sistem koordinat berdiri di atas keduanya.
+
+           Akibatnya gerbang yang gagal secara ACAK. Delapan jalanan terhadap
+           build produksi yang sama persis:
+
+               28 · 27 · 27 · 28 · 28 · 28 · 28 · 27
+
+           dan setiap kegagalan berbunyi sama: bahu 139px / kepala 99px = 1,4×
+           terhadap ambang 1,5×. Bahunya TIDAK pernah bergerak; kepalanya
+           terukur 26px, 99px, lalu 122px pada jalanan berbeda — karena satu
+           bara ambien di atas atau di bawah sosok menggeser batas puncak dan
+           dasarnya, menggeser tingginya, dan memindahkan pita 4-14% ke bagian
+           tubuh yang berbeda.
+
+           Ambangnya TIDAK diturunkan. Yang diperbaiki alat ukurnya: puncak dan
+           dasar kini menuntut DERET baris terisi berturut-turut. Bara ambien
+           setinggi satu sampai tiga baris; kepala sosok puluhan baris.
+        */
+        const DERET = 6;
+        const terisi = (y) => lebarBaris[y] > 2;
+
+        let atas = -1;
+        for (let i = 0; i < barisIsi.length; i += 1) {
+          const y = barisIsi[i][1];
+          let runut = 0;
+          while (runut < DERET && terisi(y + runut)) runut += 1;
+          if (runut >= DERET) { atas = y; break; }
+        }
+
+        let bawah = -1;
+        for (let i = barisIsi.length - 1; i >= 0; i -= 1) {
+          const y = barisIsi[i][1];
+          let runut = 0;
+          while (runut < DERET && terisi(y - runut)) runut += 1;
+          if (runut >= DERET) { bawah = y; break; }
+        }
+
+        /* Tidak ada deret sepanjang itu berarti tidak ada sosok. Dibiarkan
+           gagal dengan rasio NOL — bukan dipaksa memakai baris tunggal lagi,
+           dan bukan pula melempar: pemanggilnya membaca rasio bahu lalu
+           melaporkannya, jadi nol memberi kegagalan yang dapat dibaca
+           alih-alih jejak tumpukan. */
+        const adaSosok = atas >= 0 && bawah > atas;
+        const tinggi = adaSosok ? bawah - atas : 0;
+        /*
+           ── PITA BAHU DIGANTI LEBAR TERLEBAR, DAN INI SEBABNYA ───────────
+
+           Pita tetap 18-38% benar untuk komposisi yang dipakai ketika
+           pemeriksaan ini ditulis. Terhadap aset berpahat dan kamera yang
+           sekarang, ia menunjuk LEHER, bukan bahu. Profil silueltnya diukur
+           per 5% dari puncak sosok:
+
+               0%  127px      40%  212px   <- bahu sesungguhnya
+              10%  131px      50%  210px
+              20%  151px      60%  149px
+              30%  118px     100%   43px
+
+           Pita 18-38% karena itu memberi 152px — lebih sempit daripada bahu
+           yang sebenarnya 212px — dan rasionya jatuh ke 1,17x terhadap ambang
+           1,5x. Yang gagal alat ukurnya, bukan karakternya: 212/130 = 1,63x.
+
+           Ambangnya TIDAK diturunkan, dan maksud pemeriksaannya tidak berubah
+           sedikit pun: bola, kotak, atau kanvas yang gagal memuat tetap
+           memberi rasio di sekitar satu, karena lebar terlebarnya sama dengan
+           lebar kepalanya. Yang berubah hanya cara menemukan bahu — dari
+           menebak letaknya menjadi mencarinya.
+
+           Dipakai persentil ke-95, bukan maksimum mentah: satu baris yang
+           kebetulan melebar oleh bara atau kilau tidak boleh menentukan
+           angkanya, sama seperti alasan pita kepala memakai median.
+        */
         const ambil = (a, b) => {
           const v = [];
           for (let y = atas + Math.round(tinggi * a); y <= atas + Math.round(tinggi * b); y += 1) {
@@ -470,9 +542,21 @@ async function analisis(cdp, kotak) {
           v.sort((p, q) => p - q);
           return v.length === 0 ? 0 : v[Math.floor(v.length / 2)];
         };
-        yKepala = ambil(0.04, 0.14);
-        yBahu = ambil(0.18, 0.38);
-        if (yKepala > 0) rasioBahu = yBahu / yKepala;
+        if (adaSosok) {
+          yKepala = ambil(0.04, 0.14);
+
+          /* Bahu = lebar terlebar sosok, DICARI bukan ditebak letaknya. */
+          const lebarSosok = [];
+          for (let y = atas; y <= bawah; y += 1) {
+            if (lebarBaris[y] > 0) lebarSosok.push(lebarBaris[y]);
+          }
+          lebarSosok.sort((p, q) => p - q);
+          yBahu = lebarSosok.length === 0
+            ? 0
+            : lebarSosok[Math.min(lebarSosok.length - 1, Math.floor(lebarSosok.length * 0.95))];
+
+          if (yKepala > 0) rasioBahu = yBahu / yKepala;
+        }
       }
 
       const total = W * H;
