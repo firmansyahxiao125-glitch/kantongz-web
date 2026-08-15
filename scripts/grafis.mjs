@@ -475,6 +475,37 @@ await withChrome([], async (cdp) => {
   );
 });
 
+/* ── 2b. SAKLAR PENGGUNA: mati berarti benar-benar mati ────────────────
+   Deteksi perangkat menjawab "sanggupkah", dan tidak pernah dapat menjawab
+   "maukah". Saklar yang hanya menyembunyikan adegan tanpa membatalkan
+   unduhannya bukan saklar — ia tetap membakar baterai dan kuota yang justru
+   ingin dihemat orangnya. Jadi yang diperiksa NOL KANVAS, bukan nol piksel. */
+
+console.log('\n── saklar efek 3D ──');
+await withChrome([], async (cdp) => {
+  await viewport(cdp, 1440, 900, false);
+  await goto(cdp, BASE, 8000);
+  const sebelum = await evaluate(cdp, `document.querySelector('[data-tier]')?.getAttribute('data-tier')`);
+  ok('bawaan: tingkat penuh', sebelum === 'full', `(${String(sebelum)})`);
+
+  await evaluate(cdp, `localStorage.setItem('kantongz.efek3d','mati')`);
+  await goto(cdp, BASE, 8000);
+  const tier = await evaluate(cdp, `document.querySelector('[data-tier]')?.getAttribute('data-tier')`);
+  const kanvas = await evaluate(cdp, `document.querySelectorAll('[data-tier] canvas').length`);
+  const tombol = await evaluate(
+    cdp,
+    `document.querySelector('[data-tier] button')?.getAttribute('aria-label') ?? ''`,
+  );
+  ok('dimatikan: tingkat off', tier === 'off', `(${String(tier)})`);
+  ok('dimatikan: NOL kanvas WebGL', kanvas === 0, `(${String(kanvas)})`);
+  ok('dimatikan: tebasan tetap dapat ditekan', /Tebas/i.test(tombol), `("${String(tombol).slice(0, 26)}")`);
+
+  await evaluate(cdp, `localStorage.removeItem('kantongz.efek3d')`);
+  await goto(cdp, BASE, 8000);
+  const pulih = await evaluate(cdp, `document.querySelector('[data-tier]')?.getAttribute('data-tier')`);
+  ok('dikembalikan ke otomatis: penuh lagi', pulih === 'full', `(${String(pulih)})`);
+});
+
 /* ── 3. gerak dikurangi: nol kanvas, dan cadangan yang dirancang ──────── */
 
 console.log('\n── gerak dikurangi ──');

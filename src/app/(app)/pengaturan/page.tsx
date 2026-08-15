@@ -18,6 +18,7 @@ import { Field } from '@/components/ui/field';
 import { Select } from '@/components/ui/select';
 import { ErrorState, Skeleton } from '@/components/ui/state';
 import { isApiError } from '@/lib/api';
+import { tulis3D, usePreferensi3D } from '@/lib/gpu';
 import { messageFor } from '@/lib/contracts';
 import { keys, ledger } from '@/lib/ledger';
 import { CATEGORY_DEFAULT } from '@/lib/palette';
@@ -37,6 +38,10 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 export default function PengaturanPage() {
+  /* Dibaca lewat `useSyncExternalStore`: `localStorage` hidup di luar React,
+     dan menyalinnya masuk lewat efek menambah satu render pada tiap pemuatan. */
+  const efek3d = usePreferensi3D();
+
   const { choice, setChoice } = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -76,6 +81,58 @@ export default function PengaturanPage() {
                 >
                   <Icon size={16} aria-hidden />
                   {theme.label}
+                </button>
+              );
+            })}
+          </div>
+        </CardBody>
+      </Card>
+
+      {/*
+        ── EFEK 3D ────────────────────────────────────────────────────────
+
+        Deteksi perangkat menjawab "sanggupkah", dan tidak pernah dapat
+        menjawab "maukah". Keduanya sering berlawanan: mesin yang sanggup tetap
+        boleh dimiliki seseorang yang baterainya tinggal sedikit, tetheringnya
+        mahal, atau memang terganggu oleh gerak tanpa menyalakan
+        `prefers-reduced-motion` di tingkat sistem.
+
+        Berlaku SEKETIKA. Saklar yang baru bekerja pada kunjungan berikutnya
+        terbaca sebagai rusak.
+      */}
+      <Card>
+        <CardBody>
+          <CardTitle>Efek 3D</CardTitle>
+          <p className="mt-1 text-sm text-muted">
+            Adegan 3D di halaman muka. Mematikannya menghemat baterai dan data;
+            isinya tetap tampil sebagai gambar diam.
+          </p>
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Efek 3D">
+            {(
+              [
+                { nilai: 'otomatis' as const, label: 'Otomatis', ket: 'Ikuti kemampuan perangkat' },
+                { nilai: 'mati' as const, label: 'Mati', ket: 'Selalu pakai gambar diam' },
+              ]
+            ).map((o) => {
+              const aktif = efek3d === o.nilai;
+              return (
+                <button
+                  key={o.nilai}
+                  type="button"
+                  role="radio"
+                  aria-checked={aktif}
+                  onClick={() => {
+                    tulis3D(o.nilai);
+                  }}
+                  className={`flex flex-col items-start gap-0.5 rounded-xl border px-3.5 py-3 text-sm transition-colors ${
+                    aktif
+                      ? 'border-[var(--color-holo)] bg-[color-mix(in_oklab,var(--color-holo)_10%,transparent)] text-ink'
+                      : 'border-line text-muted hover:text-ink'
+                  }`}
+                >
+                  <span>{o.label}</span>
+                  <span className="text-xs text-dim">{o.ket}</span>
                 </button>
               );
             })}

@@ -67,12 +67,57 @@ interface NavigatorWithMemory extends Navigator {
   deviceMemory?: number;
 }
 
+/**
+ * Preferensi pengguna, dan mengapa ia berdiri TERPISAH dari deteksi.
+ *
+ * `detectTier` menjawab "sanggupkah perangkat ini". Ia tidak pernah dapat
+ * menjawab "maukah orangnya" — dan keduanya jawaban berbeda yang sering
+ * berlawanan. Mesin yang sanggup menjalankan adegan penuh tetap boleh dimiliki
+ * seseorang yang tidak menginginkannya: baterai tinggal sedikit, tethering
+ * mahal, atau gerak di layar memang mengganggunya tanpa ia menyalakan
+ * `prefers-reduced-motion` di tingkat sistem.
+ *
+ * Disimpan di `localStorage` dan bukan di server: ia sifat PERANGKAT, bukan
+ * sifat akun. Orang yang mematikannya di ponsel tua belum tentu ingin
+ * mematikannya di desktopnya.
+ */
+export type Preferensi3D = 'otomatis' | 'mati';
+
+const KUNCI_PREF = 'kantongz.efek3d';
+
+export function baca3D(): Preferensi3D {
+  if (typeof window === 'undefined') return 'otomatis';
+  try {
+    return window.localStorage.getItem(KUNCI_PREF) === 'mati' ? 'mati' : 'otomatis';
+  } catch {
+    /* Mode privat sebagian peramban melempar pada localStorage. Jatuh ke
+       bawaan lebih baik daripada halaman yang gagal dirender. */
+    return 'otomatis';
+  }
+}
+
+const pendengar = new Set<() => void>();
+
+export function tulis3D(nilai: Preferensi3D): void {
+  try {
+    window.localStorage.setItem(KUNCI_PREF, nilai);
+  } catch {
+    /* Diabaikan dengan sengaja: preferensi yang gagal disimpan tetap harus
+       berlaku untuk sesi ini. */
+  }
+  pendengar.forEach((f) => { f(); });
+}
+
 export function detectTier(): GraphicsTier {
   if (typeof window === 'undefined') return 'off';
 
   /* Permintaan pengguna menang atas kemampuan perangkat. Seseorang yang
      meminta gerak dikurangi tidak sedang meminta gerak yang lebih halus. */
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'off';
+
+  /* Saklar eksplisit menang atas segalanya, termasuk atas perangkat yang
+     sanggup. Preferensi yang dapat dikalahkan deteksi bukan preferensi. */
+  if (baca3D() === 'mati') return 'off';
 
   if (!webglWorks()) return 'off';
 
@@ -104,8 +149,14 @@ export function detectTier(): GraphicsTier {
 function subscribe(onChange: () => void): () => void {
   const media = window.matchMedia('(prefers-reduced-motion: reduce)');
   media.addEventListener('change', onChange);
+  /* Saklar di halaman Pengaturan harus berlaku SEKETIKA, tanpa muat ulang.
+     Tanpa langganan ini, mematikannya hanya berlaku pada kunjungan
+     berikutnya — dan saklar yang tidak melakukan apa-apa ketika ditekan
+     terbaca sebagai rusak. */
+  pendengar.add(onChange);
   return () => {
     media.removeEventListener('change', onChange);
+    pendengar.delete(onChange);
   };
 }
 
@@ -124,4 +175,20 @@ function subscribe(onChange: () => void): () => void {
  */
 export function useGraphicsTier(): GraphicsTier {
   return useSyncExternalStore(subscribe, detectTier, () => 'off' as const);
+}
+
+/**
+ * Preferensi 3D sebagai hook, memakai mesin langganan yang sama.
+ *
+ * Bukan `useState` + `useEffect`. Keduanya akan membaca `localStorage` di
+ * dalam efek lalu memanggil `setState` seketika — satu render tambahan pada
+ * setiap pemuatan, dan pola yang lint repositori ini tolak dengan benar
+ * ("cascading renders").
+ *
+ * `localStorage` adalah keadaan yang hidup DI LUAR React, persis kasus yang
+ * `useSyncExternalStore` dibuat untuk menanganinya. Cuplikan peladen selalu
+ * `'otomatis'` supaya hidrasinya cocok.
+ */
+export function usePreferensi3D(): Preferensi3D {
+  return useSyncExternalStore(subscribe, baca3D, () => 'otomatis' as const);
 }

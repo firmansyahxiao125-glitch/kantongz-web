@@ -129,7 +129,7 @@ Dua pertanyaan berbeda memang berhak atas dua bentuk berbeda.
 
 Mengarang perubahan per halaman agar item ini terlihat dikerjakan akan
 menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
-| V5 | todo | — | — | layar sambutan mobile: luapan mendatar ke NOL + max-width |
+| V5 | selesai | b113caf | akses 489/489 | luapan mendatar dijaga di 17 halaman x 2 lebar, bukan diperiksa sekali |
 | V6 | selesai | ini | dokumen saja — tidak ada gerbang yang tersentuh | ROADMAP §7.1 di repo `kantongz`; §7 utuh, tidak dihapus |
 
 > Halaman pertama yang selesai adalah **titik henti manusia Y5 #1** — ia
@@ -154,7 +154,8 @@ menambah risiko tanpa menambah nilai. Yang dikerjakan adalah pemeriksaannya.
 | T3 | selesai | 58d58bd, 5aac5ec | ronin 27/27 · palet bersih | fresnel dijepit + pangkat 5; bara, cincin kontak, torii |
 | T4 | selesai | 5aac5ec | ronin 27/27 · akses 455/455 | tetikus, gulir, Enter/Spasi/sentuh; Escape menutup |
 | T5 | selesai | 4b48f3d | ronin 27/27 | tebasan membuka angka contoh, diumumkan `aria-live`, DISEBUT contoh |
-| T6 | todo | — | — | 3D dalam aplikasi: kecil, dapat dimatikan |
+| T6a | selesai | ini | grafis 19/19 · akses 489 | saklar "Efek 3D" di Pengaturan — mati berarti NOL kanvas |
+| T6b | todo | — | — | elemen 3D kecil DI DALAM aplikasi (lihat catatan) |
 | R1 | selesai | 58d58bd | palet + kontras hijau | token Ronin jadi ungu `#a855ff` |
 | R2–R6 | selesai | 5aac5ec | ronin 27 · akses 455 · grafis 13 · palet bersih | sode berlapis, kusazuri, maedate, menpō, hakama, jubah, daishō, katana melengkung, cincin kontak, torii, kamera 7,4→5,9 |
 | T7 | selesai | ini | grafis 13/13 · akses 455/455 · interior hijau · alur hijau · typography 15/0 · render 39/0 · contrast hijau · palette hijau · 63 uji · build 0 | dibangun SEBELUM samurainya, sama seperti E1 sebelum desain ulang |
@@ -235,6 +236,34 @@ tadinya gelap tidak hilang, ia hanya tertimbun.
 
 Bukti merah-sebelum-hijau dijalankan pada model terbaru, bukan diwarisi.
 `ronin` kembali 27/27.
+
+### T6a — saklar efek 3D, dan mengapa ia berdiri terpisah dari deteksi
+
+`detectTier` menjawab "sanggupkah perangkat ini". Ia tidak pernah dapat
+menjawab "maukah orangnya" — dan keduanya sering berlawanan: mesin yang
+sanggup tetap boleh dimiliki seseorang yang baterainya tinggal sedikit,
+tetheringnya mahal, atau terganggu oleh gerak tanpa menyalakan
+`prefers-reduced-motion` di tingkat sistem.
+
+Disimpan di `localStorage`, bukan di server: ia sifat PERANGKAT, bukan sifat
+akun. Yang mematikannya di ponsel tua belum tentu mau mematikannya di desktop.
+
+Dibaca lewat `useSyncExternalStore`, bukan `useState` + `useEffect`. Yang
+kedua membaca `localStorage` di dalam efek lalu memanggil `setState` seketika
+— satu render tambahan tiap pemuatan, dan pola yang lint repositori ini tolak
+dengan benar. `localStorage` memang keadaan yang hidup DI LUAR React.
+
+Gerbangnya memeriksa NOL KANVAS, bukan nol piksel: saklar yang hanya
+menyembunyikan adegan tanpa membatalkan unduhannya bukan saklar — ia tetap
+membakar baterai dan kuota yang justru ingin dihemat. Terbukti penuh -> off ->
+0 kanvas -> cadangan tetap tergambar dan dapat ditekan -> kembali penuh.
+
+**T6b belum dikerjakan, dan alasannya diukur.** Halaman aplikasi saat ini
+tidak memuat three.js sama sekali. Menaruh 3D di dalamnya berarti setiap
+pembukaan dasbor membayar bundel itu, pada permukaan yang ROADMAP §7.1
+tetapkan tenang dan terang-hangat. Ia akan dikerjakan sebagai aksen KECIL yang
+dimuat malas dan hanya pada tingkat `full`, dengan T9 membuktikan angka dan
+tata letak finansialnya tidak bergeser sedikit pun antara 3D nyala dan mati.
 
 ### R15 — sumber model diganti aset berpahat, dengan pipeline produksi
 
