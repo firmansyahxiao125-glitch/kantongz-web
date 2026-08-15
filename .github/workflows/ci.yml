@@ -111,7 +111,24 @@ jobs:
       # Menyalakannya dua kali menggandakan waktu boot dan menambah satu titik
       # gagal yang tidak menguji apa pun. `set -e` membuat kegagalan gerbang
       # mana pun langsung memerahkan langkah ini.
-      - name: Gerbang peramban (tipografi + keluaran terender)
+      #
+      # ── LIMA GERBANG, SATU PELADEN ─────────────────────────────────────
+      #
+      # `grafis`, `ronin`, dan `pwa` DITAMBAHKAN sesudah ketiganya terbukti
+      # hijau terhadap peladen standalone ini persis — bukan terhadap
+      # `next start` maupun `next dev`.
+      #
+      # Ketiganya mengukur KELUARAN TERKIRIM: anggaran JavaScript, anggaran
+      # aset 3D, dan perilaku service worker. Menjalankannya hanya di laptop
+      # berarti anggaran yang dikalibrasi dengan susah payah tidak menjaga apa
+      # pun di tempat kode benar-benar digabungkan.
+      #
+      # `scripts/permukaan.mjs` menolak peladen pengembangan di ketiganya,
+      # jadi langkah ini tidak dapat diam-diam mengukur hal yang salah — cacat
+      # yang sempat menyembunyikan tiga "kegagalan" palsu selama satu sesi
+      # penuh, dan yang di mesin pengembang disebabkan satu proses `next dev`
+      # basi yang masih memegang porta 3100.
+      - name: Gerbang peramban (5 gerbang, satu peladen standalone)
         run: |
           set -e
           cp -r .next/static .next/standalone/.next/static
@@ -119,6 +136,9 @@ jobs:
           PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
           node scripts/typography.mjs --base http://localhost:3100
           node scripts/render.mjs --base http://localhost:3100
+          node scripts/grafis.mjs --base http://localhost:3100
+          node scripts/ronin.mjs --base http://localhost:3100
+          node scripts/pwa.mjs --base http://localhost:3100
 
   security:
     runs-on: ubuntu-latest

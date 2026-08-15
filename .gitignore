@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Perkakas Claude Code milik masing-masing orang, bukan konfigurasi proyek.
+# Skill yang terpasang lokal ikut ter-commit lewat `git add -A` dan menambah
+# tiga puluh satu berkas yang tidak ada hubungannya dengan KANTONGZ.
+.claude/
